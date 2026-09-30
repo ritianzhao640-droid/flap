@@ -1,4 +1,4 @@
-# xiao17 工坊 · 对外静态站（代币发布 ＋ 税收金库）
+# 202工坊 · 对外静态站（代币发布 ＋ 税收金库）
 
 这是一个**纯静态**的网页站：没有账号系统、没有服务端、没有数据库、**没有构建步骤**。
 浏览器直接打开 `index.html` 就能看，访问者的钱包自己连区块链、自己签名。
@@ -44,7 +44,7 @@
 生成这一刻现算，你可以自己核一遍（Linux／macOS `shasum -a 256 文件名`；
 Windows PowerShell `Get-FileHash 文件名 -Algorithm SHA256`）：
 
-    index.html    sha256 = 620995D33DBBD8D6D700E1B74D01096C568A2D5A6A62B8FCC81C2A014C629473     3566 字节
+    index.html    sha256 = 2527A0FAD0DC4DDE09153581FA9B3EA182460FB81FF6935D0F9A78881EF7047F     3558 字节
     publish.html  sha256 = 11BAF51F0FC43C853E3E83A03DCCAB6197CBE6E3C5009FA46EF042B2153DA22A     149118 字节
     vault.html    sha256 = 5F9C35353A8E1FEEF8F7A7B80D789B3DB8DA376C54EA3FC0CB73F8806BA65DBC     91040 字节
 
