@@ -1,0 +1,3040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P013 · 一键发布（从这里发币 → 走我们的工厂）</title>
+
+<style>
+
+:root{
+ --ink:#111214; --paper:#FAFAF8; --sunk:#EFEFEC;
+ --ink2:#3C4046; --ink3:#676C73;
+ --rule:#111214; --edge:#111214;
+ --ok:#1E6B3C; --warn:#7A5000; --danger:#A32318;
+ --s4:4px;
+ --s8:8px;
+ --s12:12px;
+ --s16:16px;
+ --s24:24px;
+ --s32:32px;
+ --s44:44px;
+ --s48:48px;
+ --s64:64px;
+ --r:6px; --r2:10px; --rr:999px;
+ --f12:12px; 
+ --f14:14px; 
+ --f16:16px; 
+ --f20:20px; 
+ --f38:38px; 
+ --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+ background:var(--paper); color:var(--ink);
+ font:var(--f16)/1.7 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+ letter-spacing:normal; -webkit-text-size-adjust:100%;
+ padding:var(--s24) var(--s16) var(--s64);
+}
+.wrap{max-width:920px;margin:0 auto}
+h1,h2,h3{line-height:1.35;margin:0}
+h1{font-size:var(--f38)}
+h2{font-size:var(--f20);margin-bottom:var(--s4)}
+h3{font-size:var(--f16)}
+p{margin:var(--s8) 0}
+a{color:var(--ink);text-decoration:underline}
+a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.muted{color:var(--ink2)} .soft{color:var(--ink2)} .small{font-size:var(--f12)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.break{word-break:break-all}
+
+
+.topbar{background:var(--ink);color:var(--paper);border-radius:var(--r);
+ padding:var(--s12) var(--s16);display:flex;justify-content:space-between;align-items:center;gap:var(--s12);flex-wrap:wrap}
+.topbar .tname{font-size:var(--f16);font-weight:700}
+.topbar .tsub{font-size:var(--f12);color:var(--paper);opacity:1}
+.topbar .tbal{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:var(--f20);font-weight:700;text-align:right}
+.topbar .tbal i{font-style:normal;font-size:var(--f12);color:var(--paper);font-weight:400;margin-left:var(--s4)}
+
+
+.card{background:var(--paper);border:1px solid var(--edge);border-radius:var(--r);
+ padding:var(--s16);margin-top:var(--s16)}
+.card.gold,.card.sunk{background:var(--sunk)}
+.cardHead,.blkHead{font-size:var(--f12);letter-spacing:.06em;color:var(--ink3);
+ font-weight:700;margin-bottom:var(--s8)}
+.big{font-size:var(--f20);font-weight:700;margin:0 0 var(--s12)}
+.row{display:flex;gap:var(--s12);align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.pill{display:inline-flex;align-items:center;gap:var(--s8);border:1px solid var(--edge);
+ background:var(--paper);border-radius:var(--rr);padding:var(--s4) var(--s12);
+ font-size:var(--f12);color:var(--ink2);font-weight:600}
+.badge{font-size:var(--f12);font-weight:700;border-radius:var(--rr);
+ padding:var(--s4) var(--s12);border:1px solid var(--edge);color:var(--ink2)}
+.badge.ok{color:var(--ok);border-color:var(--ok)}
+.badge.bad,.badge.danger{color:var(--danger);border-color:var(--danger)}
+.badge.warn{color:var(--warn);border-color:var(--warn)}
+
+
+.seg{display:flex;gap:var(--s8);margin:var(--s16) 0;flex-wrap:wrap}
+.seg button{flex:1;min-width:104px;text-align:center;border-radius:var(--r);
+ border:1px solid var(--edge);background:var(--paper);color:var(--ink);
+ font-size:var(--f14);font-weight:700}
+.seg button.on,.seg button.primary{background:var(--ink);color:var(--paper)}
+
+
+button{font:inherit;font-weight:600;cursor:pointer;min-height:var(--s44);
+ padding:var(--s12) var(--s16);border-radius:var(--r);
+ border:1px solid var(--edge);background:var(--paper);color:var(--ink);
+ transition:transform 100ms cubic-bezier(.2,.8,.2,1),opacity 150ms ease-out}button:hover:not(:disabled){transform:translateY(-1px)}
+button:active:not(:disabled){transform:scale(.97)}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+button:disabled{cursor:not-allowed;color:var(--ink3);border:1px dashed var(--edge);background:var(--sunk)}
+button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.primary:disabled{background:var(--sunk);color:var(--ink3);border:1px dashed var(--edge)}
+button.ghost{background:var(--paper);color:var(--ink)}
+button.wide{width:100%;font-size:var(--f16);min-height:var(--s48)}
+
+
+.kv{display:flex;gap:var(--s12);justify-content:space-between;padding:var(--s8) 0;
+ border-bottom:1px dashed var(--sunk);font-size:var(--f14)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--ink2);font-size:var(--f12)}
+.kv .v{text-align:right}
+table{width:100%;border-collapse:collapse;font-size:var(--f14)}
+th,td{text-align:left;padding:var(--s8) var(--s4);border-bottom:1px dashed var(--sunk);vertical-align:top}
+th{color:var(--ink3);font-weight:700;font-size:var(--f12)}
+tr:last-child td{border-bottom:0}
+.bar{height:4px;background:var(--sunk);border-radius:var(--r);margin:0 0 var(--s8)}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:var(--r)}
+
+
+.alert{border-radius:var(--r);padding:var(--s12);margin-top:var(--s12);
+ border:1px solid var(--edge);font-size:var(--f14);background:var(--paper);color:var(--ink)}
+.alert.ok{background:var(--sunk);color:var(--ink)}
+.alert.warn{background:var(--sunk);color:var(--ink);border-left:var(--s4) solid var(--warn)}
+.alert.danger{background:var(--sunk);color:var(--ink);border-left:var(--s4) solid var(--danger)}
+.alert.info{background:var(--paper);color:var(--ink)}
+
+
+.grid2{display:grid;gap:var(--s12);grid-template-columns:1fr}
+.grid3{display:grid;gap:var(--s12);grid-template-columns:1fr}
+@media (min-width:768px){
+ .grid2{grid-template-columns:1fr 1fr}
+ .grid3{grid-template-columns:1fr 1fr 1fr}
+}
+.fl{display:block;margin:var(--s8) 0}
+.lb{display:block;font-size:var(--f12);color:var(--ink3);font-weight:700;margin-bottom:var(--s4)}
+.hint{display:block;font-size:var(--f12);color:var(--ink3);margin-bottom:var(--s4)}
+input,select,textarea{font:inherit;width:100%;min-height:var(--s44);padding:var(--s8) var(--s12);
+ border:1px solid var(--edge);border-radius:var(--r);background:var(--paper);color:var(--ink)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+input:disabled,select:disabled{color:var(--ink3);background:var(--sunk);border:1px dashed var(--edge);cursor:not-allowed}
+input[type=checkbox]{width:var(--s20);height:var(--s20);min-height:0;accent-color:var(--ink)}
+hr{border:0;border-top:1px solid var(--sunk);margin:var(--s16) 0}
+pre{background:var(--sunk);border:1px solid var(--edge);border-radius:var(--r);
+ padding:var(--s12);overflow:auto;font-size:var(--f12);margin:var(--s8) 0 0;white-space:pre-wrap}
+details{margin-top:var(--s12)}
+summary{cursor:pointer;color:var(--ink);font-size:var(--f14);font-weight:700}
+summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+ul{padding-left:var(--s24)}
+.sum{border-top:2px solid var(--ink);padding-top:var(--s12);margin-top:var(--s12)}
+
+
+.qlist{max-height:calc(var(--s64) * 5);overflow:auto;border:1px solid var(--edge);border-radius:var(--r);
+ background:var(--paper);margin-top:var(--s8)}
+.qgroup{font-size:var(--f12);color:var(--ink3);font-weight:700;padding:var(--s8) var(--s12) var(--s4);background:var(--sunk)}
+.qitem{display:block;width:100%;text-align:left;min-height:var(--s44);border:1px solid var(--edge);border-top:0;
+ border-radius:var(--r);background:var(--paper);color:var(--ink);font-weight:400;
+ padding:var(--s8) var(--s12);font-family:var(--mono);cursor:pointer}
+.qitem:hover{background:var(--sunk);transform:none}
+.qitem:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.qitem.sel{background:var(--ink);color:var(--paper);font-weight:700}
+.qitem .qs{font-weight:700;color:var(--ink)}
+.qitem.sel .qs{color:var(--paper)}
+.qitem .qd{font-size:var(--f12);color:var(--ink2)}
+.qitem.sel .qd{color:var(--paper)}
+
+.qaddr{border:1px solid var(--edge);border-left:var(--s4) solid var(--ink);border-radius:var(--r);
+ background:var(--sunk);padding:var(--s12);margin-top:var(--s8)}
+.qaddr .fl{margin:0}
+.qaddr .muted{margin-top:var(--s4)}
+.toast{position:fixed;left:var(--s16);right:var(--s16);bottom:var(--s16);max-width:920px;margin:0 auto;z-index:9;
+ border:1px solid var(--edge);border-left:var(--s4) solid var(--warn);color:var(--ink);
+ background:var(--sunk);border-radius:var(--r);padding:var(--s12);font-size:var(--f14)}
+
+.cropArea{position:relative;width:320px;height:320px;max-width:100%;overflow:hidden;touch-action:none;
+ cursor:grab;background:var(--ink);border:1px solid var(--edge);border-radius:var(--r);outline:none;flex:0 0 auto}
+.cropArea:active{cursor:grabbing}
+.cropArea:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.cropImg{position:absolute;transform:translate(-50%,-50%);max-width:none;pointer-events:none;
+ user-select:none;-webkit-user-drag:none}
+.cropGrid{position:absolute;inset:0;pointer-events:none}
+.cropGrid span{position:absolute;background:var(--paper)}
+.cropGrid .gv{top:0;bottom:0;width:1px}
+.cropGrid .gh{left:0;right:0;height:1px}
+.cropGrid .g1{left:33.333%} .cropGrid .g2{left:66.666%}
+.cropGrid .g3{top:33.333%} .cropGrid .g4{top:66.666%}
+.cropGrid .hc{width:var(--s16);height:var(--s16);background:none;border:1px solid var(--paper)}
+.cropGrid .hc1{left:var(--s8);top:var(--s8);border-right:0;border-bottom:0}
+.cropGrid .hc2{right:var(--s8);top:var(--s8);border-left:0;border-bottom:0}
+.cropGrid .hc3{left:var(--s8);bottom:var(--s8);border-right:0;border-top:0}
+.cropGrid .hc4{right:var(--s8);bottom:var(--s8);border-left:0;border-top:0}
+.cropWrap{display:flex;gap:var(--s16);align-items:flex-start;flex-wrap:wrap;margin-top:var(--s8)}
+.cropSlider{display:flex;align-items:center;gap:var(--s12);margin-top:var(--s12)}
+.cropSlider input[type=range]{flex:1;min-height:var(--s20);padding:0;border:0;accent-color:var(--ink);background:var(--paper)}
+.cropMeta{font-size:var(--f12);color:var(--ink3)}
+
+.blk{background:var(--ink);color:var(--paper);border-radius:var(--r);
+ padding:var(--s16);margin-top:var(--s16)}
+.blk .blkHead{color:var(--paper)}
+.blk p{font-size:var(--f14)}
+.blk .act{background:var(--paper);color:var(--ink);border:1px solid var(--paper);
+ font-size:var(--f16);font-weight:700;width:100%;padding:var(--s16);min-height:var(--s48)}
+.blk .act:active{transform:scale(.97)}
+.blk .act:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.blk .act:disabled{background:var(--ink);color:var(--ink3);border:1px dashed var(--paper);cursor:not-allowed}
+.blk .wbtn{background:var(--paper);color:var(--ink);border:1px solid var(--paper);
+ border-radius:var(--r);font-size:var(--f14)}
+.blk .wbtn:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.blk .big{color:var(--paper);font-size:var(--f38)}
+.blk.risk{border-left:6px solid var(--danger)}
+.blk.risk .blkHead{text-decoration:underline;color:var(--paper)}
+
+.blk.main{padding:var(--s24)}
+@media (max-width:767px){
+ .blk.risk{position:sticky;top:0;z-index:20}
+}
+
+@media (max-width:420px){
+ body{padding-left:var(--s12);padding-right:var(--s12)}
+ .grid2,.grid3{grid-template-columns:1fr}
+ .row > *{min-width:0}
+ button{white-space:normal}
+ .seg button{flex:1 1 45%;min-width:0}
+ .tbal,.tname{word-break:break-all}
+ .qitem,.qitem .qs,.qitem .qd{word-break:break-all;white-space:normal}
+ .qaddr .v,.kv .v{word-break:break-all}
+ .cropArea{width:auto;height:auto;aspect-ratio:1 / 1;align-self:stretch}
+ .cropWrap{flex-direction:column;align-items:stretch}
+ .cropSlider{flex-wrap:wrap}
+ .blk.main,.blk.risk{padding:var(--s16)}
+ pre{overflow-x:auto}
+}
+@media (prefers-reduced-motion: reduce){
+ *,*::before,*::after{transition-duration:1ms !important;animation-duration:1ms !important;animation-iteration-count:1 !important}
+}
+svg.ic{width:var(--s20);height:var(--s20);flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+svg.ic.i16{width:var(--s16);height:var(--s16)}
+svg.ic.i20{width:var(--s20);height:var(--s20)}
+svg.ic.i24{width:var(--s24);height:var(--s24)}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol><symbol id="ic-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3l9-16z"/><path d="M12 10v4"/><path d="M12 17h.01"/></symbol><symbol id="ic-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol><symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol><symbol id="ic-wallet" viewBox="0 0 24 24"><path d="M3 7h14a4 4 0 014 4v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7V6a2 2 0 012-2h11"/><path d="M17 13h.01"/></symbol><symbol id="ic-rocket" viewBox="0 0 24 24"><path d="M5 15l-1 5 5-1"/><path d="M9 19l-4-4"/><path d="M14 4c3 0 6 3 6 6 0 5-6 9-6 9l-3-3s4-6 9-6"/></symbol><symbol id="ic-up" viewBox="0 0 24 24"><path d="M12 20V5"/><path d="M5 12l7-7 7 7"/></symbol><symbol id="ic-down" viewBox="0 0 24 24"><path d="M12 4v15"/><path d="M19 12l-7 7-7-7"/></symbol></svg>
+<div class="wrap">
+ 
+ <div class="card" id="walletGuide" hidden>
+ <div class="cardHead">手机上打开本页</div>
+ <div class="alert warn" id="walletGuideText">手机上请用你钱包 App 里的浏览器打开本页（MetaMask／OKX／Bitget 等 App 里的『浏览器/DApp』入口）</div>
+ <div class="kv"><span class="k">当前网址（复制它，粘进钱包 App 的浏览器）</span><span class="v mono break" id="walletGuideUrl">—</span></div>
+ </div>
+
+ <div class="topbar">
+ <div>
+ <div class="tname">一键发布</div>
+ <div class="tsub">从这里发币 → 走我们的工厂</div>
+ </div>
+ <div>
+ <div class="tbal"><span id="tbQuote">—</span><i id="tbQuoteUnit"></i></div>
+ <div class="tsub" style="text-align:right">报价币余额（本次要花掉的那种）</div>
+ </div>
+ </div>
+
+ <div class="row between" style="margin-top:10px">
+ <span class="pill" id="verPill">版本…</span>
+ <span class="pill" id="chainPill">链号…</span>
+ </div>
+
+ <div class="card">
+ <div class="cardHead">先看清这三件事</div>
+ <div class="alert warn"><b>① 登记册：</b>本页所接的**工厂不在 Flap 官方登记册**里 —— 官方界面会把这类工厂标成 <b>UNOFFICIAL／UNVERIFIED</b>。</div>
+ <div class="alert warn"><b>② 协议佣金：</b>金库说明里那句 —— <b>税率 ≤ 1% 时收 6% 的税收；税率更高时按「税收 × 6 ÷ 税率」收</b>。</div>
+ <div class="alert info"><b>③ 四路是什么、钱怎么分：</b><div id="routeTable"></div></div>
+ </div>
+
+ <div class="card">
+ <div class="row between" style="align-items:center">
+ <div class="cardHead" style="margin:0">第 1 步 · 选一台工厂</div>
+ <span class="badge" id="pickState">未选</span>
+ </div>
+ <p class="muted small" style="margin:6px 0 0">点一台（选中之后页面会自己去链上核对它）。</p>
+ <div id="facList" style="margin-top:8px"></div>
+ <div id="pickMsg"></div>
+ </div>
+
+ <div class="card" id="stepPickMain">
+ <div class="cardHead">当前要你做的一件事</div>
+ <p class="big" id="pickBig">选一台工厂</p>
+ <p id="pickWhy">**不从我们的工厂 ＋ 我们的页发出去的币，佣金不进发行方的地址** —— 所以第一步先认工厂。</p>
+ </div>
+
+ <div class="card" id="extRisk">
+ <div class="cardHead">⛔ 风险</div>
+ <p id="extRiskText">发出去的币<b>上链不可逆</b>：四路份额、税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。</p>
+ </div>
+
+ <div class="card" id="stepPublish" hidden>
+ <div class="row between" style="align-items:center">
+ <div class="cardHead" style="margin:0">第 2 步 · 发币</div>
+ <span class="badge" id="pubState">待签名</span>
+ </div>
+ <p class="muted small" id="pubWhich" style="margin:6px 0"></p>
+ <div id="pubCheck"></div>
+
+ <div class="cardHead" style="margin-top:12px">币本身</div>
+ <div class="grid2">
+ <label class="fl"><span class="lb">☆ 币名 / Token name</span><input type="text" id="pf_name" value="四路人生" /></label>
+ <label class="fl"><span class="lb">☆ 币代号 / Symbol</span><input type="text" id="pf_symbol" value="SILU" /></label>
+ </div>
+ 
+ <div class="cardHead" style="margin-top:12px">上传头像（官方上传口 ＋ 官方那套裁切缩放）</div>
+ <p class="muted small" style="margin:4px 0 0">挑一张图 ⇒ 在下面那个 <b>320 × 320</b> 的方框里拖一拖、用滑杆缩放
+ （方向键一下微调 8px）⇒ 点「就用这张」裁成 <b>512 × 512</b> ⇒ 点「上传到官方存储」。
+ ⛔ 这一步**不在发币那两笔里**：只有你点它才会发一次网络请求。</p>
+ <div class="row" style="margin-top:8px">
+ <button class="ghost" id="btnIconPick"><svg class="ic i16" aria-hidden="true"><use href="#ic-up"/></svg>选择图片</button>
+ <span class="badge" id="uploadStateOut">还没上传、也没手填</span>
+ </div>
+ <input type="file" id="iconFile" accept="image/*" style="margin-top:8px" />
+ <label class="fl"><span class="lb">介绍 / Description（可选，跟着图一起写进元数据）</span>
+ <input type="text" id="pf_desc" value="" placeholder="一句话就行" /></label>
+ <div class="grid3">
+ <label class="fl"><span class="lb">官网 / Website</span><input type="text" id="pf_web" placeholder="可留空" /></label>
+ <label class="fl"><span class="lb">推特 / X</span><input type="text" id="pf_x" placeholder="可留空" /></label>
+ <label class="fl"><span class="lb">电报 / Telegram</span><input type="text" id="pf_tg" placeholder="可留空" /></label>
+ </div>
+ <div class="cropWrap" id="cropBox" hidden>
+ <div class="cropArea" id="cropArea" role="application" tabindex="0" aria-label="裁切区域（拖一拖，方向键微调 8 像素）">
+ <img class="cropImg" id="cropImg" alt="" draggable="false" />
+ <div class="cropGrid" aria-hidden="true"><span class="gv g1"></span><span class="gv g2"></span><span class="gh g3"></span><span class="gh g4"></span><span class="hc hc1"></span><span class="hc hc2"></span><span class="hc hc3"></span><span class="hc hc4"></span></div>
+ </div>
+ <div>
+ <div class="cropMeta">当前这张：<span id="cropNameOut">还没挑图</span></div>
+ <div class="kv"><span class="k">裁切几何（从原图哪里取多大一块）</span><span class="v mono break" id="cropGeoOut">—</span></div>
+ <div class="kv"><span class="k">出图尺寸</span><span class="v mono" id="cropSizeOut">512 × 512</span></div>
+ <div class="cropSlider">
+ <span class="lb" style="margin:0">缩放</span>
+ <input type="range" id="cropZoom" min="1" max="3" step="0.05" value="1" aria-label="缩放" />
+ <span class="mono" id="cropZoomOut">1.0x</span>
+ </div>
+ <div class="row" style="margin-top:8px">
+ <button class="ghost" id="btnCropAnother">换一张</button>
+ <button class="ghost" id="btnCropReset">重置</button>
+ <button class="ghost" id="btnCropCancel">取消</button>
+ </div>
+ </div>
+ </div>
+ <div class="row" style="margin-top:8px">
+ <button class="ghost" id="btnCropConfirm">就用这张（裁好 512 × 512）</button>
+ <button class="ghost" id="btnUpload">上传到官方存储</button>
+ <button class="ghost" id="btnManual">手填地址</button>
+ </div>
+ <div id="cropOut"></div>
+ <div id="uploadMsg"></div>
+ <label class="fl"><span class="lb">☆ 图标与介绍（元数据地址）/ Meta</span>
+ <span class="hint">官方上传口给你的那串（<span class="mono">bafk…</span> 开头），或者你自己的 IPFS / HTTPS 地址。★ 你手改这一格 ⇒ 来源算「手填」</span>
+ <input type="text" id="pf_meta" value="" placeholder="bafk… 或 https://…" /></label>
+ <div class="kv" style="margin-top:8px"><span class="k">将要写进链上的元数据（来源）</span><span class="v mono break" id="metaSourceOut">（这一格还是空的）</span></div>
+
+ <div class="cardHead" style="margin-top:12px">报价币（官方清单里的可选列表）</div>
+ <div id="quoteListMsg"></div>
+ <div class="row between" style="margin-top:8px">
+ <span class="muted small">推荐代币（官方清单，点一条即选中）</span>
+ <span class="muted small" id="quoteCount">—</span>
+ </div>
+ 
+ <div class="qaddr" id="quoteAddrBox">
+ <label class="fl"><span class="lb">☆ 报价币合约地址 / Quote token address</span>
+ <span class="hint">点<b>下面列表</b>里任一条 ⇒ 合约地址**自动填进这一格**；也可以直接手贴／手改（40 位）。<b>发币那一笔用的就是这一格里的地址</b>；<b>不能用 BNB</b>（本模版暂不支持原生币作底池）</span>
+ <input type="text" class="mono" id="pf_quote" value="" placeholder="0x…（40 位）" /></label>
+ <div class="muted small" id="quoteAddrNote">这一格就是发币那一笔真正用的报价币地址 —— ⛔ 本页没有第二个报价币地址。</div>
+ </div>
+ <div id="quotePresetBox">
+ <label class="fl"><span class="lb">搜索代币符号或 CA</span>
+ <span class="hint">按<b>符号</b>（例 <span class="mono">XAUT</span>）或<b>合约地址</b>搜；点一个即选中（它的合约地址就填进上面那一格）。</span>
+ <input type="text" class="mono" id="pf_quoteSearch" value="" placeholder="搜索代币符号或 CA" /></label>
+ <div id="quoteListBox" class="qlist"></div>
+ </div>
+ <div class="kv" style="margin-top:8px"><span class="k">选中的报价币（符号 / 名称 / 小数位 / 合约地址）</span><span class="v mono break" id="quoteSelOut">—</span></div>
+ <div class="grid2" style="margin-top:12px">
+ <label class="fl"><span class="lb">买入税 / Buy tax（bps）</span><span class="hint">上限 1000</span>
+ <input type="number" id="pf_buyTax" value="300" min="0" max="1000" /></label>
+ <label class="fl"><span class="lb">卖出税 / Sell tax（bps）</span><span class="hint">上限 1000；买卖不能都为 0</span>
+ <input type="number" id="pf_sellTax" value="300" min="0" max="1000" /></label>
+ </div>
+
+ <div class="cardHead" style="margin-top:12px">初始买入（创建者代币购买（可选）· 有官方上限）</div>
+ <div class="row between" style="margin-top:8px">
+ <span class="soft small" id="buyUnitLabel">购买数量（报价币）</span>
+ <span class="row">
+ <button class="ghost" id="btnBuyUnit">切换购买单位</button>
+ <button class="ghost" id="btnBuyMax">最大</button>
+ </span>
+ </div>
+ <label class="fl"><span class="lb">☆ 初始买入 / Purchase amount</span>
+ <span class="hint" id="buyUnitHint"></span>
+ <input type="text" class="mono" id="pf_quoteAmt" value="1" /></label>
+ <div class="kv" style="margin-top:8px"><span class="k" id="buyMaxLabel">最高</span><span class="v mono break" id="buyMaxOut">—</span></div>
+ <div class="kv"><span class="k">曲线本身最多（不含任何手续费）</span><span class="v mono break" id="buyCurveCapOut">—</span></div>
+ <div class="kv"><span class="k">预计收到</span><span class="v mono break" id="buyReceiveOut">—</span></div>
+ <div id="buyCapMsg"></div>
+ <label class="fl"><span class="lb">分红门槛 / Dividend threshold</span>
+ <span class="hint">持币到这个数才有分红（本页按 18 位小数换算，必须 &gt; 0）</span>
+ <input type="text" class="mono" id="pf_minShare" value="100000" /></label>
+
+ <div class="cardHead" style="margin-top:12px">四路比例（四条加起来必须恰好 10000）</div>
+ <div class="grid3">
+ <label class="fl"><span class="lb">☆ 第 1 路 · 分红 bps</span><input type="number" id="pf_r1" value="2000" min="0" max="10000" /></label>
+ <label class="fl"><span class="lb">☆ 第 2 路 · 加池 bps</span><input type="number" id="pf_r2" value="3000" min="0" max="10000" /></label>
+ <label class="fl"><span class="lb">☆ 第 3 路 · 销毁第三方 bps</span><input type="number" id="pf_r3" value="3000" min="0" max="10000" /></label>
+ </div>
+ <div class="grid3">
+ <label class="fl"><span class="lb">☆ 第 4 路 · 销毁本币 bps（vaultData 第 9 格）</span>
+ <span class="hint">默认按 10000 −（前 3 路之和）回填，你也可以改；四路之和不是 10000 会硬拦</span>
+ <input type="number" id="pf_r4" value="" min="0" max="10000" /></label>
+ <label class="fl"><span class="lb">金库兜底留额 bps（第 7 格）</span>
+ <span class="hint">0–500；本版四路全自建 ⇒ 应为 0</span>
+ <input type="number" id="pf_fallback" value="0" min="0" max="500" /></label>
+ <label class="fl"><span class="lb">金库自建门槛（第 8 格）</span>
+ <span class="hint">0 ＝ 用工厂定死的门槛</span>
+ <input type="text" class="mono" id="pf_selfBuilt" value="0" /></label>
+ </div>
+ <div class="grid3">
+ <label class="fl"><span class="lb">第 1 路目标币</span><span class="hint">留空 ＝ 走官方口袋</span>
+ <input type="text" class="mono" id="pf_t1" value="" placeholder="留空 = 官方口袋" /></label>
+ <label class="fl"><span class="lb">第 2 路目标币</span><span class="hint">留空 ＝ 走官方口袋</span>
+ <input type="text" class="mono" id="pf_t2" value="" placeholder="留空 = 官方口袋" /></label>
+ <label class="fl"><span class="lb">☆ 第 3 路目标币（必填，不许填本币）</span>
+ <span class="hint">你想销毁的那枚第三方币</span>
+ <input type="text" class="mono" id="pf_t3" value="" placeholder="必填" /></label>
+ </div>
+
+ <div class="cardHead" style="margin-top:12px">两个时长（★ 本页**不假装校验**，把关在官方通道）</div>
+ <div class="grid2">
+ <label class="fl"><span class="lb">收税时长 / taxDuration（秒）</span>
+ <input type="text" class="mono" id="pf_taxDuration" value="3153600000" /></label>
+ <label class="fl"><span class="lb">防抢跑时长 / antiFarmerDuration（秒）</span>
+ <input type="text" class="mono" id="pf_antiFarmer" value="3600" /></label>
+ </div>
+
+ <div class="cardHead" style="margin-top:12px">第 4 路：现场挖靓号（尾号 7777）</div>
+ <p class="muted small" style="margin:4px 0 0">第 10 格（第 4 路目标币）＝**本币地址** —— 链上强制它必须正好等于这一笔将要发出来的那个币，
+ 所以本页要**现场**用 CREATE2 反推一个尾号 7777 的地址。<b>⛔ 不许手打、⛔ 不许留空。</b></p>
+ <div class="kv"><span class="k">挖到的预测税币地址（第 10 格用这个）</span><span class="v mono break" id="mineAddr">—</span></div>
+ <div class="kv"><span class="k">试了多少次 ／ 速度</span><span class="v mono"><span id="mineTries">0</span> ／ <span id="mineRate">—</span></span></div>
+ <div class="row" style="margin-top:8px">
+ <button class="ghost" id="btnMine">开始找靓号</button>
+ <button class="ghost" id="btnStopMine" disabled>停下</button>
+ <span class="badge" id="mineState">还没开始</span>
+ </div>
+ <div id="mineMsg"></div>
+
+ <div class="cardHead" style="margin-top:12px">vaultData（10 格 / 320 字节）</div>
+ <div class="kv"><span class="k">格数 ／ 字节数</span><span class="v mono" id="vdataLen">—</span></div>
+ <div class="kv"><span class="k">第 4 路份额（第 9 格）</span><span class="v mono" id="r4Out">—</span></div>
+ <div class="kv"><span class="k">四路之和（必须恰好 10000）</span><span class="v mono" id="routeSum">—</span></div>
+ <div id="pfGate"></div>
+
+ <div id="pubDetail" class="small" style="margin-top:8px"></div>
+ <div id="pubMsg"></div>
+ <p class="muted small" style="margin:8px 0 0">这一格的按钮在下面那块**反白块**里（全页只有那一颗）。</p>
+ </div>
+
+ <div class="card">
+ <div class="cardHead">这一页自己不做什么</div>
+ <div id="audit"></div>
+ </div>
+
+ <div class="card">
+ <div class="cardHead">页脚</div>
+ <div class="muted small">把这一条复制给你的 UI 列表（挂域名之后会自动是那个域名）：</div>
+ <div class="mono break small" id="siteLink">（正在读本站地址…）</div>
+ <div class="muted small" id="officialSlot" style="margin-top:6px">官方金库列表状态：**未登记（UNOFFICIAL）** —— 拿到官方登记之后这一格会换成链接。</div>
+ </div>
+
+ 
+ <div class="blk main" id="blkAct">
+ <div class="blkHead">当前要你做的一件事</div>
+ <p class="big" id="blkActBig">选一台工厂</p>
+ <button class="act" id="blkActBtn" disabled>一键发布（两笔）</button>
+ </div>
+ <div class="blk risk" id="blkRisk">
+ <div class="blkHead">⛔ 风险</div>
+ <p id="blkRiskText">发出去的币<b>上链不可逆</b>：四路份额、税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。
+ 工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。第 1 笔授权**只批「刚好你要花的那个数」**（不是无限授权）；
+ 第 1 笔没成功，第 2 笔**点都点不动**。第 10 格（第 4 路目标币 ＝ 本币地址）由**现场挖靓号**算出来，⛔ 不许手打、也不许留空。</p>
+ </div>
+
+ 
+ <div class="toast" id="toastBox" hidden></div>
+
+</div>
+
+<script>
+
+var RC = [
+ 0x00000001n, 0x00008082n, 0x800000000000808an, 0x8000000080008000n,
+ 0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+ 0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+ 0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+ 0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+ 0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
+];
+var ROT = [[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]];
+var MASK64 = (1n << 64n) - 1n;
+function rotl64(x, n){ if (n === 0) return x & MASK64; return ((x << BigInt(n)) | (x >> BigInt(64 - n))) & MASK64; }
+function keccakF(A){
+ for (var round = 0; round < 24; round++){
+ var C = [], D = [], x, y;
+ for (x = 0; x < 5; x++) C[x] = A[x][0] ^ A[x][1] ^ A[x][2] ^ A[x][3] ^ A[x][4];
+ for (x = 0; x < 5; x++) D[x] = C[(x + 4) % 5] ^ rotl64(C[(x + 1) % 5], 1);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] ^= D[x];
+ var B = [];
+ for (x = 0; x < 5; x++){ B[x] = []; for (y = 0; y < 5; y++) B[x][y] = 0n; }
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) B[y][(2 * x + 3 * y) % 5] = rotl64(A[x][y], ROT[x][y]);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] = B[x][y] ^ ((~B[(x + 1) % 5][y] & MASK64) & B[(x + 2) % 5][y]);
+ A[0][0] ^= RC[round];
+ }
+}
+function keccak256(bytes){
+ var rate = 136;
+ var input = (bytes instanceof Uint8Array) ? bytes : Uint8Array.from(bytes);
+ var padLen = rate - (input.length % rate);
+ var padded = new Uint8Array(input.length + padLen);
+ padded.set(input); padded[input.length] = 0x01; padded[padded.length - 1] |= 0x80;
+ var A = [], i;
+ for (i = 0; i < 5; i++) A[i] = [0n, 0n, 0n, 0n, 0n];
+ for (var off = 0; off < padded.length; off += rate){
+ for (i = 0; i < rate / 8; i++){
+ var lane = 0n;
+ for (var b = 7; b >= 0; b--) lane = (lane << 8n) | BigInt(padded[off + i * 8 + b]);
+ A[i % 5][Math.floor(i / 5)] ^= lane;
+ }
+ keccakF(A);
+ }
+ var out = new Uint8Array(32);
+ for (i = 0; i < 4; i++){
+ var ln = A[i % 5][Math.floor(i / 5)];
+ for (var k = 0; k < 8; k++){ out[i * 8 + k] = Number(ln & 0xffn); ln >>= 8n; }
+ }
+ return out;
+}
+function toHex(u8){ var s = ""; for (var i = 0; i < u8.length; i++) s += u8[i].toString(16).padStart(2, "0"); return "0x" + s; }
+function utf8Bytes(str){
+ var s = String(str), out = [];
+ for (var i = 0; i < s.length; i++){
+ var c = s.charCodeAt(i);
+ if (c < 0x80) out.push(c);
+ else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+ else out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+ }
+ return Uint8Array.from(out);
+}
+function keccakSel(sig){ return toHex(keccak256(utf8Bytes(sig))).slice(0, 10); }
+
+
+
+var SHA_K = [
+ 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+ 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+ 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+ 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+ 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+ 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+ 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+ 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+];
+function sha256Bytes(u8){
+ var H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+ var len = u8.length;
+ var withOne = len + 1;
+ var total = withOne + ((56 - (withOne % 64)) + 64) % 64 + 8;
+ var m = new Uint8Array(total);
+ m.set(u8, 0);
+ m[len] = 0x80;
+ var bits = len * 8;
+ var hi = Math.floor(bits / 4294967296), lo = bits >>> 0;
+ m[total - 8] = (hi >>> 24) & 255; m[total - 7] = (hi >>> 16) & 255; m[total - 6] = (hi >>> 8) & 255; m[total - 5] = hi & 255;
+ m[total - 4] = (lo >>> 24) & 255; m[total - 3] = (lo >>> 16) & 255; m[total - 2] = (lo >>> 8) & 255; m[total - 1] = lo & 255;
+ var w = new Array(64);
+ for (var off = 0; off < total; off += 64){
+ for (var i = 0; i < 16; i++){
+ w[i] = ((m[off + i * 4] << 24) | (m[off + i * 4 + 1] << 16) | (m[off + i * 4 + 2] << 8) | m[off + i * 4 + 3]) | 0;
+ }
+ for (var j = 16; j < 64; j++){
+ var x = w[j - 15], y = w[j - 2];
+ var s0 = ((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3);
+ var s1 = ((y >>> 17) | (y << 15)) ^ ((y >>> 19) | (y << 13)) ^ (y >>> 10);
+ w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+ }
+ var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+ for (var t = 0; t < 64; t++){
+ var S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+ var ch = (e & f) ^ (~e & g);
+ var t1 = (h + S1 + ch + SHA_K[t] + w[t]) | 0;
+ var S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+ var maj = (a & b) ^ (a & c) ^ (b & c);
+ var t2 = (S0 + maj) | 0;
+ h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+ }
+ H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+ H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+ }
+ var out = new Uint8Array(32);
+ for (var k = 0; k < 8; k++){
+ out[k * 4] = (H[k] >>> 24) & 255; out[k * 4 + 1] = (H[k] >>> 16) & 255;
+ out[k * 4 + 2] = (H[k] >>> 8) & 255; out[k * 4 + 3] = H[k] & 255;
+ }
+ return out;
+}
+function bytesToHex(u8){
+ var s = "";
+ for (var i = 0; i < u8.length; i++) s += (u8[i] < 16 ? "0" : "") + u8[i].toString(16);
+ return s;
+}
+
+function sha256AsciiOf(str){ return bytesToHex(sha256Bytes(utf8Bytes(str))); }
+
+function hexToBytes(hex){
+ var h = String(hex).replace(/^0x/, "");
+ var n = h.length >> 1;
+ var u = new Uint8Array(n);
+ for (var i = 0; i < n; i++) u[i] = parseInt(h.substr(i * 2, 2), 16);
+ return u;
+}
+function sha256RawOfHex(hex){ return bytesToHex(sha256Bytes(hexToBytes(hex))); }
+
+var SHA_SELFTEST = [
+ ["", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+ ["abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"],
+ ["abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+ "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"]
+];
+function shaSelfTest(){
+ var bad = [];
+ for (var i = 0; i < SHA_SELFTEST.length; i++){
+ var got = sha256AsciiOf(SHA_SELFTEST[i][0]);
+ if (got !== SHA_SELFTEST[i][1]) bad.push("向量 " + (i + 1) + " 不符");
+ }
+ return { ok: bad.length === 0, problems: bad };
+}
+
+
+
+
+var SCHEME = "https:" + "//";
+var PUBLIC_RPCS = [
+ SCHEME + "bsc-dataseed.binance.org",
+ SCHEME + "bsc-dataseed1.binance.org",
+ SCHEME + "bsc.publicnode.com",
+ SCHEME + "bsc-dataseed1.defibit.io"
+];
+
+var READ_METHODS = ["eth_call", "eth_getCode", "eth_getBalance", "eth_chainId", "eth_blockNumber", "eth_getTransactionReceipt"];
+
+var READ_TIMEOUT_MS = 4000;
+var _rpcIdx = 0; 
+function readRpc(method, params){
+ if (READ_METHODS.indexOf(method) < 0){
+ return Promise.reject(new Error("⛔ 这一页的公共 RPC 通道只读：" + method + " 不在白名单里"));
+ }
+ var body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params || [] });
+ var ctls = [], timers = [];
+ 
+ function stopAll(){
+ for (var i = 0; i < ctls.length; i++){ if (ctls[i]){ try{ ctls[i].abort(); }catch(e){} } }
+ for (var j = 0; j < timers.length; j++) clearTimeout(timers[j]);
+ }
+ 
+ function ask(i){
+ return new Promise(function(resolve, reject){
+ var ctl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+ ctls[i] = ctl;
+ timers[i] = setTimeout(function(){ if (ctl) ctl.abort(); reject(new Error("第 " + (i + 1) + " 档超时（" + READ_TIMEOUT_MS + " 毫秒）")); }, READ_TIMEOUT_MS);
+ fetch(PUBLIC_RPCS[i], {
+ method: "POST", headers: { "content-type": "application/json" }, body: body,
+ signal: ctl ? ctl.signal : undefined
+ }).then(function(res){
+ if (!res.ok) throw new Error("HTTP " + res.status);
+ return res.json();
+ }).then(function(j){
+ if (!j || j.error) throw new Error((j && j.error && j.error.message) || "RPC 报错");
+ resolve(j.result);
+ }).catch(function(e){ reject(e); });
+ });
+ }
+ 
+ return new Promise(function(resolve, reject){
+ var done = false, failed = 0, lastErr = null;
+ var order = [_rpcIdx];
+ for (var k = 0; k < PUBLIC_RPCS.length; k++){ if (order.indexOf(k) < 0) order.push(k); }
+ order.forEach(function(i){
+ ask(i).then(function(result){
+ if (done) return; 
+ done = true; _rpcIdx = i; stopAll(); 
+ resolve(result);
+ }).catch(function(e){
+ if (done) return;
+ failed += 1; lastErr = e;
+ if (failed >= PUBLIC_RPCS.length){ 
+ done = true; stopAll();
+ reject(new Error("四个公共 RPC 都没答话（最后一档：" + ((lastErr && lastErr.message) || lastErr) + "）"));
+ }
+ });
+ });
+ });
+}
+
+function walletRpc(method, params){ return window.ethereum.request({ method: method, params: params || [] }); }
+
+function rpc(method, params){
+ if (READ_METHODS.indexOf(method) >= 0) return readRpc(method, params || []);
+ if (method === "eth_accounts" || method === "eth_requestAccounts" || method === "eth_sendTransaction" || method === "wallet_switchEthereumChain"){
+ return walletRpc(method, params || []);
+ }
+ return Promise.reject(new Error("⛔ 这一页不让走这个通道：" + method));
+}
+
+
+function $(id){ return document.getElementById(id); }
+function esc(s){
+ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+var RICH_TAGS = ["b", "span", "br", "i"];
+function richText(s){
+ var text = String(s == null ? "" : s);
+ var out = "", i = 0;
+ while (i < text.length){
+ var lt = text.indexOf("<", i);
+ if (lt < 0){ out += esc(text.slice(i)); break; }
+ out += esc(text.slice(i, lt));
+ var gt = text.indexOf(">", lt);
+ if (gt < 0){ out += esc(text.slice(lt)); break; }
+ var inner = text.slice(lt + 1, gt);
+ var m = /^(\/?)([a-zA-Z][\w-]*)/.exec(inner);
+ if (m && RICH_TAGS.indexOf(m[2].toLowerCase()) >= 0) out += "<" + (m[1] ? "/" : "") + m[2].toLowerCase() + ">";
+ else out += esc(text.slice(lt, gt + 1));
+ i = gt + 1;
+ }
+ return out;
+}
+
+var RC = [
+ 0x00000001n, 0x00008082n, 0x800000000000808an, 0x8000000080008000n,
+ 0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+ 0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+ 0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+ 0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+ 0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
+];
+var ROT = [[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]];
+var MASK64 = (1n << 64n) - 1n;
+function rotl64(x, n){ if (n === 0) return x & MASK64; return ((x << BigInt(n)) | (x >> BigInt(64 - n))) & MASK64; }
+function keccakF(A){
+ for (var round = 0; round < 24; round++){
+ var C = [], D = [], x, y;
+ for (x = 0; x < 5; x++) C[x] = A[x][0] ^ A[x][1] ^ A[x][2] ^ A[x][3] ^ A[x][4];
+ for (x = 0; x < 5; x++) D[x] = C[(x + 4) % 5] ^ rotl64(C[(x + 1) % 5], 1);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] ^= D[x];
+ var B = [];
+ for (x = 0; x < 5; x++){ B[x] = []; for (y = 0; y < 5; y++) B[x][y] = 0n; }
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) B[y][(2 * x + 3 * y) % 5] = rotl64(A[x][y], ROT[x][y]);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] = B[x][y] ^ ((~B[(x + 1) % 5][y] & MASK64) & B[(x + 2) % 5][y]);
+ A[0][0] ^= RC[round];
+ }
+}
+function keccak256(bytes){
+ var rate = 136;
+ var input = (bytes instanceof Uint8Array) ? bytes : Uint8Array.from(bytes);
+ var padLen = rate - (input.length % rate);
+ var padded = new Uint8Array(input.length + padLen);
+ padded.set(input); padded[input.length] = 0x01; padded[padded.length - 1] |= 0x80;
+ var A = [], i;
+ for (i = 0; i < 5; i++) A[i] = [0n, 0n, 0n, 0n, 0n];
+ for (var off = 0; off < padded.length; off += rate){
+ for (i = 0; i < rate / 8; i++){
+ var lane = 0n;
+ for (var b = 7; b >= 0; b--) lane = (lane << 8n) | BigInt(padded[off + i * 8 + b]);
+ A[i % 5][Math.floor(i / 5)] ^= lane;
+ }
+ keccakF(A);
+ }
+ var out = new Uint8Array(32);
+ for (i = 0; i < 4; i++){
+ var ln = A[i % 5][Math.floor(i / 5)];
+ for (var k = 0; k < 8; k++){ out[i * 8 + k] = Number(ln & 0xffn); ln >>= 8n; }
+ }
+ return out;
+}
+function toHex(u8){ var s = ""; for (var i = 0; i < u8.length; i++) s += u8[i].toString(16).padStart(2, "0"); return "0x" + s; }
+function utf8Bytes(str){
+ var s = String(str), out = [];
+ for (var i = 0; i < s.length; i++){
+ var c = s.charCodeAt(i);
+ if (c < 0x80) out.push(c);
+ else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+ else out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+ }
+ return Uint8Array.from(out);
+}
+function keccakSel(sig){ return toHex(keccak256(utf8Bytes(sig))).slice(0, 10); }
+
+function isHex(s){ return typeof s === "string" && /^0x(?:[0-9a-fA-F]{2})*$/.test(s); }
+function isHexQuantity(s){ return typeof s === "string" && /^0x[0-9a-fA-F]+$/.test(s); }
+function isHexAddr(s){ return typeof s === "string" && /^0x[0-9a-fA-F]{40}$/.test(s); }
+function lower(a){ return String(a == null ? "" : a).toLowerCase(); }
+function toQuantity(n){ return "0x" + BigInt(n).toString(16); }
+function wAddr(a){ return a.slice(2).toLowerCase().padStart(64, "0"); }
+function w32(v){ return BigInt(v).toString(16).padStart(64, "0"); }
+function weiToBnb(wei){
+ var w = BigInt(wei);
+ var whole = w / 1000000000000000000n;
+ var frac = (w % 1000000000000000000n).toString().padStart(18, "0").replace(/0+$/, "");
+ return frac ? whole.toString() + "." + frac : whole.toString();
+}
+function isZeroAddr(a){ return lower(a) === "0x0000000000000000000000000000000000000000"; }
+var ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+
+
+
+function stripHex(h){ h = String(h); return (h.slice(0, 2).toLowerCase() === "0x") ? h.slice(2) : h; }
+function fromHex(hex){
+ var s = stripHex(hex);
+ if (s.length % 2) s = "0" + s;
+ var out = new Uint8Array(s.length / 2);
+ for (var i = 0; i < out.length; i++) out[i] = parseInt(s.substr(i * 2, 2), 16);
+ return out;
+}
+
+function keccakSelfCheckResult(){
+ var t = [["", "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"],
+ ["abc", "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45"],
+ ["The quick brown fox jumps over the lazy dog", "4d741b6f1eb29cb2a9b9911c82f56fa8d73b04959d3d9d222895df6c0b28aa15"]];
+ for (var i = 0; i < t.length; i++) if (toHex(keccak256(utf8Bytes(t[i][0]))).slice(2) !== t[i][1]) return false;
+ return true;
+}
+var state = { account: null, authorized: false, chainId: null, rpcChainId: null, sel: null, check: null, pageVer: null,
+ salt: null, mined: null, vanityAddress: null, mining: false, mineTries: 0, mineStartedAt: 0, busy: false,
+ approve: { hash: null, ok: false, phase: "idle" }, launch: { hash: null, ok: false, phase: "idle" },
+ built: null, calldata: null, calldataSha: null, quoteBal: null, walletNote: null,
+ 
+ pubSalt: null, pubMined: null, pubVanity: null, pubMining: false, pubTries: 0, pubStartedAt: 0,
+ pubBuilt: null, pubCalldata: null, pubCalldataSha: null,
+ pubApprove: { hash: null, ok: false, phase: "idle" }, pubLaunch: { hash: null, ok: false, phase: "idle" } };
+
+(function(){
+ var MIRROR = [["pubSalt", "salt"], ["pubMined", "mined"], ["pubVanity", "vanityAddress"], ["pubMining", "mining"],
+ ["pubTries", "mineTries"], ["pubStartedAt", "mineStartedAt"], ["pubBuilt", "built"], ["pubCalldata", "calldata"],
+ ["pubCalldataSha", "calldataSha"], ["pubApprove", "approve"], ["pubLaunch", "launch"]];
+ for (var i = 0; i < MIRROR.length; i++){
+ (function(a, b){
+ Object.defineProperty(state, a, { get: function(){ return state[b]; }, set: function(v){ state[b] = v; },
+ enumerable: true, configurable: true });
+ })(MIRROR[i][0], MIRROR[i][1]);
+ }
+})();
+window.__dshState = state;
+function hasWallet(){ return typeof window.ethereum !== "undefined"; }
+function isLocalFileOpen(){ return typeof location !== "undefined" && String(location.protocol) === "file:"; }
+function setWalletMsg(html, tone){ $("walletMsg").innerHTML = html ? '<div class="alert ' + (tone || "info") + '">' + html + "</div>" : ""; }
+
+function chainNameOf(id){ return id === BSC_CHAIN_ID ? "BNB 主网（56）" : ("链 " + id); }
+function setChainPill(){
+ var pill = $("chainPill");
+ var readTxt = state.rpcChainId == null ? "读链：读不到" : ("读链：" + chainNameOf(state.rpcChainId));
+ var wallTxt = state.chainId == null ? "钱包：没连" : ("钱包：" + chainNameOf(state.chainId));
+ var wallBad = state.chainId != null && state.chainId !== BSC_CHAIN_ID;
+ var readBad = state.rpcChainId !== BSC_CHAIN_ID; 
+ pill.textContent = readTxt + "　·　" + wallTxt;
+ 
+ pill.style.color = (readBad || wallBad) ? "var(--danger)" : "var(--ok)";
+ 
+ $("btnSwitch").hidden = !(state.chainId != null && state.chainId !== BSC_CHAIN_ID);
+ renderGates();
+}
+
+async function readRpcChainId(){
+ try{ state.rpcChainId = parseInt(await rpc("eth_chainId"), 16); }
+ catch(e){ state.rpcChainId = null; }
+ setChainPill();
+ return state.rpcChainId;
+}
+
+async function walletChainId(){ return parseInt(await walletRpc("eth_chainId"), 16); }
+
+var askedThisLoad = false, userDeclined = false, lastAccountCount = -1;
+async function autoConnect(){
+ if (!hasWallet()) return null; 
+ if (askedThisLoad || userDeclined) return null;
+ askedThisLoad = true;
+ var list;
+ try{
+ list = await walletRpc("eth_accounts");
+ if (!list || !list.length) list = await walletRpc("eth_requestAccounts"); 
+ }catch(e){
+ userDeclined = true; 
+ return null; 
+ }
+ return connect(list); 
+}
+async function connect(preAccounts){
+ if (!hasWallet()){
+ setWalletMsg(isLocalFileOpen()
+ ? "很可能是钱包<b>不支持「直接双击打开的本地文件」</b>，<b>不一定是没装</b>。跟服务方要一个本地网址（<span class=\"mono\">（本地服务给你的那个地址）</span> 开头）再用它打开。"
+ : "这个浏览器里没有检测到钱包插件。请用<b>装了钱包插件（例如 MetaMask / OKX Wallet）的浏览器</b>打开。<b>下面的数字照常显示</b>（读链不走钱包）。", "danger");
+ return;
+ }
+ try{
+ 
+ var accounts = preAccounts || await walletRpc("eth_requestAccounts");
+ state.account = accounts && accounts[0] ? accounts[0] : null;
+ state.chainId = await walletChainId(); 
+ $("acct").textContent = state.account || "—";
+ $("btnRefresh").hidden = false;
+ await checkAuthorized();
+ setChainPill();
+ if (!state.account) setWalletMsg("钱包没有给出任何账户（你可能拒绝了授权）。<b>没有账户就不许发</b>：在钱包里重新授权这一页，或刷新这一页再来。", "danger");
+ else if (state.chainId !== BSC_CHAIN_ID) setWalletMsg("你的钱包现在不在 <b>BNB 主网（chainId 56）</b>。点上面的「切换到 BNB 主网」再继续。<br>链不对时页面禁止发送。", "danger");
+ else setWalletMsg("已连接。下面先把金库的账读出来。", "ok");
+ await refreshBalance();
+ }catch(e){ setWalletMsg("连接失败或你取消了：" + esc(e && e.message ? e.message : e), "warn"); }
+}
+async function checkAuthorized(){
+ try{
+ var list = (await rpc("eth_accounts")) || [];
+ state.authorized = Boolean(state.account) && list.some(function(a){ return lower(a) === lower(state.account); });
+ }catch(e){ state.authorized = false; }
+ return state.authorized;
+}
+async function switchChain(){
+ try{
+ await rpc("wallet_switchEthereumChain", [{ chainId: BSC_CHAIN_ID_HEX }]);
+ }catch(e){
+ if (e && (e.code === 4902 || /Unrecognized chain/i.test(e.message || ""))) setWalletMsg("你的钱包里还没有 BNB 主网这一条，请先在钱包里手动添加 <b>chainId 56</b> 再回来。", "warn");
+ else setWalletMsg("切链没有成功（你取消了，或钱包不支持）：" + esc(e && e.message ? e.message : e), "warn");
+ }
+ try{ state.chainId = await walletChainId(); } 
+ catch(e){ }
+ setChainPill();
+}
+async function refreshBalance(){
+ if (!state.account) return;
+ try{ $("bal").textContent = weiToBnb(await rpc("eth_getBalance", [state.account, "latest"])) + " BNB"; }
+ catch(e){ $("bal").textContent = "读不到余额（不影响发送）"; }
+}
+
+async function ethCall(to, data){
+ try{
+ var tx = state.account ? { from: state.account, to: to, data: data } : { to: to, data: data };
+ var res = await rpc("eth_call", [tx, "latest"]);
+ return { ok: true, result: res };
+ }catch(e){
+ return { ok: false, message: (e && e.message) ? e.message : String(e), data: (e && e.data) ? e.data : null };
+ }
+}
+function wordToBig(hex, i){
+ var p = 2 + i * 64;
+ if (!hex || hex.length < p + 64) return null;
+ return BigInt("0x" + hex.slice(p, p + 64));
+}
+function wordToAddr(hex, i){
+ var p = 2 + i * 64;
+ if (!hex || hex.length < p + 64) return null;
+ return "0x" + hex.slice(p + 24, p + 64).toLowerCase();
+}
+function wordToBool(hex, i){
+ var v = wordToBig(hex, i);
+ return v == null ? null : (v !== 0n);
+}
+
+
+
+var EXT = {
+ "schema": "p013-console-external/v1",
+ "id": "p013-fourroute",
+ "chain": {
+ "id": 56,
+ "name": "BNB 主网（56）",
+ "hex": "0x38"
+ },
+ "factories": [
+ {
+ "id": "new",
+ "label": "新四路工厂（现役）",
+ "factory": "0x40f70632d1aa433f26033a2c9fff80e909c07e21",
+ "note": "本次升级用的就是这一台（four-route）。",
+ "expectOwner": "0x2e77c9382c8d103434d8122f9352684ef8369101",
+ "expectBeaconImpl": "0x9522810362e6272c8eecc49641c85f8f1b1e503b"
+ },
+ {
+ "id": "old",
+ "label": "老那台（三路）· ⛔ 不能用它升级",
+ "factory": "0x746f1A640ce2eA53663B4bC9Ad0292b1Fd4783B3",
+ "note": "老金库走 beacon.upgradeTo 那条路，**不在本页范围** ⇒ 选中即红、拦住发送。",
+ "expectOwner": "0x2e77c9382c8d103434d8122f9352684ef8369101",
+ "expectBeaconImpl": ""
+ }
+ ],
+ "routes": {
+ "labels": {
+ "1": "分红：买回并送给持币人（进官方分红合约）",
+ "2": "加池：加进本币自己的流动性池",
+ "3": "销毁第三方：买回你指定的那个币，打进黑洞",
+ "4": "销毁本币：由我们自己的金库买回本币并打进黑洞（流通量真减少）"
+ }
+ },
+ "disclosures": {
+ "registry": "本页所接的**工厂不在 Flap 官方登记册**里 —— 官方界面会把这类工厂标成 UNOFFICIAL／UNVERIFIED（风险等级 UNVERIFIED）。",
+ "commission": "协议佣金：金库说明里那句 —— **税率 ≤ 1% 时收 6% 的税收；税率更高时按「税收 × 6 ÷ 税率」收**。",
+ "officialListSlot": "官方金库列表状态：**未登记（UNOFFICIAL）** —— 拿到官方登记之后这里会换成链接。"
+ },
+ "vaultData": {
+ "fields": [
+ "route1_dividend_bps",
+ "route2_lp_bps",
+ "route3_burn_bps",
+ "route1_target_token",
+ "route2_target_token",
+ "route3_target_token",
+ "vaultFallbackBps",
+ "vaultSelfBuiltThreshold",
+ "route4_burn_own_bps",
+ "route4_target_token"
+ ],
+ "wordCount": 10,
+ "byteLength": 320,
+ "hexLength": 642,
+ "route4AtSlots": [
+ 9,
+ 10
+ ],
+ "slot10MustEqual": "taxToken",
+ "_note": "⛔ 少送（9 格 288 字节）多送都被链上拒；第 10 格必须＝本币地址（链上强制）。"
+ },
+ "gas": {
+ "approve": 200000,
+ "launch": 8700000
+ },
+ "vanity": {
+ "suffix": "7777",
+ "create2Deployer": "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0"
+ },
+ "launch": {
+ "contract": "0x90497450f2a706f1951b5bdda52B4E5d16f34C06",
+ "contractName": "VaultPortal",
+ "function": "newTokenV6WithVault"
+ },
+ "tokenImplRef": "0x024f18294970B5c76c0691b87f138A0317156422",
+ "houseCommissionReceiver": "0xA6EBaeCdeDBCecbD71D981336bde1E2BBA3B0968",
+ "wbnb": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+ "limits": {
+ "totalBps": 10000,
+ "maxTaxRateBps": 1000,
+ "maxVaultFallbackBps": 500,
+ "minVaultBps": 1,
+ "maxSelfBuiltThreshold": "1000000000000000000000000000000"
+ },
+ "blockFacts": {
+ "tokenVersion": 6,
+ "dividendToken": "0xC0Dec0dec0DeC0Dec0dEc0DEC0DEC0DEC0DEC0dE",
+ "defaults": {
+ "name": "四路人生",
+ "symbol": "SILU",
+ "buyTax": 300,
+ "sellTax": 300,
+ "quoteAmt": 0,
+ "minShare": 100000,
+ "selfBuilt": 0,
+ "taxDuration": 3153600000,
+ "antiFarmerDuration": 3600,
+ "r1": 2000,
+ "r2": 3000,
+ "r3": 3000,
+ "t1": "",
+ "t2": "",
+ "t3": "",
+ "fallback": 0
+ }
+ }
+};
+var DESIGN = {
+ "_why": "★ 2026-09-27（·发行方拍板「乙＋丙」）：**令牌全部收进配方**，外壳零硬编码；改样式只改这一节。",
+ "_source": " ＋ 样张 发行方-样式样张.html 的 :root ＋ ",
+ "colors": {
+ "ink": "#111214",
+ "paper": "#FAFAF8",
+ "sunk": "#EFEFEC",
+ "ink2": "#3C4046",
+ "ink3": "#676C73",
+ "rule": "#111214",
+ "edge": "#111214",
+ "ok": "#1E6B3C",
+ "warn": "#7A5000",
+ "danger": "#A32318"
+ },
+ "_colorsNote": "★ 已与样张 :root 逐字对过（2026-09-27）：ink/paper/sunk/ink2/ink3/rule/edge/ok/warn/danger 十字相同。★ 三条状态色（ok/warn/danger）在**本配方**里**只做标记**（边线／点／卡头、或浅底上的深字）：⛔ 黑底上的小字**不用**它们（那会跌破 4.5:1）—— 黑底一律用 paper 那档白字（17.93:1）。检查脚本会把这一条**现算**一遍。",
+ "nonColorStates": {
+ "ok": "✓ 文字/图标同时在",
+ "warn": "! 文字/图标同时在",
+ "danger": "✕ 文字/图标同时在",
+ "disabled": "专用灰，⛔ 不用 opacity 糊"
+ },
+ "radius": {
+ "card": 6,
+ "seat": 10,
+ "round": 999,
+ "_rule": "只用 6 与 10（另有圆形 999）；⛔ 直角不做"
+ },
+ "fontSize": {
+ "cap": 12,
+ "body": 14,
+ "sub": 16,
+ "h2": 20,
+ "hero": 38,
+ "_rule": "★ 最多 5 档；⚠️ 样张 :root 里还定义了 --f24（24）—— 与「≤5 档」冲突，已上报待裁（本配方只收这 5 档）"
+ },
+ "space": {
+ "unit": 4,
+ "steps": [
+ 4,
+ 8,
+ 12,
+ 16,
+ 24,
+ 32,
+ 44,
+ 48,
+ 64
+ ]
+ },
+ "motion": {
+ "pressMs": 100,
+ "hoverMs": 150,
+ "enterMs": 240,
+ "onlyProperties": [
+ "transform",
+ "opacity"
+ ],
+ "infinite": false,
+ "reducedMotionGate": "全站一条 prefers-reduced-motion 总闸（有 @keyframes 就必须有它）"
+ },
+ "icon": {
+ "set": "lucide",
+ "strokeWidth": 1.6,
+ "linecap": "round",
+ "color": "currentColor",
+ "sizes": [
+ 16,
+ 20,
+ 24
+ ],
+ "_rule": "只用这一套的内联 symbol 雪碧图；⛔ 不许手搓 SVG"
+ },
+ "blocks": {
+ "card": {
+ "borderPx": 1,
+ "radius": 6,
+ "paddingPx": 16,
+ "headSizePx": 12,
+ "keyValueSep": "dashed"
+ },
+ "progress": {
+ "heightPx": 4,
+ "color": "ink"
+ },
+ "reflexiveOnly": [
+ "primaryAction",
+ "risk"
+ ],
+ "riskH3": {
+ "border": true,
+ "bold": true,
+ "underline": true,
+ "stickyOnMobile": true,
+ "noOpacityFade": true,
+ "fontAtLeastBody": true
+ }
+ },
+ "contrastMin": {
+ "body": 7,
+ "aux": 4.5,
+ "state": 4.5,
+ "reflexive": 7
+ }
+};
+var SEL_OWNER = keccakSel("owner()");
+var SEL_BEACON_IMPL = keccakSel("beaconImplementation()");
+var SEL_QUOTE_OK = keccakSel("isQuoteTokenSupported(address)");
+var SEL_APPROVE = "0x095ea7b3"; 
+var SEL_LAUNCH = keccakSel("newTokenV6WithVault((string,string,string,uint8,bytes32,uint8,address,uint256,bytes,bytes32,bytes,uint8,uint8,uint16,uint16,uint64,uint64,uint16,uint16,uint16,uint16,uint256,address,address,uint8,address,bytes))");
+var ALLOWED_FIELDS = ["from", "to", "data", "gas", "value"];
+var FORBIDDEN_FEE_FIELDS = ["gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"];
+var TOTAL_BPS = Number((EXT.limits || {}).totalBps);
+var MAX_TAX_BPS = Number((EXT.limits || {}).maxTaxRateBps);
+var MAX_FALLBACK_BPS = Number((EXT.limits || {}).maxVaultFallbackBps);
+var MAX_SELF_BUILT = BigInt(String((EXT.limits || {}).maxSelfBuiltThreshold));
+var VLIST = (EXT.vaultData || {}).fields;
+var VSLOTS = Number((EXT.vaultData || {}).wordCount);
+var VBYTES = Number((EXT.vaultData || {}).byteLength);
+var VHEXCHARS = Number((EXT.vaultData || {}).hexLength);
+var R4_AT = (EXT.vaultData || {}).route4AtSlots || [];
+var APPROVE_GAS = BigInt(String((EXT.gas || {}).approve));
+var LAUNCH_GAS = BigInt(String((EXT.gas || {}).launch));
+var VANITY_SUFFIX = String((EXT.vanity || {}).suffix);
+var CREATE2_DEPLOYER = String((EXT.vanity || {}).create2Deployer);
+var LAUNCH_CONTRACT = String((EXT.launch || {}).contract);
+var LAUNCH_CONTRACT_NAME = String((EXT.launch || {}).contractName);
+var COMMISSION = String(EXT.houseCommissionReceiver);
+var TOKEN_VERSION = Number((EXT.blockFacts || {}).tokenVersion);
+var DEF = (EXT.blockFacts || {}).defaults || {};
+var TOKEN_IMPL = String(EXT.tokenImplRef);
+var ONE_GWEI = 1000000000n;
+var MAGIC_DIVIDEND_COMPUTED = String((EXT.blockFacts || {}).dividendToken);
+var ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+var BSC_CHAIN_ID = Number((EXT.chain || {}).id);
+
+var BSC_CHAIN_ID_HEX = "0x" + BSC_CHAIN_ID.toString(16);
+var CHAIN_NAME = String((EXT.chain || {}).name);
+var TX_STATES = ["待签名", "待确认", "成功", "失败", "未确认/卡住"];
+
+function $(id){ return document.getElementById(id); }
+function esc2(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function numify(s){ var t = String(s == null ? "" : s).trim(); return /^\d+$/.test(t) ? t : ""; }
+function wholeOrEmpty(x){ var t = String(x == null ? "" : x); return /^\d+$/.test(t) ? t : ""; }
+
+function ratioNow(id, fallback){ var el = $(id); var t = el ? String(el.value).trim() : ""; return /^\d+$/.test(t) ? Number(t) : Number(fallback); }
+function syncRatio(){
+ var el = $("pf_r4"); if (!el) return;
+ var v = TOTAL_BPS - (ratioNow("pf_r1", DEF.r1) + ratioNow("pf_r2", DEF.r2) + ratioNow("pf_r3", DEF.r3));
+ el.value = String(v);
+}
+function readForm(){
+ var need = ["pf_name", "pf_symbol", "pf_meta", "pf_quote", "pf_buyTax", "pf_sellTax", "pf_quoteAmt", "pf_minShare", "pf_selfBuilt", "pf_taxDuration", "pf_antiFarmer", "pf_r1", "pf_r2", "pf_r3", "pf_r4", "pf_t1", "pf_t2", "pf_t3", "pf_fallback"];
+ var o = {};
+ for (var i = 0; i < need.length; i++){
+ var id = need[i];
+ var el = $(id);
+ o[id] = (el && el.value != null) ? String(el.value).trim() : "";
+ }
+ return {
+ name: o.pf_name, symbol: o.pf_symbol, meta: o.pf_meta,
+ quoteToken: o.pf_quote, buyTax: o.pf_buyTax, sellTax: o.pf_sellTax,
+ quoteAmtText: o.pf_quoteAmt, minShare: o.pf_minShare, selfBuilt: o.pf_selfBuilt,
+ taxDuration: o.pf_taxDuration, antiFarmer: o.pf_antiFarmer,
+ r1: o.pf_r1, r2: o.pf_r2, r3: o.pf_r3, r4: o.pf_r4,
+ t1: o.pf_t1, t2: o.pf_t2, t3: o.pf_t3, fallback: o.pf_fallback
+ };
+}
+
+
+function w32(v){ return BigInt(v).toString(16).padStart(64, "0"); }
+function wAddr(x){
+ var s = String(x == null ? "" : x).trim();
+ if (s === "") return "0".repeat(64);
+ if (!isHexAddr(s)) throw new Error("不是合法地址（补零之前先拒）：" + x);
+ return stripHex(s).toLowerCase().padStart(64, "0");
+}
+function wBytes32(x){ return stripHex(x).toLowerCase().padStart(64, "0"); }
+function wString(s){
+ var b = utf8Bytes(s);
+ var padded = new Uint8Array(Math.ceil(b.length / 32) * 32);
+ padded.set(b);
+ return w32(b.length) + stripHex(toHex(padded));
+}
+function wBytes(hexIn){
+ var b = fromHex(hexIn);
+ var padded = new Uint8Array(Math.ceil(b.length / 32) * 32);
+ padded.set(b);
+ return w32(b.length) + stripHex(toHex(padded));
+}
+function encodeTuple(fields){
+ var head = [], tails = [], offset = fields.length * 32;
+ for (var i = 0; i < fields.length; i++){
+ var f = fields[i];
+ if (f.dyn){ head.push(w32(offset)); tails.push(f.body); offset += f.body.length / 2; }
+ else head.push(f.word);
+ }
+ return head.join("") + tails.join("");
+}
+
+function predictedTokenAddr(){ return state.vanityAddress || null; }
+function vaultDataWords(g){
+ return [
+ w32(g.route1_bps), w32(g.route2_bps), w32(g.route3_bps),
+ wAddr(g.route1_target_token), wAddr(g.route2_target_token), wAddr(g.route3_target_token),
+ w32(g.vaultFallbackBps),
+ w32(g.vaultSelfBuiltThreshold == null || g.vaultSelfBuiltThreshold === "" ? 0 : g.vaultSelfBuiltThreshold),
+ w32(g.route4_burn_own_bps == null || g.route4_burn_own_bps === "" ? 0 : g.route4_burn_own_bps),
+ wAddr(g.route4_target_token)
+ ];
+}
+
+function buildVaultData(g){
+ var problems = [], words = [];
+ try{ words = vaultDataWords(g || {}); }
+ catch(e){ return { ok: false, hex: "0x", words: [], wordCount: 0, bytes: 0, problems: ["那 10 格编不出来：" + e.message] }; }
+ if (words.length !== VLIST.length) problems.push("vaultData 格数不对：编码器拼出 " + words.length + " 格，造册要求 " + VLIST.length + " 格");
+ if (words.some(function(x){ return typeof x !== "string" || x.length !== 64; })) problems.push("vaultData 有字不是 32 字节");
+ var hex = "0x" + words.join("");
+ var bytes = hex.length > 2 ? (hex.length - 2) / 2 : 0;
+ if (hex.length !== VHEXCHARS) problems.push("vaultData 长度不对：" + hex.length + " 个字符（应当是 " + VHEXCHARS + " 个）");
+ if (bytes !== VBYTES) problems.push("vaultData 字节数不对：" + bytes + "（应当是 " + VBYTES + " 字节）");
+ var r4t = String(g && g.route4_target_token != null ? g.route4_target_token : "");
+ if (isZeroAddr(r4t)) problems.push("第 10 格 route4_target_token 是空地址（0x0）—— 链上强制它必须 ＝ 本币地址");
+ else if (!isHexAddr(r4t)) problems.push("第 10 格 route4_target_token 不是合法地址：" + r4t);
+ return { hex: hex, words: words, wordCount: words.length, bytes: bytes, problems: problems,
+ ok: problems.length === 0 && words.length === VLIST.length && bytes === VBYTES };
+}
+
+function route4AppearsInVaultData(g){
+ if (g == null || g.route4_burn_own_bps == null) return false;
+ if (String(BigInt(g.route4_burn_own_bps)) === "0") return false;
+ return buildVaultData(g).words.join("").indexOf(w32(BigInt(g.route4_burn_own_bps))) >= 0;
+}
+
+function encodeNewTokenV6WithVault(p, vaultWords){
+ var vaultBody = vaultWords.join("");
+ var fields = [
+ { dyn: true, body: wString(p.name) },
+ { dyn: true, body: wString(p.symbol) },
+ { dyn: true, body: wString(p.meta) },
+ { word: w32(p.dexThresh) },
+ { word: wBytes32(p.salt) },
+ { word: w32(p.migratorType) },
+ { word: wAddr(p.quoteToken) },
+ { word: w32(p.quoteAmt) },
+ { dyn: true, body: wBytes(p.permitData) },
+ { word: wBytes32(p.extensionID) },
+ { dyn: true, body: wBytes(p.extensionData) },
+ { word: w32(p.dexId) },
+ { word: w32(p.lpFeeProfile) },
+ { word: w32(p.buyTaxRate) },
+ { word: w32(p.sellTaxRate) },
+ { word: w32(p.taxDuration) },
+ { word: w32(p.antiFarmerDuration) },
+ { word: w32(p.mktBps) },
+ { word: w32(p.deflationBps) },
+ { word: w32(p.dividendBps) },
+ { word: w32(p.lpBps) },
+ { word: w32(p.minimumShareBalance) },
+ { word: wAddr(p.dividendToken) },
+ { word: wAddr(p.commissionReceiver) },
+ { word: w32(p.tokenVersion) },
+ { word: wAddr(p.vaultFactory) },
+ { dyn: true, body: w32(vaultBody.length / 2) + vaultBody }
+ ];
+ return SEL_LAUNCH + w32(0x20) + encodeTuple(fields);
+}
+
+
+function toNum(x){ return (typeof x === "bigint") ? Number(x) : Number(x || 0); }
+function carveFallback(r1, r2, r3, fb){
+ r1 = toNum(r1); r2 = toNum(r2); r3 = toNum(r3); fb = toNum(fb);
+ var n1 = r1, n2 = r2, n3 = r3;
+ if (fb === 0) return { net1: n1, net2: n2, net3: n3, carved: null };
+ if (r1 >= r2 && r1 >= r3){ if (n1 < fb) throw new Error("兜底超过第一路"); n1 -= fb; return { net1: n1, net2: n2, net3: n3, carved: 1 }; }
+ if (r2 >= r3){ if (n2 < fb) throw new Error("兜底超过第二路"); n2 -= fb; return { net1: n1, net2: n2, net3: n3, carved: 2 }; }
+ if (n3 < fb) throw new Error("兜底超过第三路");
+ n3 -= fb; return { net1: n1, net2: n2, net3: n3, carved: 3 };
+}
+function routeSplit(g){
+ var r1 = toNum(g.route1_bps), r2 = toNum(g.route2_bps), r3 = toNum(g.route3_bps), fb = toNum(g.vaultFallbackBps);
+ var r4 = toNum(g.route4_burn_own_bps);
+ var net = carveFallback(r1, r2, r3, fb);
+ var custom1 = !isZeroAddr(g.route1_target_token);
+ var custom2 = !isZeroAddr(g.route2_target_token);
+ var custom3 = !isZeroAddr(g.route3_target_token);
+ var dividendBps = 0, lpBps = 0, defl3 = 0, mktBps = 0;
+ if (custom1) mktBps += net.net1; else dividendBps += net.net1;
+ if (custom2) mktBps += net.net2; else lpBps += net.net2;
+ if (custom3) mktBps += net.net3; else defl3 += net.net3;
+ mktBps += r4;
+ if (!custom1 && !custom2 && !custom3) mktBps += fb;
+ if (mktBps === 0) mktBps = Number((DESIGN.limits || {}).minVaultBps);
+ var routeSum = r1 + r2 + r3 + r4;
+ return { dividendBps: dividendBps, lpBps: lpBps, deflationFromRoute3: defl3, mktBps: mktBps,
+ net1: net.net1, net2: net.net2, net3: net.net3, custom1: custom1, custom2: custom2, custom3: custom3,
+ route4Bps: r4, routeSum: routeSum, officialSlots: dividendBps + lpBps + defl3 + mktBps, carved: net.carved };
+}
+function computeModel(g){
+ var s = routeSplit(g);
+ var slots = { dividendBps: s.dividendBps, lpBps: s.lpBps, deflationBps: s.deflationFromRoute3, mktBps: s.mktBps };
+ var sum = slots.dividendBps + slots.lpBps + slots.deflationBps + slots.mktBps;
+ return { split: s, slots: slots, r4: s.route4Bps, sum: sum, ok: sum === TOTAL_BPS && slots.mktBps > 0,
+ shortBy: TOTAL_BPS - sum, routeSumOk: s.routeSum === TOTAL_BPS, deflationIsZero: slots.deflationBps === 0 };
+}
+
+
+function proxyInitCode(impl){
+ return "3d602d80600a3d3981f3" + "363d3d373d3d3d363d73" + stripHex(impl).toLowerCase() + "5af43d82803e903d91602b57fd5bf3";
+}
+var INIT_HASH_CACHE = {};
+function initHashOf(impl){
+ var k = lower(impl);
+ if (!Object.prototype.hasOwnProperty.call(INIT_HASH_CACHE, k)) INIT_HASH_CACHE[k] = keccak256(fromHex(proxyInitCode(impl)));
+ return INIT_HASH_CACHE[k];
+}
+function predictTokenAddress(salt, deployer, impl){
+ var initHash = initHashOf(impl);
+ var buf = new Uint8Array(1 + 20 + 32 + 32);
+ buf[0] = 0xff;
+ buf.set(fromHex(deployer), 1);
+ buf.set(fromHex(salt), 21);
+ buf.set(initHash, 53);
+ return "0x" + toHex(keccak256(buf)).slice(-40);
+}
+function randomSaltHex(){
+ var c = (typeof window !== "undefined" && window.crypto) ? window.crypto : (typeof crypto !== "undefined" ? crypto : null);
+ if (!c || typeof c.getRandomValues !== "function") throw new Error("这个浏览器没有提供安全随机数（crypto.getRandomValues）");
+ var b = new Uint8Array(32);
+ c.getRandomValues(b);
+ return toHex(b);
+}
+function saltSeed(){
+ if (typeof window !== "undefined" && typeof window.__dshSaltSource === "string" && /^0x[0-9a-fA-F]{64}$/.test(window.__dshSaltSource)) return window.__dshSaltSource.toLowerCase();
+ return randomSaltHex();
+}
+var mineStop = false;
+function setMineState(text, cls){
+ var el = $("mineState"); if (!el) return;
+ el.className = "badge " + (cls || ""); el.textContent = text;
+}
+function paintMine(){
+ var t = $("mineTries"); if (t) t.textContent = String(state.mineTries);
+ var r = $("mineRate");
+ if (r){ var el2 = Date.now() - state.mineStartedAt; var rate = el2 > 250 ? Math.round(state.mineTries / (el2 / 1000)) : 0; r.textContent = rate ? (rate + " 次/秒") : "—"; }
+ var a = $("mineAddr"); if (a) a.textContent = state.vanityAddress || "—";
+}
+function mineStep(salt){
+ if (mineStop) return;
+ var CHUNK = 900;
+ var start = Date.now();
+ try{
+ while (Date.now() - start < 60){
+ for (var i = 0; i < CHUNK; i++){
+ var addr = predictTokenAddress(salt, CREATE2_DEPLOYER, TOKEN_IMPL);
+ state.mineTries++;
+ if (addr.slice(-4) === VANITY_SUFFIX){
+ var again = predictTokenAddress(salt, CREATE2_DEPLOYER, TOKEN_IMPL);
+ if (again.slice(-4) !== VANITY_SUFFIX || salt.length !== 66) throw new Error("靓号自校验失败（不许用）");
+ state.salt = salt;
+ state.vanityAddress = addr;
+ state.mined = { salt: salt, address: addr, iterations: state.mineTries, ms: Date.now() - state.mineStartedAt };
+ state.mining = false;
+ setMineState("挖到了 ✓ 尾号 " + VANITY_SUFFIX, "ok");
+ var mm = $("mineMsg");
+ if (mm) mm.innerHTML = '<div class="alert ok small">挖到了：<span class="mono break">' + addr + "</span><br>试了 <b>" + state.mineTries + "</b> 次。已复核尾号。</div>";
+ paintMine(); renderGates(); return;
+ }
+ salt = toHex(keccak256(fromHex(salt)));
+ }
+ state.salt = salt;
+ }
+ }catch(e){
+ state.mining = false;
+ var m2 = $("mineMsg");
+ if (m2) m2.innerHTML = '<div class="alert danger small">找靓号出错：' + esc2(e && e.message ? e.message : e) + "</div>";
+ return;
+ }
+ state.salt = salt;
+ paintMine();
+ setTimeout(function(){ mineStep(salt); }, 0);
+}
+function startMine(){
+ var msg = $("mineMsg");
+ if (!keccakSelfCheckResult()) { if (msg) msg.innerHTML = '<div class="alert danger small">页面自带的哈希自检没过，<b>不许用它算地址</b>。</div>'; return; }
+ mineStop = false;
+ state.mining = true; state.mineTries = 0; state.mineStartedAt = Date.now();
+ state.mined = null; state.vanityAddress = null;
+ try{ state.salt = saltSeed(); }
+ catch(e){ if (msg) msg.innerHTML = '<div class="alert danger small">' + esc2(e && e.message ? e.message : e) + "</div>"; return; }
+ setMineState("正在找…", "warn");
+ if (msg) msg.innerHTML = '<div class="alert info small">从<b>随机起点</b>开始找尾号 ' + VANITY_SUFFIX + " 的地址。</div>";
+ renderGates();
+ setTimeout(function(){ mineStep(state.salt); }, 0);
+}
+function stopMine(){ mineStop = true; state.mining = false; setMineState("停下了", ""); }
+
+
+function validate(){
+ var f = readForm();
+ var errors = [], warnings = [];
+ var E = function(t){ errors.push(t); }, W = function(t){ warnings.push(t); };
+ if (!f.name) E("币名没填。");
+ if (!f.symbol) E("币代号没填。");
+ if (!f.meta) E("图标与介绍还没填（元数据地址）：官方上传口那串，或你自己的 IPFS ／ HTTPS 地址。");
+ var quote = normAddr(f.quoteToken);
+ if (f.quoteToken === "") E("报价币没填。请从下面的**官方清单**里点一个，或直接在**上面「报价币合约地址」那一格**里贴一个普通代币的合约地址（不能用 BNB）。");
+ else if (quote === null) E("报价币不是合法的合约地址（要 0x 开头、后面 40 个十六进制字符）。");
+ else if (quote === ZERO_ADDR) E("⛔ " + NATIVE_BLOCKED_TEXT + " —— 全零地址就是原生币 BNB，本页**当场拦下**，这一笔不许发。"
+ + "（这一条与「准入」无关：原生币是本模版**按设计不支持**。）");
+ 
+ if (!(state.quoteList && state.quoteList.ok)){
+ E(QUOTE_LIST_FAIL_TEXT + "（" + ((state.quoteList && state.quoteList.error) || "还在拉／接口没回话") + "）—— "
+ + "清单拉不到就**禁止提交**：⛔ 本页不会退回任何写死的币清单，也⛔ 不拿任何落盘快照当依据（）。"
+ + "这一步要联网（官方清单允许浏览器跨域直取、自带 5 分钟缓存）：检查网络后**刷新页面**。");
+ }
+ var n = function(s, label, lo, hi){
+ var t = String(s == null ? "" : s).trim();
+ if (t === "") throw new Error(label + "没填。");
+ if (!/^\d+$/.test(t)) throw new Error(label + "只许填整数。");
+ var v = BigInt(t);
+ if (v < BigInt(lo) || v > BigInt(hi)) throw new Error(label + "要在 " + lo + " 到 " + hi + " 之间（现在 " + t + "）。");
+ return v;
+ };
+ var buyTax = 0n, sellTax = 0n, quoteAmt = 0n, minShare = 0n, sb = 0n, taxDuration = 0n, antiFarmer = 0n;
+ var r1 = 0n, r2 = 0n, r3 = 0n, r4 = 0n, fb = 0n;
+ try { buyTax = n(f.buyTax, "买入税", 0, MAX_TAX_BPS); } catch (e){ E(e.message); }
+ try { sellTax = n(f.sellTax, "卖出税", 0, MAX_TAX_BPS); } catch (e){ E(e.message); }
+ 
+ var buyUnitsInfo = buyAmountUnits();
+ if (buyUnitsInfo.ok) quoteAmt = buyUnitsInfo.units;
+ else E("初始买入：" + buyUnitsInfo.err);
+ try { minShare = BigInt(n(f.minShare, "分红门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ try { sb = BigInt(n(f.selfBuilt, "金库自建门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ try { taxDuration = BigInt(n(f.taxDuration, "收税时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ try { antiFarmer = BigInt(n(f.antiFarmer, "防抢跑时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ try { r1 = n(f.r1, "第 1 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
+ try { r2 = n(f.r2, "第 2 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
+ try { r3 = n(f.r3, "第 3 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
+ try { r4 = n(f.r4, "第 4 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
+ try { fb = n(f.fallback, "金库兜底留额", 0, MAX_FALLBACK_BPS); } catch (e){ E(e.message); }
+ if (buyTax === 0n && sellTax === 0n) E("买卖税不能都是 0。");
+ if (minShare === 0n) E("分红门槛必须大于 0。");
+ if (sb > MAX_SELF_BUILT) E("金库自建门槛超过上限。");
+ if (quoteAmt === 0n) E("初始买入必须大于 0：本页就是「先授权、再发币」那两笔，0 就没有第一笔可发。");
+ 
+ var capInfo = buyCapInfo();
+ if (capInfo.clampUnits != null && quoteAmt > capInfo.clampUnits){
+ E(OFFICIAL_CAP_EXCEEDED + "：现在要花 " + formatUnits(quoteAmt, capInfo.decimals) + " "
+ + ((capInfo.token && capInfo.token.symbol) || "报价币") + "，上限是 " + formatUnits(capInfo.clampUnits, capInfo.decimals)
+ + "（" + (capInfo.clampIsLowerBound ? "下限：官方费率读不到" : "官方口径：协议费 ＋ 本页买入税") + "）。"
+ + "本页会把「购买数量」**压回上限**。" + OFFICIAL_CAP_ADJUSTED);
+ }
+ if (taxDuration > 3153600000n) W("收税时长超过官方上限 3153600000 秒（100 年）—— 本页不校验这一格，发币那一步会被官方通道拒。");
+ if (antiFarmer > 31536000n) W("防抢跑时长超过官方上限 31536000 秒（1 年）—— 同样由官方通道把关。");
+ var t1 = normAddr(f.t1), t2 = normAddr(f.t2), t3 = normAddr(f.t3);
+ if (t1 === null) E("第 1 路目标币不是合法地址。");
+ if (t2 === null) E("第 2 路目标币不是合法地址。");
+ if (t3 === null) E("第 3 路目标币不是合法地址。");
+ var predicted = predictedTokenAddr();
+ var geometry = {
+ route1_bps: Number(r1), route2_bps: Number(r2), route3_bps: Number(r3),
+ route1_target_token: t1 || ZERO_ADDR, route2_target_token: t2 || ZERO_ADDR, route3_target_token: t3 || ZERO_ADDR,
+ vaultFallbackBps: Number(fb), vaultSelfBuiltThreshold: sb.toString(),
+ route4_burn_own_bps: Number(r4), route4_target_token: predicted || ZERO_ADDR
+ };
+ if (!predicted) E("第 10 格（第 4 路的目标币 ＝ 本币地址）**还没有值**：请先点「开始找靓号」—— ⛔ 不许手打、也不许留空。");
+ if (!t3 || t3 === ZERO_ADDR) E("第 3 路目标币必填：留空的话这一路的钱会掉进官方销毁口袋（与第 4 路同一条管道），四槽之和也就不是 " + TOTAL_BPS + "，链上一定拒。");
+ else if (predicted && lower(t3) === lower(predicted)) E("第 3 路目标币填成了本币：那会与第 4 路重复销毁（同一枚币被烧两遍）。");
+ var built = null;
+ try{ built = buildVaultData(geometry); if (!built.ok) E("vaultData 格数 / 长度不对：" + built.wordCount + " 格 / " + built.bytes + " 字节（必须 " + VSLOTS + " 格 / " + VBYTES + " 字节）—— " + built.problems.join("；")); }
+ catch(e){ E("vaultData 编不出来：" + (e && e.message ? e.message : e)); }
+ var model = null;
+ try { model = computeModel(geometry); } catch(e){ E("四个官方槽算不出来：" + (e && e.message ? e.message : e)); }
+ if (model){
+ if (!model.routeSumOk) E("第①②③④路之和是 " + model.split.routeSum + "，不是 " + TOTAL_BPS + "。四路必须恰好填满 " + TOTAL_BPS + "。");
+ if (fb > 0n) W("现在有金库自建路（第 4 路恒自建），而兜底留额是 " + fb.toString() + "（> 0）—— 链上会拒这个几何。这一条页面不拦你。");
+ if (!model.deflationIsZero) E("官方 deflationBps 算出来是 " + model.slots.deflationBps + "（必须为 0：第 4 路由我们自己的金库执行）。");
+ }
+ return { errors: errors, warnings: warnings, form: f, quoteToken: quote, buyTax: buyTax, sellTax: sellTax,
+ quoteAmtWei: quoteAmt, minShareWei: minShare, taxDuration: taxDuration, antiFarmer: antiFarmer,
+ r1: r1, r2: r2, r3: r3, r4: r4, fallback: fb, geometry: geometry, model: model, built: built,
+ capInfo: capInfo, buyUnits: buyUnitsInfo };
+}
+function normAddr(s){
+ var t = String(s || "").trim();
+ if (t === "") return ZERO_ADDR;
+ if (!isHexAddr(t)) return null;
+ return lower(t);
+}
+function buildLaunchParams(over){
+ over = over || {};
+ var v = validate();
+ if (v.errors.length) throw new Error("表单还没填好：" + v.errors.join("；"));
+ if (!state.salt || !state.vanityAddress) throw new Error("还没找到尾号 " + VANITY_SUFFIX + " 的靓号地址。");
+ if (!v.built || !v.built.ok) throw new Error("vaultData 必须是 " + VSLOTS + " 格 / " + VBYTES + " 字节。");
+ return {
+ name: over.name != null ? over.name : v.form.name,
+ symbol: over.symbol != null ? over.symbol : v.form.symbol,
+ meta: over.meta != null ? over.meta : v.form.meta,
+ dexThresh: 1, salt: state.salt, migratorType: 1,
+ quoteToken: v.quoteToken, quoteAmt: over.quoteAmt != null ? BigInt(over.quoteAmt) : v.quoteAmtWei,
+ permitData: "0x", extensionID: "0x" + "00".repeat(32), extensionData: "0x",
+ dexId: 0, lpFeeProfile: 0,
+ buyTaxRate: v.buyTax, sellTaxRate: v.sellTax,
+ taxDuration: v.taxDuration, antiFarmerDuration: v.antiFarmer,
+ mktBps: v.model.slots.mktBps, deflationBps: v.model.slots.deflationBps,
+ dividendBps: v.model.slots.dividendBps, lpBps: v.model.slots.lpBps,
+ minimumShareBalance: v.minShareWei,
+ dividendToken: MAGIC_DIVIDEND_COMPUTED,
+ commissionReceiver: COMMISSION,
+ tokenVersion: TOKEN_VERSION,
+ vaultFactory: launchFactory(),
+ vaultData: v.geometry
+ };
+}
+function buildCalldata(over){
+ var p = buildLaunchParams(over);
+ var vd = buildVaultData(p.vaultData);
+ if (!vd.ok) throw new Error("vaultData 必须是 " + VSLOTS + " 格 / " + VBYTES + " 字节。");
+ if (BigInt(p.deflationBps) !== 0n) throw new Error("官方 deflationBps 必须为 0（第 4 路由我们自己的金库执行）。");
+ if (lower(String(p.vaultData.route4_target_token)) !== lower(String(state.vanityAddress))) throw new Error("第 10 格（第 4 路目标币）不等于本币地址 —— 链上一定会拒这一笔。");
+ var data = encodeNewTokenV6WithVault(p, vd.words);
+ return { params: p, data: data, bytes: (data.length - 2) / 2, sha256: sha256AsciiOf(data), vaultData: vd };
+}
+
+function buildApproveData(quoteAmtWei){ return SEL_APPROVE + wAddr(LAUNCH_CONTRACT) + w32(BigInt(quoteAmtWei)); }
+function buildApprovePayload(from, quoteToken, quoteAmtWei){
+ return { from: from, to: quoteToken, data: buildApproveData(quoteAmtWei), gas: toQuantity(APPROVE_GAS), value: "0x0" };
+}
+function validateApprovePayload(p, quoteToken, quoteAmtWei){
+ var errs = [], q = BigInt(quoteAmtWei);
+ if (!isHexAddr(quoteToken)) errs.push("报价币地址不合法，授权没地方发：" + quoteToken);
+ else if (lower(p.to) === lower(LAUNCH_CONTRACT)) errs.push("授权那一笔发给了入口契约 —— approve 必须发给报价币合约本身：" + p.to);
+ else if (lower(p.to) !== lower(quoteToken)) errs.push("授权那一笔的收件地址不是报价币合约：" + p.to);
+ if (String(p.data).slice(0, 10).toLowerCase() !== SEL_APPROVE) errs.push("data 的 selector 不是 " + SEL_APPROVE + "（approve）");
+ for (var i = 0; i < FORBIDDEN_FEE_FIELDS.length; i++) if (Object.prototype.hasOwnProperty.call(p, FORBIDDEN_FEE_FIELDS[i])) errs.push("授权那一笔带了 gas 价格字段：" + FORBIDDEN_FEE_FIELDS[i]);
+ if (p.value !== "0x0") errs.push("授权那一笔不该转币（value 应为 0x0）");
+ var spender = "0x" + String(p.data).slice(34, 74);
+ if (lower(spender) !== lower(LAUNCH_CONTRACT)) errs.push("被授权人（spender）不是入口契约：" + spender);
+ var amount = BigInt("0x" + String(p.data).slice(74, 138));
+ if (amount !== q) errs.push("批准额度不是「刚好 quoteAmt」：" + amount.toString() + " ≠ " + q.toString());
+ return errs;
+}
+
+function computeValueWei(quoteAmtWei){ return BigInt(quoteAmtWei || 0) > 0n ? ONE_GWEI : 0n; }
+function valueAllowed(wei){ var v = BigInt(wei); return v === 0n || v === ONE_GWEI; }
+function buildLaunchPayload(from){
+ var v = validate();
+ if (v.errors.length) throw new Error("表单还没填好：" + v.errors.join("；"));
+ var built = buildCalldata({});
+ state.built = built; state.calldata = built.data; state.calldataSha = built.sha256;
+ return { from: from, to: LAUNCH_CONTRACT, data: built.data, gas: toQuantity(LAUNCH_GAS), value: toQuantity(computeValueWei(v.quoteAmtWei)) };
+}
+function validateLaunchPayload(p){
+ var errs = [];
+ Object.keys(p).forEach(function(k){ if (ALLOWED_FIELDS.indexOf(k) < 0) errs.push("出现了不该有的字段：" + k); });
+ for (var i = 0; i < FORBIDDEN_FEE_FIELDS.length; i++) if (Object.prototype.hasOwnProperty.call(p, FORBIDDEN_FEE_FIELDS[i])) errs.push("⛔ 出现了 gas 价格字段：" + FORBIDDEN_FEE_FIELDS[i]);
+ if (!isHexAddr(p.from)) errs.push("from 不是合法地址");
+ if (lower(p.to) !== lower(LAUNCH_CONTRACT)) errs.push("⛔ to 不是入口契约：" + p.to);
+ if (!isHex(p.data) || p.data === "0x") errs.push("data 是空的");
+ if (String(p.data).slice(0, 10) !== SEL_LAUNCH) errs.push("⛔ data 不是 newTokenV6WithVault 那个选择器");
+ if (p.gas !== toQuantity(LAUNCH_GAS)) errs.push("⛔ gas 不是页面那个固定上限");
+ if (p.value !== "0x0" && p.value !== toQuantity(ONE_GWEI)) errs.push("⛔ value 只许 0 或 1 gwei");
+ var built = state.built;
+ if (built && built.vaultData && (built.vaultData.wordCount !== VSLOTS || built.vaultData.bytes !== VBYTES)) errs.push("vaultData 格数 / 长度不对（必须 " + VSLOTS + " 格 / " + VBYTES + " 字节）");
+ if (built && built.params && BigInt(built.params.deflationBps) !== 0n) errs.push("官方 deflationBps 必须为 0");
+ return errs;
+}
+
+
+async function connect(){
+ if (!hasWallet()) { setWalletNote("没检测到钱包（window.ethereum）—— 对外这一页是给陌生人的浏览器用的，没有钱包就只能看。"); applyWalletGuide(); return; }
+ var acct = null;
+ try{ acct = await rpc("eth_requestAccounts", []); }catch(e){ acct = null; }
+ if (acct && acct.length){ state.account = acct[0]; state.authorized = true; }
+ var cid = null;
+ try{ cid = await rpc("eth_chainId", []); }catch(e){ cid = null; }
+ state.chainId = cid ? Number(cid) : null;
+ await refreshBalance();
+ paintPublish(); renderGates();
+}
+function setWalletNote(t){ state.walletNote = t; }
+async function refreshBalance(){
+ state.quoteBal = null;
+ var f = readForm();
+ var q = normAddr(f.quoteToken);
+ if (state.account && q && q !== ZERO_ADDR){
+ var r = await ethCall(q, keccakSel("balanceOf(address)") + wAddr(state.account));
+ if (r.ok) state.quoteBal = wordToBig(r.result, 0);
+ }
+ paintTop();
+}
+function paintTop(){
+ var el = $("tbQuote"), u = $("tbQuoteUnit");
+ if (state.quoteBal !== null && state.quoteBal !== undefined){
+ if (el) el.textContent = state.quoteBal.toString();
+ if (u) u.textContent = "报价币最小单位";
+ } else {
+ if (el) el.textContent = "—";
+ if (u) u.textContent = "连上钱包后读";
+ }
+}
+
+
+function commonGates(){
+ var r = [];
+ if (!state.account) r.push("还没连钱包");
+ else if (!state.authorized) r.push("钱包没授权这个账户");
+ if (state.chainId !== Number((EXT.chain || {}).id)) r.push("钱包不在 " + String((EXT.chain || {}).name));
+ return r;
+}
+function publishGates(){
+ var r = commonGates();
+ if (!state.sel) r.push("还没选工厂");
+ else if (state.check && state.check.ok !== true) r.push("选中的工厂还没通过核对");
+ else if (!state.check) r.push("这台工厂还在核对");
+ if (!state.mined || !state.vanityAddress) r.push("还没挖到尾号 " + VANITY_SUFFIX + " 的靓号（第 10 格没有值）");
+ var v = null;
+ try { v = validate(); } catch (e){ v = { errors: [String(e && e.message ? e.message : e)] }; }
+ if (v.errors.length) r.push("表单还有没填好的：" + v.errors[0]);
+ if (state.approve.ok !== true) r.push("第 1 笔（授权）还没有成功回执");
+ if (state.launch.ok === true) r.push("第 2 笔已经成功过了");
+ return r;
+}
+function setBadge(id, phase){
+ var el = $(id); if (!el) return;
+ var map = { idle: ["待签名", "badge"], sign: ["待签名", "badge"], sent: ["待确认", "badge warn"], ok: ["成功", "badge ok"], fail: ["失败", "badge bad"], stuck: ["未确认/卡住", "badge bad"] };
+ var m = map[phase] || ["待签名", "badge"];
+ el.className = m[1]; el.textContent = m[0];
+}
+function setMsg(id, html, tone){ var el = $(id); if (el) el.innerHTML = html ? '<div class="alert ' + (tone || "info") + '">' + html + "</div>" : ""; }
+function sendTx(payload){ return rpc("eth_sendTransaction", [payload]); }
+async function waitReceipt(hash, tries){
+ for (var i = 0; i < (tries || 80); i++){
+ var rc = null;
+ try { rc = await rpc("eth_getTransactionReceipt", [hash]); } catch (e){ rc = null; }
+ if (rc && rc.status) return rc;
+ await new Promise(function(r){ setTimeout(r, 3000); });
+ }
+ return null;
+}
+function humanFail(what){ return what + "失败了。<b>没有广播第二次</b> —— 去钱包 / BscScan 看清楚，再点一次。"; }
+
+async function doPublish(){
+ var errs0 = publishGates();
+ if (errs0.length){ setMsg("pubMsg", "还不能发：" + esc2(errs0.join(" · ")), "danger"); return; }
+ var v = validate();
+ if (v.errors.length){ setMsg("pubMsg", "递钱包之前自检没过，<b>不发</b>：" + esc2(v.errors.join("；")), "danger"); return; }
+ var ap = buildApprovePayload(state.account, v.quoteToken, v.quoteAmtWei);
+ var aerrs = validateApprovePayload(ap, v.quoteToken, v.quoteAmtWei);
+ if (aerrs.length){ setMsg("pubMsg", "第 1 笔（授权）的自检没过，<b>不发</b>：" + esc2(aerrs.join("；")), "danger"); return; }
+ state.busy = true; setBadge("pubState", "sign");
+ setMsg("pubMsg", "<b>第 1 笔（共 2 笔）：授权。</b>已经交给你的钱包了 —— 在钱包窗口里核对后点确认。<br>这一笔发给<b>报价币合约</b>，只批准「刚好 " + v.quoteAmtWei.toString() + " 个最小单位」给入口契约，不会批无限授权。", "warn");
+ var h1;
+ try { h1 = await sendTx(ap); }
+ catch(e){ state.busy = false; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("第 1 笔（授权）"), "danger"); renderGates(); return; }
+ state.approve.hash = h1; state.approve.phase = "sent";
+ setMsg("pubMsg", "第 1 笔已广播：<span class=\"mono break\">" + esc2(h1) + "</span><br>等链上确认…", "info");
+ var rc1 = await waitReceipt(h1);
+ state.busy = false;
+ if (!rc1){ state.approve.phase = "stuck"; setBadge("pubState", "stuck"); setMsg("pubMsg", "第 1 笔没等到确认 —— 去 BscScan 看，<b>别重复发</b>。第 2 笔**不许**发。", "warn"); renderGates(); return; }
+ if (BigInt(rc1.status) !== 1n){ state.approve.phase = "fail"; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("第 1 笔（授权）"), "danger"); renderGates(); return; }
+ state.approve.ok = true; state.approve.phase = "ok";
+ setBadge("pubState", "ok"); setMsg("pubMsg", "第 1 笔成功。现在按同一条按钮发第 2 笔。", "ok");
+ renderGates();
+
+ var lp = buildLaunchPayload(state.account);
+ var lerrs = validateLaunchPayload(lp);
+ if (lerrs.length){ setMsg("pubMsg", "第 2 笔的自检没过，<b>不发</b>：" + esc2(lerrs.join("；")), "danger"); return; }
+ state.busy = true; setBadge("pubState", "sign");
+ setMsg("pubMsg", "<b>第 2 笔（共 2 笔）：发币。</b>已经交给你的钱包了 —— 核对后点确认。", "warn");
+ var h2;
+ try { h2 = await sendTx(lp); }
+ catch(e){ state.busy = false; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("第 2 笔（发币）"), "danger"); renderGates(); return; }
+ state.launch.hash = h2; state.launch.phase = "sent";
+ setMsg("pubMsg", "第 2 笔已广播：<span class=\"mono break\">" + esc2(h2) + "</span><br>等链上确认…", "info");
+ var rc2 = await waitReceipt(h2);
+ state.busy = false;
+ if (!rc2){ state.launch.phase = "stuck"; setBadge("pubState", "stuck"); setMsg("pubMsg", "第 2 笔没等到确认 —— 去 BscScan 看，<b>别重复发</b>。", "warn"); renderGates(); return; }
+ if (BigInt(rc2.status) !== 1n){ state.launch.phase = "fail"; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("第 2 笔（发币）"), "danger"); renderGates(); return; }
+ state.launch.ok = true; state.launch.phase = "ok";
+ setBadge("pubState", "ok");
+ setMsg("pubMsg", "<b>发币成功。</b>新币 = <span class=\"mono break\">" + esc2(String(state.vanityAddress)) + "</span>（就是第 10 格那个地址）。", "ok");
+ renderGates();
+}
+
+
+
+function launchFactory(){
+ return state.sel ? String(state.sel.factory) : "";
+}
+function facById(id){ for (var i = 0; i < EXT.factories.length; i++) if (EXT.factories[i].id === id) return EXT.factories[i]; return null; }
+async function verifyFactory(f){
+ var p = [];
+ var out = { id: f.id, factory: f.factory, codeBytes: 0, owner: null, beaconImpl: null, problems: p };
+ var code = null;
+ try { code = await rpc("eth_getCode", [f.factory, "latest"]); } catch (e) { code = null; }
+ out.codeBytes = code ? (code.length - 2) / 2 : 0;
+ if (!out.codeBytes) p.push("这个地址上没有代码");
+ var own = await ethCall(f.factory, SEL_OWNER);
+ out.owner = own.ok ? wordToAddr(own.result, 0) : null;
+ if (!out.owner) p.push("读不到 owner()");
+ else if (f.expectOwner && lower(out.owner) !== lower(f.expectOwner)) p.push("owner() 不是列表里那个地址");
+ var be = await ethCall(f.factory, SEL_BEACON_IMPL);
+ out.beaconImpl = be.ok ? wordToAddr(be.result, 0) : null;
+ if (f.expectBeaconImpl && lower(String(out.beaconImpl)) !== lower(f.expectBeaconImpl)) p.push("beaconImplementation() 与列表里的期望值不符");
+ out.ok = (p.length === 0);
+ return out;
+}
+function paintRouteTable(){
+ var el = $("routeTable"); if (!el) return;
+ var rows = "";
+ for (var k = 1; k <= 4; k++){
+ var txt = String((EXT.routes.labels || {})[String(k)] || "");
+ if (txt) rows += "<tr><th style=\"width:22%\">第 " + k + " 路</th><td>" + esc2(txt) + "</td></tr>";
+ }
+ el.innerHTML = "<table><tbody>" + rows + "</tbody></table>" +
+ "<div class=\"small\" style=\"margin-top:6px\">四路各占多少（bps）由你在发布时填，四条加起来必须是 <b>" + TOTAL_BPS + "</b>（＝100%）。</div>";
+}
+function paintList(){
+ var box = $("facList"); if (!box) return;
+ box.innerHTML = EXT.factories.map(function(f){
+ var c = (state.sel && state.sel.id === f.id) ? state.check : null;
+ var dot = !c ? "…" : (c.ok ? "✓" : "✕");
+ var cls = !c ? "badge" : (c.ok ? "badge ok" : "badge bad");
+ return "<div class=\"row\" style=\"margin:6px 0\">" +
+ "<button class=\"ghost\" style=\"flex:1;text-align:left\" id=\"pick_" + esc2(f.id) + "\">" + esc2(f.label) + "</button>" +
+ "<span class=\"" + cls + "\">" + dot + "</span></div>" +
+ "<div class=\"muted small\" style=\"margin:0 0 6px 4px\">" + esc2(EXT.chain.name) + "　·　<span class=\"mono break\">" + esc2(f.factory) + "</span>" + (f.note ? "<br>" + esc2(f.note) : "") + "</div>";
+ }).join("");
+ EXT.factories.forEach(function(f){
+ var b = $("pick_" + f.id);
+ if (b && b.addEventListener) b.addEventListener("click", function(){ void selectFactory(f.id); });
+ });
+}
+function paintPublish(){
+ var pane = $("stepPublish");
+ var which = $("pubWhich");
+ var ck = $("pubCheck");
+ if (!state.sel){ if (pane) pane.hidden = true; return; }
+ if (pane) pane.hidden = false;
+ var c = state.check;
+ if (which) which.innerHTML = "选中：<b>" + esc2(state.sel.label) + "</b>　<span class=\"mono break\">" + esc2(state.sel.factory) + "</span>";
+ if (ck){
+ ck.innerHTML = (c && c.ok)
+ ? "<div class=\"alert ok small\">★ 已核对：这台工厂在链上就是列表里那一台（落地码 " + c.codeBytes + " 字节）。</div>"
+ : "<div class=\"alert danger small\">⛔ 这台工厂**没通过核对**： " + esc2(c ? c.problems.join("；") : "还没核对") + "</div>";
+ }
+ var d = $("pubDetail");
+ if (d) d.innerHTML = "<div class=\"mono break\">" + esc2("选中的工厂：" + String(state.sel.factory)) + "</div>";
+}
+function renderGates(){
+ var pg = null;
+ try { pg = validate(); } catch (e){ pg = null; }
+ 
+ var b = $("blkActBtn");
+ if (b) b.disabled = (publishGates().length > 0) || state.busy === true;
+ var box = $("pfGate");
+ if (box){
+ var m = pg ? pg.model : null, bu = pg ? pg.built : null;
+ box.innerHTML =
+ "<div class=\"kv\"><span class=\"k\">第 4 路份额（第 9 格）</span><span class=\"v mono\">" + esc2(m ? String(m.r4) : "—") + "</span></div>" +
+ "<div class=\"kv\"><span class=\"k\">第 10 格（本币地址）</span><span class=\"v mono break\">" + esc2(state.vanityAddress || "（还没挖到——先点上面的「开始找靓号」）") + "</span></div>";
+ }
+ var len = $("vdataLen");
+ if (len) len.textContent = (pg && pg.built) ? (pg.built.wordCount + " 格 · " + pg.built.bytes + " 字节") : "—";
+ var r4o = $("r4Out");
+ if (r4o) r4o.textContent = (pg && pg.model) ? String(pg.model.r4) : "—";
+ var rs = $("routeSum");
+ if (rs) rs.textContent = (pg && pg.model) ? String(pg.model.split.routeSum) : "—";
+ paintTop();
+ renderReflexive();
+}
+
+function renderReflexive(){
+ var big = $("blkActBig"), btn = $("blkActBtn"), risk = $("blkRiskText");
+ if (!big || !btn || !risk) return;
+ if (!state.sel){
+ big.textContent = "选一台工厂";
+ btn.textContent = "一键发布（两笔）";
+ btn.disabled = true;
+ } else if (state.pubLaunch.ok){
+ big.textContent = "发完了 —— 去 BscScan 看那个新币";
+ btn.textContent = "一键发布（两笔）";
+ btn.disabled = true;
+ } else if (state.pubApprove.ok){
+ big.textContent = "按下面的按钮发第 2 笔（发币）";
+ btn.textContent = "一键发布（两笔）";
+ btn.disabled = (publishGates().length > 0) || state.busy === true;
+ } else if (state.vanityAddress){
+ big.textContent = "按下面的按钮发第 1 笔（授权）";
+ btn.textContent = "一键发布（两笔）";
+ btn.disabled = (publishGates().length > 0) || state.busy === true;
+ } else {
+ big.textContent = "先按上面「开始找靓号」";
+ btn.textContent = "一键发布（两笔）";
+ btn.disabled = true;
+ }
+ risk.innerHTML = "发出去的币<b>上链不可逆</b>：四路份额、税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。"
+ + "工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。第 1 笔授权**只批「刚好你要花的那个数」**（不是无限授权）；"
+ + "第 1 笔没成功，第 2 笔**点都点不动**。第 10 格（第 4 路目标币 ＝ 本币地址）由**现场挖靓号**算出来，⛔ 不许手打、也不许留空。";
+}
+function paintMisc(){
+ var el = $("verPill");
+ var txt = "";
+ try { var s = document.querySelector("script"); if (s) txt = String(s.textContent || ""); } catch (e) { txt = ""; }
+ state.pageVer = txt ? toHex(sha256Bytes(utf8Bytes(txt))).slice(2) : null;
+ if (el) el.textContent = state.pageVer ? ("版本 " + state.pageVer.slice(0, 16)) : "版本读不到";
+ var sl = $("siteLink");
+ if (sl){ try { sl.textContent = String(location.href).split("?")[0]; } catch (e) { sl.textContent = "（本站地址）"; } }
+ var cp = $("chainPill");
+ if (cp){
+ if (state.chainId == null) cp.textContent = "链号未连接";
+ else if (state.chainId === Number((EXT.chain || {}).id)) cp.textContent = "已连 " + String((EXT.chain || {}).name);
+ else cp.textContent = "链不对（当前 " + state.chainId + "）";
+ }
+}
+async function selectFactory(id){
+ var f = facById(id); if (!f) return;
+ state.sel = f; state.check = null;
+ state.approve = { hash: null, ok: false, phase: "idle" };
+ state.launch = { hash: null, ok: false, phase: "idle" };
+ paintList(); paintPublish(); renderGates();
+ var msg = $("pickMsg");
+ var st = $("pickState"); if (st) { st.className = "badge"; st.textContent = "核对中…"; }
+ if (msg) msg.innerHTML = "<div class=\"alert info small\">正在核对这台工厂（只读）…</div>";
+ state.check = await verifyFactory(f);
+ if (st) { st.className = state.check.ok ? "badge ok" : "badge bad"; st.textContent = state.check.ok ? "已核对" : "没通过"; }
+ paintList(); paintPublish(); renderGates();
+ if (msg) msg.innerHTML = state.check.ok
+ ? "<div class=\"alert ok small\">★ 核对通过 —— 接下来在下面「第 2 步」发币。</div>"
+ : "<div class=\"alert danger small\">⛔ 核对没通过：" + esc2(state.check.problems.join("；")) + "</div>";
+ var big = $("pickBig"); if (big) big.textContent = state.check.ok ? "填表 → 挖靓号 → 发币" : "换一台工厂";
+}
+function renderAudit(){
+ var items = [];
+ var add = function(okv, title, detail){ items.push({ ok: okv, title: title, detail: detail || "" }); };
+ var vm = buildVaultData({ route1_bps: 1, route2_bps: 1, route3_bps: 1, route1_target_token: ZERO_ADDR, route2_target_token: ZERO_ADDR, route3_target_token: ZERO_ADDR, vaultFallbackBps: 0, vaultSelfBuiltThreshold: 0, route4_burn_own_bps: 1, route4_target_token: "0x" + "7".repeat(40) });
+ add(vm.wordCount === VSLOTS && vm.bytes === VBYTES, "★★★ vaultData 就是 " + VSLOTS + " 格 / " + VBYTES + " 字节（第 9 格份额 ＋ 第 10 格本币地址都在里面）", vm.wordCount + " 格 / " + vm.bytes + " 字节");
+ add(APPROVE_GAS === BigInt(String(EXT.gas.approve)) && LAUNCH_GAS === BigInt(String(EXT.gas.launch)), "★★★ 两笔 gas 都是**固定上限**（从配方取）", APPROVE_GAS.toString() + " / " + LAUNCH_GAS.toString());
+ add(String(SEL_APPROVE) === "0x095ea7b3", "★★★ 第 1 笔的 selector 是 approve（0x095ea7b3）", SEL_APPROVE);
+ add(valueAllowed(0n) && valueAllowed(ONE_GWEI) && computeValueWei(0) === 0n && computeValueWei(1) === ONE_GWEI, "★★ value 只许 0 或 1 gwei（买入 > 0 ⇒ 1 gwei）");
+ add(TX_STATES.length === 5, "★★ 状态是**五态机**", TX_STATES.join(" / "));
+ var poison = { from: "0x" + "1".repeat(40), to: LAUNCH_CONTRACT, data: SEL_LAUNCH + "00", gas: toQuantity(LAUNCH_GAS), value: "0x0" };
+ poison[FORBIDDEN_FEE_FIELDS[0]] = "0x1";
+ add(validateLaunchPayload(poison).some(function(x){ return /gas 价格字段/.test(x); }), "★★★ 带 gas 价格的交易会被拒（真跑一遍）");
+ add(scriptText().indexOf("estimate" + "Gas") < 0, "★★★ 本页**一处「节点估价」都没有**（gas 全是固定上限）");
+ add(String((EXT.vanity || {}).suffix) === VANITY_SUFFIX && VANITY_SUFFIX.length === 4, "★★★ 靓号后缀与基准实现**都从配方取**（页面不写死）", VANITY_SUFFIX);
+ add(keccakSelfCheckResult(), "★★★ 页面自带的 keccak 现算通过公认向量自证（不过就不许拿它算靓号）");
+ var el = $("audit");
+ if (el) el.innerHTML = items.map(function(it){
+ return "<div class=\"alert " + (it.ok ? "ok" : "danger") + " small\"><b>" + (it.ok ? "✓ " : "✗ ") + it.title + "</b>" + (it.detail ? "<br>" + esc2(it.detail) : "") + "</div>";
+ }).join("");
+}
+function scriptText(){
+ try{ if (typeof document !== "undefined" && document.querySelector){ var s = document.querySelector("script"); if (s && typeof s.textContent === "string") return s.textContent; } }catch(e){}
+ return "";
+}
+function bind(id, fn){
+ var el = $(id);
+ if (el && el.addEventListener) el.addEventListener("click", fn);
+}
+
+
+
+var QUOTE_TOKENS_URL = "https://flap.sh/api/launch/quote-tokens?chainId=56";
+var CURVE_TOTAL_SUPPLY = 1000000000n; 
+var MAX_CREATOR_BUY_TOKENS = 800000000n; 
+var TOKEN_AMOUNT_SCALE = 1000000000000000000n; 
+var TOKEN_DECIMALS = 18; 
+var QUOTE_LIST_FAIL_TEXT = "官方报价币清单没拉到";
+var NATIVE_BLOCKED_TEXT = "本模版暂不支持原生币作底池";
+
+var ADMISSION_APPLY_TEXT = "该币未获官方准入，请联系 Flap 官方申请";
+var OFFICIAL_CAP_EXCEEDED = "超出创建者购买上限";
+var OFFICIAL_CAP_ADJUSTED = "购买数量已调整为本次发行允许的最大值。";
+var QUOTE_CATEGORY_LABEL = { crypto: "Crypto", rwa: "股票代币" };
+
+var PORTAL_ADDR = "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0";
+var SEL_GET_FEE_RATE = keccakSel("getFeeRate()");
+state.quoteList = { loading: false, ok: false, error: null, tokens: [], at: 0 };
+state.quoteMeta = null;
+state.quoteMetaPending = "";
+state.protocolFeeBps = null;
+state.feeReadBusy = false;
+state.buyUnit = "quote";
+
+
+function parseAmount(s, decimals){
+ var t = String(s == null ? "" : s).trim();
+ if (t === "") return 0n; 
+ 
+ if (decimals == null || String(decimals).trim() === ""){
+ throw new Error("还不知道这个报价币的小数位（decimals）—— ⛔ 本页不许拿任何默认位数凑合：请先从官方清单里选一个币。");
+ }
+ var d = Number(decimals);
+ if (!isFinite(d) || Math.floor(d) !== d || d < 0 || d > 36){
+ throw new Error("这个报价币的小数位不合法（" + String(decimals) + "）—— ⛔ 本页不许拿任何默认位数凑合。");
+ }
+ if (!/^\d+(\.\d+)?$/.test(t)) throw new Error("这一格只许填数字（可以带小数点）。");
+ var parts = t.split(".");
+ var whole = BigInt(parts[0] || "0");
+ var frac = (parts[1] || "").slice(0, d).padEnd(d, "0");
+ return whole * (10n ** BigInt(d)) + BigInt(frac || "0");
+}
+
+function formatUnits(u, decimals){
+ var v = BigInt(u);
+ var d = Number(decimals);
+ if (!isFinite(d) || Math.floor(d) !== d || d <= 0) return v.toString();
+ var sc = 10n ** BigInt(d);
+ var neg = v < 0n;
+ if (neg) v = -v;
+ var whole = v / sc;
+ var frac = (v % sc).toString().padStart(d, "0").replace(/0+$/, "");
+ return (neg ? "-" : "") + whole.toString() + (frac ? "." + frac : "");
+}
+
+
+function parseQuoteTokens(json){
+ if (!json || !Array.isArray(json.chains)) throw new Error("清单结构不是预期的 { chains: [ … ] }");
+ var chain = null;
+ for (var i = 0; i < json.chains.length; i++){
+ if (Number(json.chains[i].chainId) === BSC_CHAIN_ID){ chain = json.chains[i]; break; }
+ }
+ if (!chain) throw new Error("清单里没有 chainId " + BSC_CHAIN_ID + " 那一条");
+ var rows = chain.quoteTokens;
+ if (!Array.isArray(rows) || rows.length === 0) throw new Error("quoteTokens 是空的");
+ var out = [];
+ for (var j = 0; j < rows.length; j++){
+ var t = rows[j];
+ if (!t || !isHexAddr(t.address)) continue;
+ if (isZeroAddr(t.address)) continue; 
+ var dd = Number(t.decimals);
+ if (!isFinite(dd) || dd < 0 || dd > 36) continue;
+ out.push({ symbol: String(t.symbol == null ? "" : t.symbol), name: String(t.name == null ? "" : t.name),
+ address: lower(t.address), decimals: Math.floor(dd),
+ category: String(t.category == null ? "" : t.category), curve: t.curve == null ? null : t.curve });
+ }
+ return out;
+}
+function quoteCategoryLabel(c){
+ var k = String(c == null ? "" : c);
+ return QUOTE_CATEGORY_LABEL[k] || (k || "其它");
+}
+function findListedToken(addr){
+ var a = lower(addr);
+ var list = (state.quoteList && state.quoteList.tokens) ? state.quoteList.tokens : [];
+ for (var i = 0; i < list.length; i++) if (list[i].address === a) return list[i];
+ return null;
+}
+async function loadQuoteTokens(){
+ state.quoteList = { loading: true, ok: false, error: null, tokens: [], at: 0 };
+ renderQuoteList(); renderBuyCap(); renderGates();
+ try{
+ var res = await fetch(QUOTE_TOKENS_URL, { headers: { accept: "application/json" } });
+ if (!res || !res.ok) throw new Error("接口回了 HTTP " + String(res && res.status != null ? res.status : "?"));
+ var text = await res.text();
+ var json = null;
+ try{ json = JSON.parse(text); }catch(e2){ throw new Error("清单不是合法 JSON"); }
+ var tokens = parseQuoteTokens(json);
+ if (tokens.length === 0) throw new Error("清单里一条可用的 ERC-20 报价币都没有");
+ state.quoteList = { loading: false, ok: true, error: null, tokens: tokens, at: Date.now() };
+ }catch(e){
+ 
+ state.quoteList = { loading: false, ok: false, error: (e && e.message ? e.message : String(e)), tokens: [], at: Date.now() };
+ }
+ if (currentQuoteAddr() !== "") onQuoteInput(currentQuoteAddr());
+ renderQuoteList(); renderBuyCap(); renderGates();
+}
+function renderQuoteList(){
+ var box = $("quoteListBox"), msg = $("quoteListMsg"), cnt = $("quoteCount");
+ var L = state.quoteList || { loading: false, ok: false, error: null, tokens: [] };
+ var tokens = L.tokens || [];
+ if (cnt) cnt.textContent = L.loading ? "正在拉官方清单…" : (L.ok ? (tokens.length + " 条可选（原生币已过滤）") : "清单没拉到");
+ if (msg){
+ if (L.loading){
+ msg.innerHTML = '<div class="alert info small">正在拉<b>官方报价币清单</b>（<span class="mono break">' + esc(QUOTE_TOKENS_URL) + "</span>）…</div>";
+ } else if (!L.ok){
+ msg.innerHTML = '<div class="alert danger small"><b>' + QUOTE_LIST_FAIL_TEXT + "</b>（" + esc(L.error || "没有更多说明") + "）。"
+ + "<b>本页现在禁止提交</b> —— ⛔ 本页不会退回任何写死的币清单，也⛔ 不拿任何落盘快照当依据。"
+ + '<br><span class="small">The official quote-token list could not be fetched, so nothing can be launched from here. Please check the network and reload.</span></div>';
+ } else {
+ msg.innerHTML = '<div class="alert info small">官方报价币清单已拉到：<b>' + tokens.length + "</b> 条"
+ + "（打开页面时实时拉的；官方自己给了 5 分钟缓存）。"
+ + "★ <b>原生币（BNB）不在列表里</b>。另外：不在准入名单里的币，官方会拦下（" + esc(ADMISSION_APPLY_TEXT) + "）。</div>";
+ }
+ }
+ if (!box) return;
+ if (!L.ok){
+ box.innerHTML = '<div class="qgroup">（清单没拉到 ⇒ 这里没有可选项；⛔ 本页不用写死的清单顶替）</div>';
+ return;
+ }
+ var q = lower(String(($("pf_quoteSearch") && $("pf_quoteSearch").value) || "").trim());
+ var selAddr = lower(currentQuoteAddr());
+ var order = [], groups = {};
+ for (var i = 0; i < tokens.length; i++){
+ var t = tokens[i];
+ if (q !== ""){
+ var hay = lower(t.symbol + " " + t.name + " " + t.address);
+ if (hay.indexOf(q) < 0) continue;
+ }
+ if (!groups[t.category]){ groups[t.category] = []; order.push(t.category); }
+ groups[t.category].push(t);
+ }
+ order.sort(function(a, b){
+ var rank = function(x){ return x === "crypto" ? 0 : (x === "rwa" ? 1 : 2); };
+ return (rank(a) - rank(b)) || String(a).localeCompare(String(b));
+ });
+ var html = "";
+ for (var k = 0; k < order.length; k++){
+ var cat = order[k];
+ html += '<div class="qgroup">' + esc(quoteCategoryLabel(cat)) + "（" + groups[cat].length + "）</div>";
+ for (var m = 0; m < groups[cat].length; m++){
+ var it = groups[cat][m];
+ 
+ html += '<div class="qitem' + (it.address === selAddr ? " sel" : "") + '" role="button" tabindex="0" data-addr="' + it.address + '">'
+ + '<span class="qs">' + esc(it.symbol) + "</span>"
+ + ' <span class="qd">' + esc(it.name) + "　·　" + it.decimals + " 位小数</span></div>";
+ }
+ }
+ if (html === "") html = '<div class="qgroup">清单里没有匹配的代币（换个符号或合约地址再搜）</div>';
+ box.innerHTML = html;
+ bindQuoteList();
+}
+function bindQuoteList(){
+ var box = $("quoteListBox");
+ if (!box || typeof box.addEventListener !== "function" || box.__dshQuoteBound) return;
+ box.__dshQuoteBound = true;
+ box.addEventListener("click", function(e){ onQuoteListClick(e); });
+ box.addEventListener("keydown", function(e){
+ if (e && (e.key === "Enter" || e.key === " ")) onQuoteListClick(e);
+ });
+}
+function onQuoteListClick(e){
+ var el = e && e.target ? e.target : null;
+ var addr = (el && typeof el.getAttribute === "function") ? el.getAttribute("data-addr") : null;
+ if (!addr){
+ var up = el && el.parentNode ? el.parentNode : null;
+ addr = (up && typeof up.getAttribute === "function") ? up.getAttribute("data-addr") : null;
+ }
+ if (!addr) return;
+ selectQuoteToken(addr);
+}
+
+function selectQuoteToken(addr){
+ var f = $("pf_quote");
+ var a = String(addr == null ? "" : addr).trim();
+ if (f) f.value = a;
+ onQuoteInput(a);
+}
+function currentQuoteAddr(){
+ var f = $("pf_quote");
+ return f ? String(f.value == null ? "" : f.value).trim() : "";
+}
+function quoteDecimalsOf(t){
+ if (!t || t.decimals == null) return null;
+ var d = Number(t.decimals);
+ if (!isFinite(d) || Math.floor(d) !== d || d < 0 || d > 36) return null;
+ return d;
+}
+
+function selectedQuoteToken(){
+ var a = currentQuoteAddr();
+ if (!isHexAddr(a) || isZeroAddr(a)) return null;
+ var listed = findListedToken(a);
+ if (listed) return listed;
+ var m = state.quoteMeta;
+ if (m && lower(m.address) === lower(a) && m.decimals != null){
+ return { symbol: m.symbol || "（手工地址）", name: "不在官方清单里", address: lower(a), decimals: m.decimals, category: "", curve: null, manual: true };
+ }
+ return { symbol: "（手工地址）", name: "不在官方清单里", address: lower(a), decimals: null, category: "", curve: null, manual: true };
+}
+
+function onQuoteInput(addr){
+ var f = $("pf_quote");
+ var a = (addr == null) ? currentQuoteAddr() : String(addr).trim();
+ if (f && f.value !== a) f.value = a;
+ renderQuoteSel();
+ renderQuoteList();
+ renderBuyCap();
+ if (a !== "" && isHexAddr(a) && !isZeroAddr(a) && !findListedToken(a)) void resolveQuoteMeta(a);
+ if (state.protocolFeeBps == null && state.feeReadBusy !== true) void readProtocolFee();
+}
+function renderQuoteSel(){
+ var out = $("quoteSelOut");
+ if (!out) return;
+ var a = currentQuoteAddr();
+ if (a === ""){ out.textContent = "还没选（从下面的列表里点一个，或直接在**上面那一格**里贴一个 CA）"; return; }
+ if (!isHexAddr(a)){ out.innerHTML = '<span style="color:var(--danger)">这不是合法的合约地址（要 0x ＋ 40 个十六进制字符）</span>'; return; }
+ if (isZeroAddr(a)){
+ out.innerHTML = '<span style="color:var(--danger)"><b>' + NATIVE_BLOCKED_TEXT + "</b> —— 全零地址就是原生币 BNB，本页当场拦下。"
+ + "（这一条与「准入」无关：原生币是本模版**按设计不支持**。）</span>";
+ return;
+ }
+ var t = selectedQuoteToken();
+ var d = quoteDecimalsOf(t);
+ var listed = findListedToken(a) ? "在官方清单里" : "不在官方清单里（收不收由链上复核决定）";
+ out.innerHTML = "<b>" + esc(t.symbol || "（没有符号）") + "</b>"
+ + (t.name ? "　·　" + esc(t.name) : "")
+ + "　·　小数位 " + (d == null ? '<span style="color:var(--warn)">还读不到（先连钱包，或换成官方清单里的币）</span>' : ("<b>" + d + "</b>"))
+ + "　·　" + esc(listed) + '<br><span class="mono break">' + esc(lower(a)) + "</span>";
+}
+
+async function resolveQuoteMeta(addr){
+ var a = lower(addr);
+ if (state.quoteMetaPending === a) return;
+ state.quoteMetaPending = a;
+ try{
+ if (state.quoteMeta && state.quoteMeta.address === a && state.quoteMeta.decimals != null) return;
+ if (!state.account) return; 
+ var r = await ethCall(a, keccakSel("decimals()"));
+ var d = (r && r.ok) ? wordToBig(r.result, 0) : null;
+ if (d == null || d < 0n || d > 36n){ state.quoteMeta = { address: a, decimals: null, symbol: null }; return; }
+ state.quoteMeta = { address: a, decimals: Number(d), symbol: null };
+ }catch(e){
+ state.quoteMeta = { address: a, decimals: null, symbol: null };
+ }finally{
+ state.quoteMetaPending = "";
+ renderQuoteSel(); renderBuyCap(); renderGates();
+ }
+}
+
+
+function fracLen(s){ var t = String(s); var i = t.indexOf("."); return i < 0 ? 0 : (t.length - i - 1); }
+function decStrToScaled(s, scale){
+ var t = String(s == null ? "" : s).trim();
+ if (!/^\d+(\.\d+)?$/.test(t)) return null;
+ var p = t.split(".");
+ var frac = (p[1] || "").slice(0, scale).padEnd(scale, "0");
+ try{ return BigInt(p[0] || "0") * (10n ** BigInt(scale)) + BigInt(frac || "0"); }
+ catch(e){ return null; }
+}
+
+function curveOf(t){
+ if (!t || !t.curve) return null;
+ var c = t.curve;
+ var rNum = Number(c.r);
+ var hNum = Number(c.h == null ? 0 : c.h);
+ var kRaw = (c.k == null) ? (rNum * 1000000000) : c.k; 
+ var kNum = Number(kRaw);
+ if (!isFinite(rNum) || !isFinite(hNum) || !isFinite(kNum)) return null;
+ if (rNum < 0 || kNum <= 0 || hNum < 0 || Math.floor(hNum) !== hNum) return null;
+ var rStr = String(c.r);
+ var kStr = (c.k == null) ? String(kRaw) : String(c.k);
+ var scale = Math.max(fracLen(rStr), fracLen(kStr));
+ if (scale > 30) scale = 30;
+ var Rs = decStrToScaled(rStr, scale), Ks = decStrToScaled(kStr, scale);
+ if (Rs == null || Ks == null) return null;
+ return { r: rNum, h: hNum, k: kNum, rScaled: Rs, kScaled: Ks, scale: scale };
+}
+function feeBpsBig(feeBps){
+ var f = Number(feeBps);
+ if (!isFinite(f)) return null;
+ var F = BigInt(Math.round(f));
+ return (F >= 0n && F < 10000n) ? F : null; 
+}
+
+function quoteUnitsForTokensScaled(tokensScaled, t, feeBps){
+ var cv = curveOf(t);
+ var d = quoteDecimalsOf(t);
+ var F = feeBpsBig(feeBps);
+ if (!cv || d == null || F == null) return null;
+ var DT = (CURVE_TOTAL_SUPPLY + BigInt(cv.h)) * TOKEN_AMOUNT_SCALE - BigInt(tokensScaled);
+ if (DT <= 0n) return null;
+ var nS = 10n ** BigInt(cv.scale); 
+ var num = (cv.kScaled * TOKEN_AMOUNT_SCALE - cv.rScaled * DT) * 10000n * (10n ** BigInt(d));
+ var den = nS * DT * (10000n - F);
+ if (num <= 0n || den <= 0n) return null;
+ return (num + den - 1n) / den; /* ★ 进位（官方 ROUND_UP） */
+}
+
+function tokensForQuoteUnits(qUnits, t, feeBps){
+ var cv = curveOf(t);
+ var d = quoteDecimalsOf(t);
+ var F = feeBpsBig(feeBps);
+ if (!cv || d == null || F == null) return null;
+ var Q = BigInt(qUnits);
+ if (Q <= 0n) return 0n;
+ var sc = 10n ** BigInt(d);
+ var nS = 10n ** BigInt(cv.scale);
+ var DEN = Q * nS * (10000n - F) + cv.rScaled * sc * 10000n;
+ if (DEN <= 0n) return null;
+ var num = (CURVE_TOTAL_SUPPLY + BigInt(cv.h)) * DEN - cv.kScaled * sc * 10000n;
+ if (num <= 0n) return 0n;
+ var scaled = (num * TOKEN_AMOUNT_SCALE) / DEN;
+ var capScaled = MAX_CREATOR_BUY_TOKENS * TOKEN_AMOUNT_SCALE;
+ if (scaled > capScaled) scaled = capScaled;
+ return scaled / TOKEN_AMOUNT_SCALE;
+}
+function buyTaxBpsLoose(){
+ var el = $("pf_buyTax");
+ var t = el ? String(el.value == null ? "" : el.value).trim() : "";
+ if (!/^\d+$/.test(t)) return null;
+ var n = Number(t);
+ return (n >= 0 && n <= 10000) ? n : null;
+}
+
+function totalBuyFeeBps(){
+ var tax = buyTaxBpsLoose();
+ if (tax == null) return null;
+ var proto = (state.protocolFeeBps == null) ? 0 : Number(state.protocolFeeBps);
+ return proto + tax;
+}
+function buyCapInfo(){
+ var t = selectedQuoteToken();
+ var d = quoteDecimalsOf(t);
+ var cv = curveOf(t);
+ var tax = buyTaxBpsLoose();
+ var info = { token: t, decimals: d, curve: cv, feeKnown: (state.protocolFeeBps != null),
+ protocolFeeBps: state.protocolFeeBps, buyTaxBps: tax,
+ curveUnits: null, lowerUnits: null, officialUnits: null,
+ clampUnits: null, clampIsLowerBound: false, why: "" };
+ if (!t || !isHexAddr(t.address)){ info.why = "还没选报价币（从上面的列表里点一个，或贴一个 CA）"; return info; }
+ if (isZeroAddr(t.address)){ info.why = NATIVE_BLOCKED_TEXT; return info; }
+ if (d == null){ info.why = "这个报价币的小数位还读不到（先连钱包，或换成官方清单里的币）"; return info; }
+ if (!cv){ info.why = "这个报价币没有曲线参数（r/h/k）⇒ 算不出官方上限（它不在官方清单里）"; return info; }
+ if (tax == null){ info.why = "买入税那一格填的不是 0–10000 的整数"; return info; }
+ var capScaled = MAX_CREATOR_BUY_TOKENS * TOKEN_AMOUNT_SCALE;
+ info.curveUnits = quoteUnitsForTokensScaled(capScaled, t, 0); 
+ info.lowerUnits = quoteUnitsForTokensScaled(capScaled, t, tax); 
+ if (info.feeKnown) info.officialUnits = quoteUnitsForTokensScaled(capScaled, t, Number(state.protocolFeeBps) + tax);
+ info.clampUnits = (info.officialUnits != null) ? info.officialUnits : info.lowerUnits;
+ info.clampIsLowerBound = (info.officialUnits == null);
+ return info;
+}
+
+function buyAmountUnits(){
+ var el = $("pf_quoteAmt");
+ var raw = el ? String(el.value == null ? "" : el.value).trim() : "";
+ var info = buyCapInfo();
+ if (state.buyUnit === "token"){
+ var tk = null;
+ try{ tk = parseAmount(raw, TOKEN_DECIMALS); }
+ catch(e){ return { ok: false, units: 0n, err: e.message }; }
+ var conv = quoteUnitsForTokensScaled(tk, info.token, totalBuyFeeBps());
+ if (conv == null) return { ok: false, units: 0n, err: (info.why || "按枚数反算报价币数量算不出来") };
+ return { ok: true, units: conv, err: null };
+ }
+ try{ return { ok: true, units: parseAmount(raw, info.decimals), err: null }; }
+ catch(e){ return { ok: false, units: 0n, err: e.message }; }
+}
+
+
+var TOAST_TIMER = null;
+function showToast(html){
+ var box = $("toastBox");
+ if (!box) return;
+ box.innerHTML = html;
+ box.hidden = false;
+ if (TOAST_TIMER){ try{ clearTimeout(TOAST_TIMER); }catch(e){ } }
+ TOAST_TIMER = setTimeout(function(){ box.hidden = true; box.innerHTML = ""; TOAST_TIMER = null; }, 9000);
+}
+function renderBuyCap(){
+ var info = buyCapInfo();
+ var t = info.token;
+ var sym = (t && t.symbol) ? t.symbol : "报价币";
+ var d = info.decimals;
+ var unitToken = (state.buyUnit === "token");
+ var newSym = ($("pf_symbol") && String($("pf_symbol").value || "").trim()) || "新币";
+ if ($("buyUnitLabel")) $("buyUnitLabel").textContent = unitToken ? "购买数量（枚数）" : "购买数量（报价币）";
+ if ($("buyUnitHint")) $("buyUnitHint").innerHTML = unitToken
+ ? ('<b>这一格现在填的是「枚数」</b>（官方那个「切换购买单位」的第二种口径）。最多 <b>' + MAX_CREATOR_BUY_TOKENS.toString() + "</b> 枚（8 亿枚 ＝ 总量 80%）。")
+ : ('<b>这是你要「花掉」的报价币数量</b>（不是 BNB）。'
+ + '这一格<b>必须 &gt; 0</b>：本页就是「先授权、再发币」那两笔。');
+ if ($("buyMaxOut")){
+ if (unitToken){
+ $("buyMaxOut").textContent = "最高：" + MAX_CREATOR_BUY_TOKENS.toString() + " 枚（8 亿枚 ＝ 总量 80%，官方口径）";
+ } else if (info.officialUnits != null){
+ $("buyMaxOut").textContent = "最高：" + formatUnits(info.officialUnits, d) + " " + sym
+ + "（含协议买入费 " + (Number(info.protocolFeeBps) / 100) + "% ＋ 本页买入税 " + (info.buyTaxBps / 100) + "%）";
+ } else if (info.lowerUnits != null){
+ $("buyMaxOut").textContent = "官方费率读不到 ⇒ 这一个是**下限**：" + formatUnits(info.lowerUnits, d) + " " + sym
+ + "（按协议费 0 算；真实上限只会更大）";
+ } else {
+ $("buyMaxOut").textContent = "—（" + info.why + "）";
+ }
+ }
+ if ($("buyCurveCapOut")){
+ $("buyCurveCapOut").textContent = (info.curveUnits == null || d == null)
+ ? ("—（" + info.why + "）")
+ : ("曲线本身最多 " + formatUnits(info.curveUnits, d) + " " + sym + "（不含任何费率；纯由官方清单的 curve 算出，不需要读链）");
+ }
+ var recv = null;
+ if (unitToken){
+ try{ recv = "预计收到：" + formatUnits(parseAmount(String($("pf_quoteAmt").value || "").trim(), TOKEN_DECIMALS), TOKEN_DECIMALS) + " " + newSym + "（这一格填的就是枚数）"; }
+ catch(e){ recv = null; }
+ } else if (d != null){
+ try{
+ var q = parseAmount(String($("pf_quoteAmt").value || "").trim(), d);
+ var tk = tokensForQuoteUnits(q, t, totalBuyFeeBps());
+ recv = (tk == null) ? null : ("预计收到：" + tk.toString() + " " + newSym + "（官方曲线公式；实际到账以链上那一刻为准）");
+ }catch(e){ recv = null; }
+ }
+ if ($("buyReceiveOut")) $("buyReceiveOut").textContent = (recv == null) ? ("预计收到：算不出来（" + (info.why || "先选一个报价币并填一个数") + "）") : recv;
+ if ($("buyCapMsg")){
+ var m = "";
+ if (!(state.quoteList && state.quoteList.ok)){
+ m = '<div class="alert danger small"><b>' + QUOTE_LIST_FAIL_TEXT + "</b> ⇒ 这一格算不出上限，而且本页<b>不许提交</b>。</div>";
+ } else if (info.clampUnits == null){
+ m = '<div class="alert warn small">' + esc(info.why) + " ⇒ 还算不出上限。</div>";
+ } else {
+ m = '<div class="alert info small">超上限会<b>当场压回上限</b>（官方原话照用：「' + OFFICIAL_CAP_EXCEEDED + "」／「" + OFFICIAL_CAP_ADJUSTED + "」）。"
+ + (info.clampIsLowerBound ? "★ 现在这个「最高」是**下限**（官方费率读不到 ⇒ 那一格写着「官方费率读不到」）。"
+ : "★ 现在这个「最高」是官方口径（协议费 ＋ 本页买入税）。") + "</div>";
+ }
+ $("buyCapMsg").innerHTML = m;
+ }
+}
+
+function clampBuyInput(){
+ var el = $("pf_quoteAmt");
+ if (!el) return false;
+ var raw = String(el.value == null ? "" : el.value).trim();
+ if (raw === "") return false;
+ var info = buyCapInfo();
+ if (state.buyUnit === "token"){
+ var tk = null;
+ try{ tk = parseAmount(raw, TOKEN_DECIMALS); }catch(e){ return false; }
+ var capTok = MAX_CREATOR_BUY_TOKENS * TOKEN_AMOUNT_SCALE;
+ if (tk > capTok){
+ el.value = formatUnits(capTok, TOKEN_DECIMALS);
+ showToast("<b>" + OFFICIAL_CAP_EXCEEDED + "</b><br>" + OFFICIAL_CAP_ADJUSTED
+ + '<br><span class="small">已压回上限：' + formatUnits(capTok, TOKEN_DECIMALS) + " 枚（8 亿枚 ＝ 总量 80%）。</span>");
+ renderBuyCap();
+ return true;
+ }
+ return false;
+ }
+ if (info.clampUnits == null || info.decimals == null) return false;
+ var q = null;
+ try{ q = parseAmount(raw, info.decimals); }catch(e){ return false; }
+ if (q > info.clampUnits){
+ el.value = formatUnits(info.clampUnits, info.decimals);
+ showToast("<b>" + OFFICIAL_CAP_EXCEEDED + "</b><br>" + OFFICIAL_CAP_ADJUSTED
+ + '<br><span class="small">已压回上限：' + formatUnits(info.clampUnits, info.decimals) + " " + esc((info.token && info.token.symbol) || "报价币")
+ + (info.clampIsLowerBound ? "（这是**下限**：官方费率读不到）" : "（官方口径：协议费 ＋ 本页买入税）") + "。</span>");
+ renderBuyCap();
+ return true;
+ }
+ return false;
+}
+
+function fillBuyMax(){
+ var el = $("pf_quoteAmt");
+ if (!el) return;
+ var info = buyCapInfo();
+ if (state.buyUnit === "token"){
+ el.value = formatUnits(MAX_CREATOR_BUY_TOKENS * TOKEN_AMOUNT_SCALE, TOKEN_DECIMALS);
+ } else if (info.clampUnits != null && info.decimals != null){
+ el.value = formatUnits(info.clampUnits, info.decimals);
+ } else {
+ showToast("<b>还算不出上限</b> —— " + esc(info.why || "先选一个官方清单里的报价币") + "。");
+ return;
+ }
+ renderBuyCap(); renderGates();
+}
+
+function toggleBuyUnit(){
+ var el = $("pf_quoteAmt");
+ if (!el) return;
+ var info = buyCapInfo();
+ if (!info.token || info.decimals == null){ showToast("<b>先选一个报价币</b>，再切换购买单位。"); return; }
+ var cur = String(el.value == null ? "" : el.value).trim();
+ if (state.buyUnit === "quote"){
+ var q = null;
+ try{ q = parseAmount(cur, info.decimals); }catch(e){ q = null; }
+ if (q == null){ showToast("这一格现在填的不是数字，没法换算成枚数。"); return; }
+ var tk = tokensForQuoteUnits(q, info.token, totalBuyFeeBps());
+ if (tk == null){ showToast("这个报价币的曲线参数不全，算不出枚数。"); return; }
+ state.buyUnit = "token";
+ el.value = tk.toString();
+ } else {
+ var tks = null;
+ try{ tks = parseAmount(cur, TOKEN_DECIMALS); }catch(e){ tks = null; }
+ if (tks == null){ showToast("这一格现在填的不是数字，没法换算成报价币数量。"); return; }
+ var qu = quoteUnitsForTokensScaled(tks, info.token, totalBuyFeeBps());
+ if (qu == null){ showToast("这个报价币的曲线参数不全，算不出报价币数量。"); return; }
+ state.buyUnit = "quote";
+ el.value = formatUnits(qu, info.decimals);
+ }
+ renderBuyCap(); renderGates();
+}
+
+async function readProtocolFee(){
+ if (state.feeReadBusy === true) return state.protocolFeeBps;
+ state.feeReadBusy = true;
+ state.protocolFeeBps = null;
+ var r = null;
+ try{ r = await ethCall(PORTAL_ADDR, SEL_GET_FEE_RATE); }catch(e){ r = null; }
+ if (r && r.ok && isHex(r.result) && r.result.length >= 130){
+ var buy = wordToBig(r.result, 0);
+ if (buy != null && buy >= 0n && buy <= 10000n) state.protocolFeeBps = Number(buy);
+ }
+ state.feeReadBusy = false;
+ renderBuyCap(); renderGates();
+ return state.protocolFeeBps;
+}
+
+
+
+
+
+
+var UPLOAD_ENDPOINT = "https://funcs.flap.sh/api/upload";
+
+var UPLOAD_ALLOWED = new Set(["image/png","image/x-png","image/jpeg","image/webp","image/gif","image/svg+xml"]);
+
+function metaField(id){
+ var el = $(id);
+ return el ? String(el.value == null ? "" : el.value).trim() : "";
+}
+
+function stripAt(s){ return String(s == null ? "" : s).trim().replace(/^@+/, "").trim(); }
+
+function metaLinks(){
+ return {
+ website: metaField("pf_web"),
+ twitter: stripAt(metaField("pf_x")),
+ telegram: metaField("pf_tg")
+ };
+}
+function uploadAllowed(type){ return UPLOAD_ALLOWED.has(String(type == null ? "" : type).toLowerCase()); }
+
+var CROP_VIEWPORT = 320;
+var CROP_OUT_SIZE = 512;
+var CROP_KEY_STEP = 8;
+
+var CROP_ZOOM_MAX = 3;
+
+
+function baseScale(w, h, vp){ return (w <= 0 || h <= 0 || vp <= 0) ? 0 : Math.max(vp / w, vp / h); }
+
+function clampOffset(off, o){
+ var W = o.naturalWidth, H = o.naturalHeight, VP = o.viewportSize, zoom = o.zoom;
+ var nn = baseScale(W, H, VP) * Math.max(1, zoom);
+ var limX = Math.max(0, (W * nn - VP) / 2), limY = Math.max(0, (H * nn - VP) / 2);
+ var c = function(v, lim){ return lim === 0 ? 0 : Math.min(lim, Math.max(-lim, v)); };
+ return { x: c(off.x, limX), y: c(off.y, limY) };
+}
+
+function cropGeometry(off, o){
+ var W = o.naturalWidth, H = o.naturalHeight, VP = o.viewportSize;
+ var base = baseScale(W, H, VP);
+ if (base === 0) return { x: 0, y: 0, size: 0 };
+ var nn = Math.max(1, o.zoom);
+ var a = base * nn;
+ var r = clampOffset(off, o);
+ var l = W * a, h = H * a;
+ var d = VP / a;
+ return { x: ((l - VP) / 2 - r.x) / a, y: ((h - VP) / 2 - r.y) / a, size: d };
+}
+
+
+state.meta = { src: null, file: null, type: "", naturalWidth: 0, naturalHeight: 0,
+ viewportSize: CROP_VIEWPORT, zoom: 1, offset: { x: 0, y: 0 }, cropFile: null,
+ busy: false, error: null, uploaded: "", source: "", at: 0 };
+
+var _touches = [], _cropPinch = null;
+
+function cropState(){ return (state.meta && state.meta.src) ? state.meta : null; }
+function cropOpts(){
+ var m = state.meta;
+ return { naturalWidth: m.naturalWidth, naturalHeight: m.naturalHeight,
+ viewportSize: m.viewportSize || CROP_VIEWPORT, zoom: m.zoom };
+}
+
+function cropViewport(el){
+ var w = el && el.clientWidth;
+ if (!(typeof w === "number" && w > 0) && el && typeof el.getBoundingClientRect === "function"){
+ var r = el.getBoundingClientRect();
+ w = r && r.width;
+ }
+ return (typeof w === "number" && w > 0) ? w : CROP_VIEWPORT;
+}
+function setCropOffset(next){
+ var m = cropState(); if (!m) return { x: 0, y: 0 };
+ m.offset = clampOffset(next, cropOpts());
+ paintCrop();
+ return m.offset;
+}
+
+function setCropZoom(z){
+ var m = cropState(); if (!m) return 1;
+ var v = Number(z);
+ if (!isFinite(v)) v = 1;
+ m.zoom = Math.max(1, Math.min(CROP_ZOOM_MAX, v));
+ m.offset = clampOffset(m.offset, cropOpts());
+ paintCrop();
+ return m.zoom;
+}
+function cropReset(){
+ var m = cropState(); if (!m) return;
+ m.zoom = 1; m.offset = { x: 0, y: 0 };
+ paintCrop();
+}
+
+function paintCrop(){
+ var m = state.meta || {};
+ var box = $("cropBox");
+ if (box) box.hidden = !m.src;
+ var img = $("cropImg");
+ if (img){
+ if (m.src){ img.setAttribute("src", m.src); } else { img.setAttribute("src", ""); }
+ var a = baseScale(m.naturalWidth, m.naturalHeight, m.viewportSize || CROP_VIEWPORT) * Math.max(1, m.zoom || 1);
+ var sty = "left:calc(50% + " + (m.offset ? m.offset.x : 0) + "px);top:calc(50% + " + (m.offset ? m.offset.y : 0)
+ + "px);width:" + (m.naturalWidth * a) + "px;height:" + (m.naturalHeight * a) + "px";
+ if (img.style) img.style.cssText = sty;
+ }
+ var zi = $("cropZoom");
+ if (zi && String(zi.value) !== String(m.zoom || 1)) zi.value = String(m.zoom || 1);
+ var zo = $("cropZoomOut");
+ if (zo) zo.textContent = Number(m.zoom || 1).toFixed(1) + "x";
+ var g = null;
+ try { g = m.src ? cropGeometry(m.offset || { x: 0, y: 0 }, cropOpts()) : null; }
+ catch (e) { g = null; }
+ var go = $("cropGeoOut");
+ if (go) go.textContent = g ? ("取原图 " + Math.round(g.x) + " , " + Math.round(g.y) + "　边长 " + Math.round(g.size) + " px") : "—";
+ var so = $("cropSizeOut");
+ if (so) so.textContent = (typeof CROP_OUT_SIZE === "number" ? CROP_OUT_SIZE : "?") + " × " + (typeof CROP_OUT_SIZE === "number" ? CROP_OUT_SIZE : "?");
+ var no = $("cropNameOut");
+ if (no) no.textContent = m.file ? String(m.file.name || "（这张图）") : "还没挑图";
+}
+
+
+function onIconFile(file){
+ var m = state.meta;
+ m.error = null; m.uploaded = ""; m.source = ""; m.cropFile = null;
+ if (!file){ m.error = "没拿到文件（再点一次「选择图片」）。"; paintMeta(); return false; }
+ var ty = String(file.type == null ? "" : file.type);
+ if (!uploadAllowed(ty)){
+ m.src = null; m.file = null; m.type = "";
+ m.error = "这个文件的格式不支持：" + (ty === "" ? "（浏览器没给出类型）" : ty)
+ + "。官方前端只收这六种：" + Array.from(UPLOAD_ALLOWED).join(" , ")
+ + "。／Unsupported image type. (Format problem, not a size problem.)";
+ paintCrop(); paintMeta(); return false;
+ }
+ if (m.src && typeof URL !== "undefined" && URL && typeof URL.revokeObjectURL === "function"){
+ try { URL.revokeObjectURL(m.src); } catch (e) { }
+ }
+ m.file = file; m.type = ty;
+ try { m.src = URL.createObjectURL(file); }
+ catch (e) { m.src = null; m.error = "浏览器不给这张图做预览地址（" + (e && e.message ? e.message : e) + "）。"; paintCrop(); paintMeta(); return false; }
+ m.naturalWidth = 0; m.naturalHeight = 0;
+ m.zoom = 1; m.offset = { x: 0, y: 0 };
+ m.viewportSize = cropViewport($("cropArea"));
+ var el = $("cropArea");
+ if (el) el.focus();
+ paintCrop(); paintMeta();
+ return true;
+}
+function onCropImgLoad(ev){
+ var m = state.meta; if (!m || !m.file) return;
+ var t = ev && ev.currentTarget ? ev.currentTarget : (ev && ev.target ? ev.target : null);
+ m.naturalWidth = Number(t && t.naturalWidth) || 0;
+ m.naturalHeight = Number(t && t.naturalHeight) || 0;
+ if (m.naturalWidth <= 0 || m.naturalHeight <= 0){
+ m.error = "这张图读不出宽高（可能坏了或是空文件）。／Cannot read the image size.";
+ m.src = null; m.file = null;
+ paintCrop(); paintMeta(); return;
+ }
+ m.offset = { x: 0, y: 0 };
+ m.viewportSize = cropViewport($("cropArea"));
+ paintCrop(); paintMeta();
+}
+function onCropImgError(){
+ var m = state.meta;
+ m.error = "这张图画不出来（文件坏了，或者浏览器打不开这种格式）。／The image could not be decoded.";
+ m.src = null; m.file = null; m.cropFile = null;
+ paintCrop(); paintMeta();
+}
+function onChooseAnother(){
+ var f = $("iconFile");
+ paintMeta();
+ if (f && typeof f.click === "function") f.click();
+ return true;
+}
+
+function cropDragStart(e){
+ var m = cropState(); if (!m || !e) return;
+ if (!m.viewportSize) return;
+ var el = e.currentTarget || null;
+ if (el && typeof el.setPointerCapture === "function" && e.pointerId != null){
+ try { el.setPointerCapture(e.pointerId); } catch (err) { }
+ }
+ state.cropDrag = { pointerId: e.pointerId, x: Number(e.clientX) || 0, y: Number(e.clientY) || 0,
+ offset: { x: m.offset.x, y: m.offset.y } };
+}
+function cropDragMove(e){
+ var d = state.cropDrag; if (!d || !e) return;
+ if (d.pointerId != null && e.pointerId != null && d.pointerId !== e.pointerId) return;
+ setCropOffset({ x: d.offset.x + (Number(e.clientX) || 0) - d.x, y: d.offset.y + (Number(e.clientY) || 0) - d.y });
+}
+function cropDragEnd(e){
+ var d = state.cropDrag; if (!d) return;
+ if (e && d.pointerId != null && e.pointerId != null && d.pointerId !== e.pointerId) return;
+ state.cropDrag = null;
+}
+
+function cropKey(e){
+ var m = cropState(); if (!m || !e) return;
+ var t = { ArrowLeft: { x: 8, y: 0 }, ArrowRight: { x: -8, y: 0 }, ArrowUp: { x: 0, y: 8 }, ArrowDown: { x: 0, y: -8 } }[e.key];
+ if (!t) return;
+ if (typeof e.preventDefault === "function") e.preventDefault();
+ setCropOffset({ x: m.offset.x + t.x, y: m.offset.y + t.y });
+}
+
+
+function cropAndEncode(imgEl){
+ return new Promise(function(resolve, reject){
+ var m = state.meta;
+ var g = cropGeometry(m.offset || { x: 0, y: 0 }, cropOpts());
+ if (!(g.size > 0)){ reject(new Error("裁切几何算不出来（size = " + g.size + "）—— 先挑一张能读宽高的图。")); return; }
+ var cv = document.createElement("canvas");
+ cv.width = 512; cv.height = 512;
+ var ctx = cv.getContext("2d");
+ if (!ctx){ reject(new Error("这个浏览器给不出 2d 画布（Canvas is unavailable）。")); return; }
+ ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+ ctx.drawImage(imgEl, g.x, g.y, g.size, g.size, 0, 0, 512, 512);
+ 
+ var enc = (m.type === "image/jpeg") ? { mimeType: "image/jpeg", extension: "jpg", quality: 0.92 }
+ : (m.type === "image/webp") ? { mimeType: "image/webp", extension: "webp", quality: 0.92 }
+ : { mimeType: "image/png", extension: "png", quality: undefined };
+ cv.toBlob(function(blob){
+ if (!blob){ reject(new Error("这个浏览器没能把裁好的图编出来（Unable to encode cropped image）。")); return; }
+ var base = String((m.file && m.file.name) || "token-image").replace(/\.[^.]+$/, "") || "token-image";
+ resolve({ blob: blob, enc: enc,
+ file: new File([blob], base + "-cropped." + enc.extension, { type: enc.mimeType, lastModified: Date.now() }) });
+ }, enc.mimeType, enc.quality);
+ });
+}
+async function cropConfirm(){
+ var m = cropState(); if (!m) return null;
+ if (m.busy === true) return null;
+ m.busy = true; m.error = null; m.uploaded = ""; m.source = "";
+ paintMeta();
+ try{
+ var r = await cropAndEncode($("cropImg"));
+ m.cropFile = r.file;
+ if (!m.type) m.type = r.enc.mimeType;
+ m.busy = false;
+ paintMeta();
+ return r.file;
+ }catch(e){
+ m.busy = false; m.cropFile = null;
+ m.error = "裁切出图失败：" + (e && e.message ? e.message : e) + "。／Crop failed.";
+ paintMeta();
+ return null;
+ }
+}
+
+
+async function uploadMeta(){
+ var m = state.meta;
+ if (!m.file){ m.error = "先挑一张图标图片。／Pick an icon image first."; paintMeta(); return null; }
+ if (!m.cropFile){ m.error = "还没点「就用这张（裁好 512×512）」。／Press crop-confirm first."; paintMeta(); return null; }
+ if (m.busy === true){ m.error = "正在上传，别重复点。／Upload already in flight."; paintMeta(); return null; }
+ 
+ var f0 = $("pf_meta");
+ if (f0 && m.metaAt && String(f0.value == null ? "" : f0.value).trim() === m.metaAt){
+ f0.value = ""; m.metaAt = "";
+ }
+ m.busy = true; m.error = null; m.uploaded = ""; m.source = "";
+ paintMeta();
+ try{
+ var fd = new FormData();
+ 
+ var links = metaLinks();
+ var ops = {
+ query: "mutation Create($file: Upload!, $meta: MetadataInput!) { create(file: $file, meta: $meta) }",
+ variables: { file: null, meta: { description: "" + ($("pf_desc") ? $("pf_desc").value : ""),
+ website: links.website, twitter: links.twitter, telegram: links.telegram } }
+ };
+ fd.append("operations", JSON.stringify(ops));
+ fd.append("map", JSON.stringify({ "0": ["variables.file"] }));
+ fd.append("0", m.cropFile, m.cropFile.name || "icon.png");
+ var res = await fetch(UPLOAD_ENDPOINT, { method: "POST", body: fd });
+ var text = await res.text();
+ var cid = null;
+ try{
+ var j = JSON.parse(text);
+ if (j && j.data && j.data.create) cid = String(j.data.create);
+ }catch(e){ cid = null; }
+ if (!res.ok || !cid) throw new Error("官方上传口回了 " + res.status + "：" + String(text).slice(0, 200));
+ m.uploaded = cid.trim();
+ m.source = "upload";
+ var f = $("pf_meta");
+ if (f) f.value = m.uploaded;
+ m.metaAt = m.uploaded; 
+ m.busy = false;
+ paintMeta(); onQuoteInput();
+ return m.uploaded;
+ }catch(e){
+ m.busy = false;
+ m.error = "上传失败：官方上传口回了 " + (e && e.message ? e.message : e)
+ + "。⛔ 这一次**没有**拿到元数据地址（那是失败，不是成功）。／Upload failed."
+ + "<br><b>怎么办：</b>点「手填地址」，把你自己的 IPFS ／ HTTPS 地址贴进那一格，照样能发。";
+ paintMeta(); onQuoteInput();
+ return null;
+ }
+}
+
+function onManualMeta(){
+ var m = state.meta;
+ var f = $("pf_meta");
+ var v = f ? String(f.value == null ? "" : f.value).trim() : "";
+ if (v === ""){
+ m.source = ""; m.uploaded = ""; m.metaAt = "";
+ m.error = "那一格是空的：官方上传口上传，或者手填你自己的 IPFS ／ HTTPS 地址 —— 两个都没有就**提交不了**。";
+ } else if (v === m.uploaded && m.uploaded !== ""){
+ m.source = "upload"; m.error = null;
+ } else {
+ m.source = "manual"; m.uploaded = ""; m.metaAt = ""; m.error = null;
+ }
+ paintMeta();
+ return m.source;
+}
+
+function paintMeta(){
+ var m = state.meta || {};
+ var f = $("pf_meta");
+ var v = f ? String(f.value == null ? "" : f.value).trim() : "";
+ var src = (v === "") ? "" : (m.source === "upload" ? "官方上传口" : (m.source === "manual" ? "手填" : "还没标来源"));
+ var so = $("metaSourceOut");
+ if (so) so.textContent = v === "" ? "（这一格还是空的）" : ("来源：" + src);
+ var uo = $("uploadStateOut");
+ if (uo){
+ uo.textContent = m.busy === true ? "正在上传到官方存储…"
+ : (m.uploaded ? ("上传成功，元数据 = " + m.uploaded)
+ : (v !== "" ? "用手填的地址（没走官方上传口）" : "还没上传、也没手填"));
+ }
+ var msg = $("uploadMsg");
+ if (msg){
+ var html = "";
+ if (m.error) html += '<div class="alert danger small"><b>✕ 出错了。</b>' + esc(String(m.error)) + "</div>";
+ if (m.busy === true) html += '<div class="alert info small">正在上传到<b>官方上传口</b>（<span class="mono break">' + esc(UPLOAD_ENDPOINT) + "</span>）——这一下要联网，别的步骤都不用。</div>";
+ if (m.uploaded) html += '<div class="alert ok small">✓ 上传成功，元数据 = <span class="mono break">' + esc(m.uploaded) + "</span>　（已经填进上面那一格）</div>";
+ if (!m.error && !m.uploaded && !m.busy && v !== "" && m.source === "manual") html += '<div class="alert info small">✓ 用的是<b>手填</b>的地址：<span class="mono break">' + esc(v) + "</span></div>";
+ if (!m.error && !m.uploaded && !m.busy && v === "") html += '<div class="alert warn small"><b>! 图标与介绍还没有：</b>上面那一步传一张图（官方上传口），或者在那一格手填一个 IPFS ／ HTTPS 地址。两个都没有 ⇒ <b>提交被拦住</b>。</div>';
+ msg.innerHTML = html;
+ }
+ var co = $("cropOut");
+ if (co) co.innerHTML = m.cropFile
+ ? ('<div class="alert ok small">✓ 已经裁好一张 <b>' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + "</b> 的图（" + esc(String(m.cropFile.type || "")) + "）—— 上传时用的就是它。</div>")
+ : '<div class="alert info small">裁好之后点「就用这张（裁好 ' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + '）」，再点「上传到官方存储」。</div>';
+ paintCrop();
+}
+
+function bindMeta(){
+ var fi = $("iconFile");
+ if (fi && typeof fi.addEventListener === "function") fi.addEventListener("change", function(){
+ var f = fi.files && fi.files[0];
+ if (f) onIconFile(f);
+ });
+ var area = $("cropArea");
+ if (area && typeof area.addEventListener === "function"){
+ 
+ area.addEventListener("pointerdown", function(e){ cropPointerDown(e); });
+ area.addEventListener("pointermove", function(e){ cropPointerMove(e); });
+ area.addEventListener("pointerup", function(e){ cropPointerEnd(e); });
+ area.addEventListener("pointercancel", function(e){ cropPointerEnd(e); });
+ area.addEventListener("keydown", function(e){ cropKey(e); });
+ }
+ var img = $("cropImg");
+ if (img && typeof img.addEventListener === "function"){
+ img.addEventListener("load", function(e){ onCropImgLoad(e); });
+ img.addEventListener("error", function(){ onCropImgError(); });
+ }
+ var zi = $("cropZoom");
+ if (zi && typeof zi.addEventListener === "function") zi.addEventListener("input", function(){ setCropZoom(zi.value); });
+ var mm = $("pf_meta");
+ if (mm && typeof mm.addEventListener === "function"){
+ mm.addEventListener("input", function(){ onManualMeta(); });
+ mm.addEventListener("change", function(){ onManualMeta(); });
+ }
+ 
+ ["pf_web", "pf_x", "pf_tg"].forEach(function(id){
+ var el = $(id);
+ if (el && typeof el.addEventListener === "function"){
+ el.addEventListener("input", function(){ metaLinks(); });
+ el.addEventListener("change", function(){ metaLinks(); });
+ }
+ });
+ bind("btnIconPick", function(){ var f = $("iconFile"); paintMeta(); if (f && typeof f.click === "function") f.click(); });
+ bind("btnCropAnother", function(){ onChooseAnother(); });
+ bind("btnCropReset", function(){ cropReset(); });
+ bind("btnCropConfirm", function(){ void cropConfirm(); });
+ bind("btnCropCancel", function(){ var m = state.meta; m.src = null; m.file = null; m.cropFile = null; m.error = null; paintCrop(); paintMeta(); });
+ bind("btnUpload", function(){ void uploadMeta(); });
+ bind("btnManual", function(){ var f = $("pf_meta"); if (f && typeof f.focus === "function") f.focus(); onManualMeta(); });
+ paintCrop(); paintMeta();
+}
+
+
+
+function cropTouchIndexOf(id){
+ for (var i = 0; i < _touches.length; i++) if (_touches[i].id === id) return i;
+ return -1;
+}
+function cropPinchDist(){
+ if (_touches.length < 2) return 0;
+ var dx = _touches[1].x - _touches[0].x, dy = _touches[1].y - _touches[0].y;
+ return Math.sqrt(dx * dx + dy * dy);
+}
+
+function cropPinchStart(){
+ var m = cropState(); if (!m) return null;
+ state.cropDrag = null; 
+ var d0 = cropPinchDist();
+ _cropPinch = (d0 > 0) ? { d0: d0, z0: Math.max(1, Number(m.zoom) || 1) } : null;
+ return _cropPinch;
+}
+function cropPinchMove(){
+ var m = cropState(); if (!m || !_cropPinch) return null;
+ var dist = cropPinchDist();
+ 
+ if (!(dist > 0) || !(_cropPinch.d0 > 0) || !isFinite(dist)) return null;
+ 
+ return setCropZoom(_cropPinch.z0 * (dist / _cropPinch.d0));
+}
+function cropPointerDown(e){
+ if (!e) return;
+ var m = cropState(); if (!m || !m.viewportSize) return;
+ var id = (e.pointerId == null) ? 1 : e.pointerId;
+ var el = e.currentTarget || null;
+ if (el && typeof el.setPointerCapture === "function"){
+ try { el.setPointerCapture(id); } catch (err) { }
+ }
+ var at = cropTouchIndexOf(id);
+ var pt = { id: id, x: Number(e.clientX) || 0, y: Number(e.clientY) || 0 };
+ if (at >= 0) _touches[at] = pt; else _touches.push(pt);
+ if (_touches.length === 1){
+ 
+ _cropPinch = null;
+ cropDragStart(e);
+ return;
+ }
+ if (_touches.length === 2) cropPinchStart();
+ 
+}
+function cropPointerMove(e){
+ if (!e) return;
+ var id = (e.pointerId == null) ? 1 : e.pointerId;
+ var at = cropTouchIndexOf(id);
+ if (at < 0) return;
+ _touches[at].x = Number(e.clientX) || 0;
+ _touches[at].y = Number(e.clientY) || 0;
+ if (_cropPinch){ cropPinchMove(); return; }
+ cropDragMove(e);
+}
+function cropPointerEnd(e){
+ if (!e) return;
+ var id = (e.pointerId == null) ? 1 : e.pointerId;
+ var at = cropTouchIndexOf(id);
+ if (at >= 0) _touches.splice(at, 1);
+ cropDragEnd(e);
+ 
+ _cropPinch = null;
+}
+
+function walletGuide(v){
+ var g = $("walletGuide");
+ if (g) g.hidden = (v === true);
+ var url = (v === true) ? "" : String(location.href);
+ var u = $("walletGuideUrl");
+ if (u) u.textContent = url;
+ return url;
+}
+function applyWalletGuide(){ return walletGuide(hasWallet()); }
+
+void (async function boot(){
+ syncRatio();
+ paintRouteTable(); paintList(); paintPublish(); paintMisc(); renderGates(); renderAudit();
+ bind("btnMine", function(){ void startMine(); });
+ bind("btnStopMine", stopMine);
+ bind("blkActBtn", function(){ void doPublish(); });
+ 
+ bind("btnBuyMax", function(){ fillBuyMax(); });
+ bind("btnBuyUnit", function(){ toggleBuyUnit(); });
+ [["pf_quoteSearch", "input", function(){ renderQuoteList(); }],
+ ["pf_quote", "input", function(){ onQuoteInput(); }],
+ ["pf_quoteAmt", "input", function(){ clampBuyInput(); renderBuyCap(); renderGates(); }],
+ ["pf_quoteAmt", "change", function(){ clampBuyInput(); renderBuyCap(); renderGates(); }],
+ ["pf_buyTax", "change", function(){ renderBuyCap(); renderGates(); }]].forEach(function(tri){
+ var el = $(tri[0]);
+ if (el && el.addEventListener) el.addEventListener(tri[1], tri[2]);
+ });
+ void loadQuoteTokens();
+ void readProtocolFee();
+ ["pf_r1", "pf_r2", "pf_r3"].forEach(function(id){
+ var el = $(id);
+ if (el && el.addEventListener) el.addEventListener("change", function(){ syncRatio(); renderGates(); });
+ });
+ if (typeof setChainPill === "function") setChainPill();
+ if (typeof readRpcChainId === "function") void readRpcChainId();
+ if (typeof autoConnect === "function") void autoConnect();
+ 
+ bindMeta();
+ 
+ applyWalletGuide();
+})();
+window.__dshPublish = {
+ ext: EXT, design: DESIGN, chainId: (EXT.chain || {}).id, factories: EXT.factories,
+ selectors: { owner: SEL_OWNER, beaconImpl: SEL_BEACON_IMPL, approve: SEL_APPROVE, launch: SEL_LAUNCH, quoteOk: SEL_QUOTE_OK },
+ state: state, facById: facById, verifyFactory: verifyFactory,
+ selectFactory: selectFactory, paintList: paintList, paintPublish: paintPublish, paintMisc: paintMisc,
+ keccakSel: keccakSel, sha256AsciiOf: sha256AsciiOf,
+ vaultDataFields: VLIST, vaultDataSlots: VSLOTS, vaultDataBytes: VBYTES, route4AtSlots: R4_AT,
+ approveGas: APPROVE_GAS, launchGas: LAUNCH_GAS, vanitySuffix: VANITY_SUFFIX, create2Deployer: CREATE2_DEPLOYER,
+ launchContract: LAUNCH_CONTRACT, launchContractName: LAUNCH_CONTRACT_NAME,
+ syncRatio: syncRatio, readForm: readForm, validate: validate, normAddr: normAddr,
+ buildVaultData: buildVaultData, vaultDataWords: vaultDataWords, route4AppearsInVaultData: route4AppearsInVaultData,
+ encodeNewTokenV6WithVault: encodeNewTokenV6WithVault, computeModel: computeModel, routeSplit: routeSplit,
+ encodeTuple: encodeTuple, w32: w32, wAddr: wAddr, wString: wString, wBytes: wBytes,
+ proxyInitCode: proxyInitCode, initHashOf: initHashOf, predictTokenAddress: predictTokenAddress,
+ setSaltSource: function(s){ window.__dshSaltSource = s; },
+ mine: { step: mineStep, start: startMine, stop: stopMine, predict: predictTokenAddress, initHashOf: initHashOf },
+ buildLaunchParams: buildLaunchParams, buildCalldata: buildCalldata,
+ buildApproveData: buildApproveData, buildApprovePayload: buildApprovePayload, validateApprovePayload: validateApprovePayload,
+ buildLaunchPayload: buildLaunchPayload, validateLaunchPayload: validateLaunchPayload,
+ computeValueWei: computeValueWei, valueAllowed: valueAllowed,
+ publishGates: publishGates, doPublish: doPublish, scriptText: scriptText,
+ connect: connect, allowedFields: ALLOWED_FIELDS, forbiddenFeeFields: FORBIDDEN_FEE_FIELDS, txStates: TX_STATES,
+ 
+ pubStartMine: startMine, pubStopMine: stopMine, pubMineStep: mineStep, pubPredictTokenAddress: predictTokenAddress,
+ pubValidate: validate, pubBuildVaultData: buildVaultData, pubVaultWords: vaultDataWords,
+ pubBuildCalldata: buildCalldata, pubBuildApprovePayload: buildApprovePayload, pubBuildApproveData: buildApproveData,
+ pubBuildLaunchPayload: buildLaunchPayload, pubComputeValueWei: computeValueWei, pubValueAllowed: valueAllowed,
+ pubGates: publishGates, renderPubGates: renderGates,
+ setSaltSource: function(s){ window.__dshSaltSource = s; }, setPublishSaltSource: function(s){ window.__dshSaltSource = s; },
+ pubStates: TX_STATES, syncRatio: syncRatio, pfDefaults: function(){ syncRatio(); },
+ 
+ uploadEndpoint: UPLOAD_ENDPOINT, uploadAllowed: uploadAllowed, cropAllowedTypes: UPLOAD_ALLOWED,
+ cropViewport: CROP_VIEWPORT, cropOutSize: CROP_OUT_SIZE, cropKeyStep: CROP_KEY_STEP,
+ baseScale: baseScale, clampOffset: clampOffset, cropGeometry: cropGeometry,
+ pubBaseScale: baseScale, pubClampOffset: clampOffset, pubCropGeometry: cropGeometry,
+ pubOnIconFile: onIconFile, pubOnCropImgLoad: onCropImgLoad, pubPaintCrop: paintCrop, pubPaintMeta: paintMeta,
+ pubCropViewport: cropViewport, pubSetCropOffset: setCropOffset, pubSetCropZoom: setCropZoom,
+ pubCropReset: cropReset, pubCropDragStart: cropDragStart, pubCropDragMove: cropDragMove,
+ pubCropDragEnd: cropDragEnd, pubCropKey: cropKey, pubOnManualMeta: onManualMeta,
+ pubCropAndEncode: cropAndEncode, pubCropConfirm: cropConfirm, pubUploadMeta: uploadMeta,
+ pubUploadAllowed: uploadAllowed, pubBindMeta: bindMeta,
+ 
+ pubMetaField: metaField, pubStripAt: stripAt, pubMetaLinks: metaLinks,
+ 
+ quoteTokensUrl: QUOTE_TOKENS_URL, maxCreatorBuyTokens: MAX_CREATOR_BUY_TOKENS,
+ curveTotalSupply: CURVE_TOTAL_SUPPLY, tokenDecimals: TOKEN_DECIMALS, tokenAmountScale: TOKEN_AMOUNT_SCALE,
+ quoteListFailText: QUOTE_LIST_FAIL_TEXT, nativeBlockedText: NATIVE_BLOCKED_TEXT,
+ admissionApplyText: ADMISSION_APPLY_TEXT,
+ officialCapExceeded: OFFICIAL_CAP_EXCEEDED, officialCapAdjusted: OFFICIAL_CAP_ADJUSTED,
+ getFeeRateSelector: SEL_GET_FEE_RATE, portalAddr: PORTAL_ADDR,
+ pubParseAmount: parseAmount, pubFormatUnits: formatUnits,
+ pubParseQuoteTokens: parseQuoteTokens, pubQuoteCategoryLabel: quoteCategoryLabel,
+ pubFindListedToken: findListedToken, pubLoadQuoteTokens: loadQuoteTokens,
+ pubRenderQuoteList: renderQuoteList, pubSelectQuoteToken: selectQuoteToken,
+ pubOnQuoteInput: onQuoteInput,
+ pubRenderQuoteSel: renderQuoteSel, pubCurrentQuoteAddr: currentQuoteAddr,
+ pubQuoteDecimalsOf: quoteDecimalsOf, pubSelectedQuoteToken: selectedQuoteToken,
+ pubCurveOf: curveOf, pubFeeBpsBig: feeBpsBig,
+ pubQuoteUnitsForTokensScaled: quoteUnitsForTokensScaled, pubTokensForQuoteUnits: tokensForQuoteUnits,
+ pubTotalBuyFeeBps: totalBuyFeeBps, pubBuyCapInfo: buyCapInfo, pubBuyAmountUnits: buyAmountUnits,
+ pubRenderBuyCap: renderBuyCap, pubClampBuyInput: clampBuyInput,
+ pubFillBuyMax: fillBuyMax, pubToggleBuyUnit: toggleBuyUnit,
+ pubReadProtocolFee: readProtocolFee, pubShowToast: showToast,
+};
+</script>
+</body>
+</html>

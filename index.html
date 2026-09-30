@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xiao17 工坊 · 代币发布与税收金库</title>
+
+<style>
+:root{
+ --ink:#111214; --paper:#FAFAF8; --sunk:#EFEFEC;
+ --ink2:#3C4046; --ink3:#676C73;
+ --rule:#111214; --edge:#111214;
+ --s4:4px;
+ --s8:8px;
+ --s12:12px;
+ --s16:16px;
+ --s24:24px;
+ --s32:32px;
+ --s44:44px;
+ --s48:48px;
+ --s64:64px;
+ --r:6px; --r2:10px; --rr:999px;
+ --f12:12px; 
+ --f14:14px; 
+ --f16:16px; 
+ --f20:20px; 
+ --f38:38px; 
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+ background:var(--paper); color:var(--ink);
+ font:var(--f16)/1.7 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+ letter-spacing:normal; -webkit-text-size-adjust:100%;
+ padding:var(--s24) var(--s16) var(--s64);
+}
+.wrap{max-width:920px;margin:0 auto}
+h1{font-size:var(--f38);line-height:1.35;margin:0}
+p{margin:var(--s8) 0}
+a{color:var(--ink);text-decoration:none}
+a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+
+.topbar{background:var(--ink);color:var(--paper);border-radius:var(--r);
+ padding:var(--s16);display:flex;justify-content:space-between;align-items:center;gap:var(--s12);flex-wrap:wrap}
+.topbar .tname{font-size:var(--f20);font-weight:700}
+.topbar .tsub{font-size:var(--f12)}
+.muted{color:var(--ink2)}
+.small{font-size:var(--f12)}
+.lead{font-size:var(--f16);color:var(--ink2);margin:var(--s24) 0 0}
+
+
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s16);margin:var(--s24) 0 0}
+.act{display:block;border:1px solid var(--edge);border-radius:var(--r2);
+ padding:var(--s24);min-height:var(--s44);background:var(--paper)}
+.act .k{font-size:var(--f20);font-weight:700;display:block;margin:0 0 var(--s4)}
+.act .d{font-size:var(--f14);color:var(--ink2);display:block}
+.act .go{display:inline-block;margin:var(--s16) 0 0;border-radius:var(--rr);
+ padding:var(--s12) var(--s24);font-size:var(--f16);font-weight:700}
+.act-1{background:var(--ink);border-color:var(--ink)}
+.act-1 .k{color:var(--paper)}
+.act-1 .d{color:var(--paper)}
+.act-1 .go{background:var(--paper);color:var(--ink)}
+.act-2 .go{background:var(--ink);color:var(--paper)}
+
+
+.foot{margin:var(--s32) 0 0;border-top:1px solid var(--edge);padding:var(--s16) 0 0;
+ font-size:var(--f12);color:var(--ink3)}
+</style>
+</head>
+<body>
+<main class="wrap">
+ <div class="topbar">
+ <span class="tname">xiao17 工坊</span>
+ <span class="tsub">BNB Chain（BSC）· 代币发布 ＋ 税收金库</span>
+ </div>
+
+ <h1>两种用法</h1>
+ <p class="lead">这是一个纯静态页面：没有账号、没有后台、不经过我们的服务器 —— 你的钱包在浏览器里直连区块链，自己签名、自己确认。</p>
+
+ <section class="acts">
+ <a class="act act-1" href="publish.html" id="entry-publish">
+ <span class="k">发布代币</span>
+ <span class="d">填名称与图标，选定报价币，一键发一枚新代币；发行费与买入税当场算给你看。</span>
+ <span class="go">进入发布页 →</span>
+ </a>
+ <a class="act act-2" href="vault.html" id="entry-vault">
+ <span class="k">税收金库</span>
+ <span class="d">已发出去的币收到的税去哪了：四路分账、可以领多少、什么时候能领，都在这一页看。</span>
+ <span class="go">进入金库页 →</span>
+ </a>
+ </section>
+
+ <div class="foot">
+ 页面对链上数据只读，交易要你在钱包里亲手签名。这两张页面的内容随主网合约现读，不需要我们开任何接口。
+ </div>
+</main>
+</body>
+</html>

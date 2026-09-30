@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>税收金库 · 四路（金版）</title>
+<style>
+
+:root{
+ --c-green-deep:#0B0B0C; 
+ --c-green:#3A2F12; 
+ --c-green-bright:#F0B90B; 
+ --c-green-light:#F6D45B; 
+ --c-cream:#FBF3D6; 
+ 
+ --c-gold-water:#F0B90B;
+ 
+ --c-off:#1C1C20;
+ --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-20:20px; --fs-30:30px; --fs-hero:72px;
+ 
+ --fs-hero-name:clamp(30px, 7.4vw, 46px);
+ 
+ --hero-mark-size:clamp(40px, 12vw, 48px);
+ 
+ --chip-bg:#F6D45B; --chip-ink:#0B0B0C; --chip-line:#3A2F12;
+ --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px;
+ --r-2:10px; --r-3:14px; --r-pill:999px;
+ --ease-out:cubic-bezier(.22,1,.36,1); --ease-state:cubic-bezier(.4,0,.2,1);
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; }
+body{ overflow-x:clip; min-height:100vh; color:var(--c-cream);
+ font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; line-height:1.6;
+ background-image:linear-gradient(180deg, var(--c-green-light) 0 22%, var(--c-green-deep) 22% 100%);
+ background-color:var(--c-green-deep); }
+.wrap{ position:relative; max-width:720px; margin:0 auto; padding:var(--sp-4) var(--sp-4) var(--sp-6); }
+
+.hero{ margin:calc(var(--sp-2) * -1) calc(var(--sp-4) * -1) 0;
+ display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2) var(--sp-4);
+ padding:var(--sp-5) var(--sp-4) var(--sp-5);
+ border-radius:var(--r-3) var(--r-3) 0 0; color:var(--c-green-deep); background-color:var(--c-green-light); }
+.hero-mark{ flex:none; display:flex; align-items:center; justify-content:center;
+ width:var(--hero-mark-size); height:var(--hero-mark-size); padding:var(--sp-1); border-radius:var(--r-2);
+ font-size:var(--fs-16); font-weight:800; line-height:1.2; text-align:center; overflow:hidden;
+ color:var(--c-green-deep); background-color:var(--c-green-bright);
+ box-shadow:0 4px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep); }
+.hero-text{ min-width:0; flex:1; }
+.hero-coiner{ margin:0; font-size:var(--fs-12); font-weight:700; }
+.hero-coin{ display:block; max-width:8ch; margin:0;
+ font-size:var(--fs-hero-name); font-weight:800; line-height:1.3; letter-spacing:normal;
+ overflow-wrap:anywhere; }
+.hero-what{ margin:0; font-size:var(--fs-14); font-weight:600; }
+
+.hero-links{ flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2);
+ align-self:flex-start; margin-left:auto; }
+.hero-link{ display:inline-flex; align-items:center; gap:var(--sp-1);
+ min-height:32px; padding:var(--sp-1) var(--sp-3);
+ font-size:var(--fs-12); font-weight:700; line-height:1.3; text-decoration:none;
+ color:var(--c-cream); background-color:var(--c-green-deep);
+ border-radius:var(--r-2); box-shadow:0 0 0 1px var(--c-green-bright); }
+
+.hero-link:hover{ color:var(--c-green-deep); background-color:var(--c-green-bright); }
+.hero-link:active{ transform:translateY(1px); }
+.hero-link .icon{ width:16px; height:16px; }
+
+
+.risk{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:var(--sp-2) var(--sp-4);
+ margin:0 calc(var(--sp-4) * -1) var(--sp-2);
+ padding:var(--sp-3) var(--sp-4) var(--sp-4);
+ border-radius:0 0 var(--r-3) var(--r-3);
+ color:var(--c-cream); background-color:var(--c-green-deep); }
+.risk-group{ display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--sp-1) var(--sp-2); }
+.risk-label{ font-size:var(--fs-12); font-weight:700; line-height:1.3; color:var(--c-cream); }
+.risk-tag,.risk-word{ font-size:var(--fs-12); font-weight:700; line-height:1.3;
+ color:var(--chip-ink); background-color:var(--chip-bg);
+ padding:var(--sp-1) var(--sp-3); border-radius:var(--r-2);
+ box-shadow:0 0 0 1px var(--chip-line); }
+
+.card{ position:relative; overflow:hidden; border-radius:var(--r-3); padding:var(--sp-5) var(--sp-4) 0;
+ color:var(--c-green-deep); background-color:var(--c-green-light); }
+
+.dash{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-4); }
+
+.money{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:var(--sp-2); }
+.money-row{ display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--sp-1) var(--sp-3); }
+.money-k{ font-size:var(--fs-12); font-weight:700; }
+.money-v{ font-size:var(--fs-20); font-weight:800; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+
+.money-row-cum{ gap:var(--sp-1) 0; flex-direction:column; align-items:flex-start; }
+.money-v-cum{ flex-basis:auto; font-size:var(--fs-14); }
+
+.money-boxes{ width:100%; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
+ gap:var(--sp-2); align-items:stretch; }
+.money-box{ min-width:0; display:flex; flex-direction:column; gap:var(--sp-1);
+ padding:var(--sp-2) var(--sp-3); border-radius:var(--r-2);
+ border:1px solid var(--c-green-deep); border-color:var(--c-green-deep);
+ 
+ background:transparent; }
+
+.routes{ display:flex; flex-direction:column; gap:var(--sp-2); margin-top:var(--sp-4); }
+.route{ position:relative; display:flex; align-items:center; gap:var(--sp-3); min-height:64px;
+ overflow:hidden; border-radius:var(--r-3);
+ padding:var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+ color:var(--c-cream); background-color:var(--c-green-deep);
+ transition:background-color .26s var(--ease-state); }
+
+.route-water{ position:absolute; left:0; right:0; top:0; bottom:0; z-index:1;
+ background-color:var(--c-gold-water);
+ transform:scaleY(0); transform-origin:bottom center;
+ transition:transform .9s var(--ease-out); }
+
+.route.is-ready .route-water{ background-color:var(--c-gold-water); }
+
+.route-agent{ position:relative; z-index:2; display:inline-flex; align-items:center; justify-content:center; flex:none;
+ min-height:56px; padding:0 var(--sp-5); border-radius:var(--r-pill);
+ font-size:var(--fs-14); font-weight:800; text-align:center;
+ color:var(--c-green-bright); background-color:var(--c-green-deep);
+ box-shadow:0 0 0 2px var(--c-green-bright); }
+.route-mid{ position:relative; z-index:2; min-width:0; flex:1; display:flex; flex-direction:column; gap:2px;
+ 
+ padding:var(--sp-1) var(--sp-2); border-radius:var(--r-2);
+ color:var(--c-cream); }
+
+.route-ink{ position:absolute; left:0; right:0; top:0; bottom:0; z-index:2;
+ display:flex; align-items:center; gap:var(--sp-3);
+ padding:var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+ pointer-events:none; clip-path:inset(100% 0 0 0); }
+
+.route-ink .route-mid{ color:var(--c-green-deep); }
+
+.route-agent-ink{ visibility:hidden; }
+.route-name{ font-size:var(--fs-16); font-weight:700; }
+.route-line{ display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--sp-2);
+ font-size:var(--fs-16); font-weight:700; }
+.route-sub{ font-size:var(--fs-12); font-weight:600; font-variant-numeric:tabular-nums; }
+
+.actions{ position:relative; display:flex; flex-wrap:wrap; gap:var(--sp-2); margin-top:var(--sp-4); }
+.push{ position:relative; z-index:2; display:inline-flex; align-items:center; justify-content:center; flex:none;
+ min-height:56px; padding:0 var(--sp-5);
+ border:0; border-radius:var(--r-pill); cursor:pointer;
+ font:inherit; font-size:var(--fs-14); font-weight:800;
+ color:var(--c-green-deep);
+ background-color:var(--c-green-bright);
+ background-image:linear-gradient(to bottom, var(--c-green-bright) 0 55%, var(--c-green-light) 100%);
+ box-shadow:0 4px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep);
+ transition:transform .1s var(--ease-state), background-color .16s var(--ease-state), box-shadow .1s var(--ease-state); }
+.push:hover{ color:var(--c-green-deep); background-color:var(--c-green-light); background-image:none; box-shadow:0 4px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-light); }
+.push:active{ transform:translateY(3px); box-shadow:0 1px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep); }
+.push[data-state="loading"]{ color:var(--c-green-deep); background-color:var(--c-green-bright); box-shadow:0 1px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep); transform:translateY(3px); }
+.push[data-state="done"]{ color:var(--c-green-deep); background-color:var(--c-green-light); box-shadow:0 4px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep); }
+.push[data-state="failed"]{ color:var(--c-green-deep); background-color:var(--c-green-light); box-shadow:0 4px 0 0 var(--c-green-deep), 0 0 0 2px var(--c-green-deep); }
+.push:disabled{ color:var(--c-green-deep); background-color:var(--c-green-bright); box-shadow:0 0 0 2px var(--c-green-deep); cursor:not-allowed; opacity:.5; }
+.push[hidden]{ display:none; }
+button{ min-height:44px; }
+
+.wallet{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2) var(--sp-3);
+ margin:var(--sp-2) 0 0; padding:var(--sp-3) var(--sp-4);
+ border-radius:var(--r-3); color:var(--c-cream); background-color:var(--c-green-deep); }
+.wallet-line{ display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--sp-1) var(--sp-2);
+ flex:1; min-width:0; }
+.wallet-label{ font-size:var(--fs-12); font-weight:700; }
+.wallet-val{ font-size:var(--fs-12); font-weight:700; overflow-wrap:anywhere; }
+.wallet-val.bad{ color:var(--c-green-bright); }
+.wallet-keys{ flex:none; display:flex; flex-wrap:wrap; gap:var(--sp-2); }
+.wallet-key{ min-height:44px; padding:var(--sp-2) var(--sp-4); border:0; border-radius:var(--r-pill); cursor:pointer;
+ font:inherit; font-size:var(--fs-12); font-weight:800;
+ color:var(--c-green-deep); background-color:var(--c-green-bright);
+ box-shadow:0 3px 0 0 var(--c-green); }
+.wallet-key:hover{ background-color:var(--c-green-light); }
+.wallet-key:disabled{ opacity:.5; cursor:not-allowed; }
+.wallet-key[hidden]{ display:none; }
+
+
+.facts[hidden]{ display:none; }
+.facts{ margin-top:var(--sp-4); padding-top:var(--sp-3);
+ border-top:2px solid var(--c-green-deep);
+ display:flex; flex-direction:column; gap:var(--sp-1); }
+.facts-title{ margin:0 0 var(--sp-1); font-size:var(--fs-14); font-weight:800; }
+.fact{ display:flex; flex-wrap:wrap; gap:var(--sp-1) var(--sp-2);
+ font-size:var(--fs-12); font-weight:600; line-height:1.5; }
+.fact-k{ flex:none; min-width:9em; font-weight:800; }
+.fact-v{ min-width:0; overflow-wrap:anywhere; }
+.fact[data-tone="bad"] .fact-v{ font-weight:800; color:var(--c-green); }
+
+.card{ padding-bottom:var(--sp-5); }
+
+.main-pill{ position:relative; display:flex; align-items:center; gap:var(--sp-3); width:100%; min-height:76px; margin-top:var(--sp-5);
+ padding:var(--sp-4); border:0; border-radius:var(--r-pill);
+ color:var(--c-green-deep); background-color:var(--c-green-bright); font:inherit; text-align:left; cursor:pointer;
+ box-shadow:0 6px 0 0 var(--c-green-deep);
+ transition:transform .1s var(--ease-state), background-color .26s var(--ease-state), box-shadow .1s var(--ease-state); }
+.main-pill:hover{ color:var(--c-green-deep); background-color:var(--c-green-light); box-shadow:0 6px 0 0 var(--c-green-deep); }
+.main-pill:active{ transform:translateY(3px); box-shadow:0 3px 0 0 var(--c-green-deep); }
+.main-pill:disabled{ color:var(--c-green-deep); background-color:var(--c-green-light); box-shadow:0 0 0 2px var(--c-green-deep); cursor:not-allowed; opacity:.6; }
+.main-pill[data-state="done"]{ color:var(--c-green-deep); background-color:var(--c-green-light); }
+.main-pill[data-state="failed"]{ color:var(--c-cream); background-color:var(--c-green-deep); box-shadow:0 6px 0 0 var(--c-green); }
+
+.main-knob{ position:relative; flex:none; width:52px; height:52px; border-radius:var(--r-pill);
+ background-color:var(--c-green-deep);
+ transition:transform .26s var(--ease-state), background-color .26s var(--ease-state); }
+.main-spokes{ position:absolute; inset:16px; border-radius:var(--r-pill); border:3px solid var(--c-green-bright);
+ border-top-color:transparent; border-bottom-color:transparent; }
+.main-pill[data-state="confirming"] .main-knob{ transform:rotate(45deg); }
+.main-pill[data-state="submitted"] .main-knob{ transform:rotate(90deg); }
+.main-pill[data-state="done"] .main-knob{ transform:rotate(180deg); }
+
+.main-pill[data-state="failed"] .main-knob{ background-color:var(--c-green-bright); }
+.main-pill[data-state="failed"] .main-spokes{ border-color:var(--c-green-deep); }
+.main-mid{ min-width:0; flex:1; display:flex; flex-direction:column; gap:var(--sp-1); }
+.main-line{ display:flex; align-items:center; gap:var(--sp-2); font-size:var(--fs-12); font-weight:700; }
+.main-state{ color:var(--c-green-deep); background-color:var(--c-green-light); padding:0 var(--sp-2); border-radius:var(--r-pill); }
+.main-pill:disabled .main-state{ color:var(--c-green-deep); background-color:var(--c-green-bright); }
+.main-pill[data-state="failed"] .main-state{ color:var(--c-green-deep); background-color:var(--c-green-light); }
+.main-amount{ font-size:var(--fs-30); font-weight:800; font-variant-numeric:tabular-nums; overflow-wrap:normal; }
+.main-amount .u{ font-size:var(--fs-14); font-weight:700; margin-left:var(--sp-1); }
+.main-side{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--sp-1);
+ font-size:var(--fs-14); font-weight:800; }
+.main-side .icon{ width:16px; height:16px; }
+
+.spinner{ display:inline-block; width:14px; height:14px; border-radius:var(--r-pill);
+ border:2px solid var(--c-green-deep); border-top-color:var(--c-green-light); }
+.icon{ width:18px; height:18px; }
+:focus-visible{ outline:3px solid var(--c-green-deep); outline-offset:2px; }
+@keyframes pop{ 50%{ transform:scale(1.06); } }
+@keyframes rise{ 0%{ opacity:0; transform:translateY(8px); } 100%{ opacity:1; transform:translateY(0); } }
+.route{ animation:rise .45s var(--ease-out) forwards; animation-delay:calc(var(--j) * 40ms); }
+
+
+
+
+@media (max-width:600px){
+ .hero-links{ flex-basis:100%; margin-left:0; }
+}
+
+
+@media (max-width:600px){
+ .wallet-keys{ flex-basis:100%; }
+}
+
+
+@media (max-width:480px){
+ .push,.route-agent{ flex:0 1 auto; min-width:0; padding:0 var(--sp-4); overflow-wrap:anywhere; }
+}
+
+
+@media (max-width:480px){
+ .main-amount{ font-size:var(--fs-20); overflow-wrap:normal; }
+ .main-amount .u{ font-size:var(--fs-12); }
+}
+
+
+@media (max-width:480px){
+ .risk{ gap:var(--sp-1) var(--sp-2); padding:var(--sp-2) var(--sp-4) var(--sp-3); }
+ .risk-group{ gap:0; }
+ .risk-label::after{ content:"\3000"; }
+ .risk-tag,.risk-word{ padding:2px var(--sp-2); }
+}
+
+
+@media (max-width:480px){
+ .fact{ flex-direction:column; gap:0; }
+ .fact-k{ min-width:0; }
+}
+
+@media (max-width:480px){
+ .money-boxes{ grid-template-columns:minmax(0, 1fr); }
+ .money-v-cum{ min-width:0; overflow-wrap:anywhere; }
+}
+
+@media (prefers-reduced-motion: reduce){
+ *{ animation:none !important; transition:none !important; }
+ 
+}
+</style>
+</head>
+<body>
+<main class="wrap" id="main">
+
+ 
+ <div class="hero" id="hero">
+ <span class="hero-mark" id="hero-mark" aria-hidden="true">—</span>
+ <span class="hero-text">
+ <span class="hero-coiner">税收金库</span>
+ <h1 class="hero-coin" id="token-name">读取中…</h1>
+ <span class="hero-what">你比大多数人，早看到了它</span>
+ </span>
+ 
+ <span class="hero-links">
+ <a class="hero-link" id="link-vault" href="#" target="_blank" rel="noreferrer">
+ <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>在 BSC 上看金库</a>
+ <a class="hero-link" id="link-author" href="#">
+ <svg class="icon" aria-hidden="true"><use href="#i-coins"></use></svg><span id="author-link-text">202金库工厂</span></a>
+ </span>
+ </div>
+
+ 
+ <div class="risk">
+ <span class="risk-group"><span class="risk-label">风险等级</span><span class="risk-tag" id="risk-pill">风险状态未接入</span></span>
+ <span class="risk-group"><span class="risk-label">风险状态</span><span class="risk-word" id="risk-note">风险等级由官方页给 · 这里取不到</span></span>
+ </div>
+
+ 
+ <div class="wallet" id="wallet">
+ <span class="wallet-line">
+ <span class="wallet-label">读链</span><span class="wallet-val" id="chain-note">正在读…</span>
+ <span class="wallet-label">钱包</span><span class="wallet-val" id="wallet-note">正在问…</span>
+ <span class="wallet-label">账户</span><span class="wallet-val" id="acct-note">没连</span>
+ </span>
+ <span class="wallet-keys">
+ <button type="button" class="wallet-key" id="key-connect">连接钱包</button>
+ <button type="button" class="wallet-key" id="key-switch" hidden>切换到 BNB 主网（56）</button>
+ </span>
+ </div>
+
+ 
+ <div class="card" id="clockcard">
+ <div class="dash" id="dash">
+ <div class="money" id="money">
+ <div class="money" id="money">
+ 
+ <div class="money-boxes" id="money-boxes">
+ <div class="money-row money-box"><span class="money-k" id="money-k-bal">金库余额</span><span class="money-v money-v-cum num" id="v-reserved">—</span></div>
+ <div class="money-row money-box"><span class="money-k" id="money-k-tax">历史总税收</span><span class="money-v money-v-cum num" id="v-progress">—</span></div>
+ <div class="money-row money-row-cum money-box"><span class="money-k" id="money-k-lp">已添加 <b id="cum-lp-name">第三方代币</b> 的 LP 总量</span><span class="money-v money-v-cum num" id="v-cum-lp">—</span></div>
+ <div class="money-row money-row-cum money-box"><span class="money-k" id="money-k-burn">已销毁 <b id="cum-burn-name">第三方代币</b> 总量</span><span class="money-v money-v-cum num" id="v-cum-burn">—</span></div>
+ <div class="money-row money-row-cum money-box"><span class="money-k" id="money-k-div">已分红 <b id="cum-div-name">分红币</b> 总量</span><span class="money-v money-v-cum num" id="v-cum-div">—</span></div>
+ <div class="money-row money-row-cum money-box"><span class="money-k" id="money-k-dead">已销毁 <b id="cum-token-name">本币</b> 总量</span><span class="money-v money-v-cum num" id="v-cum-dead">—</span></div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ 
+ <div class="card" id="card">
+ <div class="routes" id="routes">
+ <div class="route" id="route-0" style="--j:0">
+ <span class="route-water" id="fill-0" aria-hidden="true"></span>
+ <span class="route-mid"><span class="route-line"><span class="route-name" id="name-0">第 1 路（分红）</span></span><span class="route-sub" id="line-0">读链中…</span></span>
+ <span class="route-ink" id="ink-0" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-0-ink">第 1 路（分红）</span></span><span class="route-sub" id="line-0-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-0-ink">读链中</span></span>
+ <span class="route-agent" id="agent-0">读链中</span>
+ </div>
+ <div class="route" id="route-1" style="--j:1">
+ <span class="route-water" id="fill-1" aria-hidden="true"></span>
+ <span class="route-mid"><span class="route-line"><span class="route-name" id="name-1">第 2 路（加池）</span></span><span class="route-sub" id="line-1">读链中…</span></span>
+ <span class="route-ink" id="ink-1" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-1-ink">第 2 路（加池）</span></span><span class="route-sub" id="line-1-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-1-ink">读链中</span></span>
+ <span class="route-agent" id="agent-1">读链中</span>
+ </div>
+ <div class="route" id="route-2" style="--j:2">
+ <span class="route-water" id="fill-2" aria-hidden="true"></span>
+ <span class="route-mid"><span class="route-line"><span class="route-name" id="name-2">第 3 路（销毁）</span></span><span class="route-sub" id="line-2">读链中…</span></span>
+ <span class="route-ink" id="ink-2" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-2-ink">第 3 路（销毁）</span></span><span class="route-sub" id="line-2-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-2-ink">读链中</span></span>
+ <span class="route-agent" id="agent-2">读链中</span>
+ </div>
+ <div class="route" id="route-3" style="--j:3">
+ <span class="route-water" id="fill-3" aria-hidden="true"></span>
+ <span class="route-mid"><span class="route-line"><span class="route-name" id="name-3">第 4 路（销毁本币）</span></span><span class="route-sub" id="line-3">读链中…</span></span>
+ <span class="route-ink" id="ink-3" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-3-ink">第 4 路（销毁本币）</span></span><span class="route-sub" id="line-3-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-3-ink">读链中</span></span>
+ <span class="route-agent" id="agent-3">读链中</span>
+ </div>
+ </div>
+
+ 
+ <div class="actions" id="actions">
+ <button type="button" class="push" id="push-next" data-state="idle">推进金库</button>
+ <button type="button" class="push" id="push-reset" data-state="idle" hidden>复位熔断</button>
+ </div>
+
+ 
+ <div class="facts" id="facts" hidden>
+ <p class="facts-title">金库读数（全部现读现算）· 只在 <code>?debug=1</code> 时展示</p>
+ <div class="fact" id="fact-vault"><span class="fact-k">金库</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-proxy"><span class="fact-k">金库本体是代理</span><span class="fact-v">读链中…</span></div>
+ 
+ <div class="fact" id="fact-balance"><span class="fact-k">金库余额（现在还剩多少）</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-received"><span class="fact-k">总税收（累计收进来多少）</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-spent"><span class="fact-k">累计已花</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-token"><span class="fact-k">本币</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-quote"><span class="fact-k">报价币（税收币）</span><span class="fact-v">读链中…</span></div>
+ 
+ <div class="fact" id="fact-factory"><span class="fact-k">工厂</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-threshold"><span class="fact-k">每一路的门槛</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-cursor"><span class="fact-k">游标（下一按碰哪一对）</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-trip"><span class="fact-k">熔断跳闸</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-queue"><span class="fact-k">上一次排队 / 间隔</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-gas"><span class="fact-k">金库的 BNB</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-dividend"><span class="fact-k">官方分红合约</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-mine"><span class="fact-k">我的可领分红</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-minShare"><span class="fact-k">镜的交叉核对 / 门槛</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-limits"><span class="fact-k">重试上限 / 已跳过</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-totals"><span class="fact-k">累计进金库 / 已花</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-route4"><span class="fact-k">第 4 路的四个账</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-pool4"><span class="fact-k">第 4 路在等的那口池子</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-msg"><span class="fact-k">这一页现在</span><span class="fact-v">读链中…</span></div>
+ 
+ <div class="fact" id="fact-cum"><span class="fact-k">累计① 已添加 &lt;目标币&gt; 的 LP 总量 ／ ② 已销毁 &lt;目标币&gt; 总量（**都是报价币口径**）</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-cum-div"><span class="fact-k">累计③ 已分红 &lt;分红币&gt; 总量（**分红币自己口径**）</span><span class="fact-v">读链中…</span></div>
+ <div class="fact" id="fact-cum-dead"><span class="fact-k">累计④ 已销毁 &lt;本币&gt; 总量（**死地址余额口径**）</span><span class="fact-v">读链中…</span></div>
+ </div>
+ </div>
+
+ 
+ <button type="button" class="main-pill" id="claim-btn" data-state="idle">
+ <span class="main-knob" aria-hidden="true"><span class="main-spokes"></span></span>
+ <span class="main-mid">
+ <span class="main-line">
+ <span class="main-state" id="claim-state-pill" hidden></span>
+ <span id="claim-token">分红币</span>
+ </span>
+ <span class="main-amount num" id="claim-amount">—</span>
+ </span>
+ <span class="main-side">
+ <span id="claim-stage" aria-live="polite"><svg class="icon" aria-hidden="true"><use href="#i-gift"></use></svg><span id="claim-btn-text">领取我的分红</span></span>
+ </span>
+ </button>
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+ <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8v12"/><path d="M3 12h18"/><path d="M12 8S10 3 7.5 4.5 9 8 12 8s4.5-2 2-3.5S12 8 12 8z"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol>
+ <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></symbol>
+ <symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6"/><path d="M15 21a6 6 0 0 0 0-12"/></symbol>
+</svg>
+
+<script>
+
+(function () {
+ 'use strict';
+
+ 
+ var P013_VAULT = '0x4533d5784f8940518a4a23e174414cf1b88fd250';
+ var BSC_CHAIN_ID = 56;
+ var BSC_CHAIN_ID_HEX = '0x38';
+ 
+ var AUTHOR_LINK = 'https://xiao17.asia/';
+ 
+ var LINK_JUMP_ENABLED = true;
+ 
+ var AUTHOR_LABEL = '202金库工厂';
+ 
+ var AUTHOR_FEEDBACK_MS = 2500;
+ 
+ var EXPLORER_ADDR = 'https://bscscan.com/address/';
+ 
+ var ALLOWED_FIELDS = ['from', 'to', 'data', 'gas', 'value'];
+ var FORBIDDEN_FEE_FIELDS = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas'];
+ 
+ var STATIC_GAS_LIMIT = 3500000n;
+ var NEXT_ROUTE_GAS_FLOOR = 2721000n;
+ var GAS_LIMIT_CLAIM = 1000000n;
+ 
+ var TX_STATES = ['待签名', '待确认', '成功', '失败', '未确认/卡住'];
+ var REFRESH_MS = 20000;
+ 
+ var PUBLIC_RPCS = [
+ 'https://bsc-dataseed.binance.org',
+ 'https://bsc-dataseed1.binance.org',
+ 'https://bsc.publicnode.com',
+ 'https://bsc-dataseed1.defibit.io'
+ ];
+ var READ_METHODS = ['eth_call', 'eth_getCode', 'eth_getBalance', 'eth_chainId', 'eth_blockNumber',
+ 'eth_getBlockByNumber', 'eth_getTransactionReceipt'];
+ var READ_TIMEOUT_MS = 4000;
+ var ZERO_ADDR = '0x' + '0'.repeat(40);
+
+ 
+ var _rpcIdx = 0;
+ function readRpc(method, params) {
+ if (READ_METHODS.indexOf(method) < 0) {
+ return Promise.reject(new Error('这一页的公共 RPC 通道只读：' + method + ' 不在白名单里'));
+ }
+ var body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params || [] });
+ var ctls = [], timers = [];
+ function stopAll() {
+ for (var i = 0; i < ctls.length; i++) { if (ctls[i]) { try { ctls[i].abort(); } catch (e) {} } }
+ for (var j = 0; j < timers.length; j++) { clearTimeout(timers[j]); }
+ }
+ function ask(i) {
+ return new Promise(function (resolve, reject) {
+ var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+ ctls[i] = ctl;
+ timers[i] = setTimeout(function () {
+ if (ctl) ctl.abort();
+ reject(new Error('第 ' + (i + 1) + ' 档超时（' + READ_TIMEOUT_MS + ' 毫秒）'));
+ }, READ_TIMEOUT_MS);
+ fetch(PUBLIC_RPCS[i], {
+ method: 'POST', headers: { 'content-type': 'application/json' }, body: body,
+ signal: ctl ? ctl.signal : undefined
+ }).then(function (res) {
+ if (!res.ok) throw new Error('HTTP ' + res.status);
+ return res.json();
+ }).then(function (j) {
+ if (!j || j.error) throw new Error((j && j.error && j.error.message) || 'RPC 报错');
+ resolve(j.result);
+ }).catch(function (e) { reject(e); });
+ });
+ }
+ return new Promise(function (resolve, reject) {
+ var done = false, failed = 0, lastErr = null;
+ var order = [_rpcIdx];
+ for (var k = 0; k < PUBLIC_RPCS.length; k++) { if (order.indexOf(k) < 0) order.push(k); }
+ order.forEach(function (i) {
+ ask(i).then(function (result) {
+ if (done) return;
+ done = true; _rpcIdx = i; stopAll();
+ resolve(result);
+ }).catch(function (e) {
+ if (done) return;
+ failed += 1; lastErr = e;
+ if (failed >= PUBLIC_RPCS.length) {
+ done = true; stopAll();
+ reject(new Error('四个公共 RPC 都没答话（最后一档：' + ((lastErr && lastErr.message) || lastErr) + '）'));
+ }
+ });
+ });
+ });
+ }
+ 
+ function walletRpc(method, params) {
+ return window.ethereum.request({ method: method, params: params || [] });
+ }
+ function rpc(method, params) {
+ if (READ_METHODS.indexOf(method) >= 0) return readRpc(method, params || []);
+ if (method === 'eth_accounts' || method === 'eth_requestAccounts' ||
+ method === 'eth_sendTransaction' || method === 'wallet_switchEthereumChain') {
+ return walletRpc(method, params || []);
+ }
+ return Promise.reject(new Error('这一页不让走这个通道：' + method));
+ }
+
+ 
+ var RC = [
+ 0x00000001n, 0x00008082n, 0x800000000000808an, 0x8000000080008000n,
+ 0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+ 0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+ 0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+ 0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+ 0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
+ ];
+ var ROT = [[0, 36, 3, 41, 18], [1, 44, 10, 45, 2], [62, 6, 43, 15, 61], [28, 55, 25, 21, 56], [27, 20, 39, 8, 14]];
+ var MASK64 = (1n << 64n) - 1n;
+ function rotl64(x, n) { if (n === 0) return x & MASK64; return ((x << BigInt(n)) | (x >> BigInt(64 - n))) & MASK64; }
+ function keccakF(A) {
+ for (var round = 0; round < 24; round++) {
+ var C = [], D = [], x, y;
+ for (x = 0; x < 5; x++) C[x] = A[x][0] ^ A[x][1] ^ A[x][2] ^ A[x][3] ^ A[x][4];
+ for (x = 0; x < 5; x++) D[x] = C[(x + 4) % 5] ^ rotl64(C[(x + 1) % 5], 1);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] ^= D[x];
+ var B = [];
+ for (x = 0; x < 5; x++) { B[x] = []; for (y = 0; y < 5; y++) B[x][y] = 0n; }
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) B[y][(2 * x + 3 * y) % 5] = rotl64(A[x][y], ROT[x][y]);
+ for (x = 0; x < 5; x++) for (y = 0; y < 5; y++) A[x][y] = B[x][y] ^ ((~B[(x + 1) % 5][y] & MASK64) & B[(x + 2) % 5][y]);
+ A[0][0] ^= RC[round];
+ }
+ }
+ function keccak256(bytes) {
+ var rate = 136;
+ var input = (bytes instanceof Uint8Array) ? bytes : Uint8Array.from(bytes);
+ var padLen = rate - (input.length % rate);
+ var padded = new Uint8Array(input.length + padLen);
+ padded.set(input); padded[input.length] = 0x01; padded[padded.length - 1] |= 0x80;
+ var A = [], i;
+ for (i = 0; i < 5; i++) A[i] = [0n, 0n, 0n, 0n, 0n];
+ for (var off = 0; off < padded.length; off += rate) {
+ for (i = 0; i < rate / 8; i++) {
+ var lane = 0n;
+ for (var b = 7; b >= 0; b--) lane = (lane << 8n) | BigInt(padded[off + i * 8 + b]);
+ A[i % 5][Math.floor(i / 5)] ^= lane;
+ }
+ keccakF(A);
+ }
+ var out = new Uint8Array(32);
+ for (i = 0; i < 4; i++) {
+ var ln = A[i % 5][Math.floor(i / 5)];
+ for (var k = 0; k < 8; k++) { out[i * 8 + k] = Number(ln & 0xffn); ln >>= 8n; }
+ }
+ return out;
+ }
+ function toHex(u8) { var s = ''; for (var i = 0; i < u8.length; i++) s += u8[i].toString(16).padStart(2, '0'); return '0x' + s; }
+ function utf8Bytes(str) {
+ var s = String(str), out = [];
+ for (var i = 0; i < s.length; i++) {
+ var c = s.charCodeAt(i);
+ if (c < 0x80) out.push(c);
+ else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+ else out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+ }
+ return Uint8Array.from(out);
+ }
+ function keccakSel(sig) { return toHex(keccak256(utf8Bytes(sig))).slice(0, 10); }
+ 
+ var SEL = {
+ taxToken: keccakSel('taxToken()'),
+ vaultQuoteToken: keccakSel('vaultQuoteToken()'),
+ factory: keccakSel('factory()'),
+ accountedQuote: keccakSel('accountedQuote()'),
+ totalReceived: keccakSel('totalReceived()'),
+ totalSpent: keccakSel('totalSpent()'),
+ totalDividendDeposited: keccakSel('totalDividendDeposited()'),
+ totalLiquiditySpent: keccakSel('totalLiquiditySpent()'),
+ totalBurnSpent: keccakSel('totalBurnSpent()'),
+ nextRouteCursor: keccakSel('nextRouteCursor()'),
+ timerTripped: keccakSel('timerTripped()'),
+ lastTriggerRequestedAt: keccakSel('lastTriggerRequestedAt()'),
+ lastTriggerAt: keccakSel('lastTriggerAt()'),
+ failedBatchCount: keccakSel('failedBatchCount()'),
+ lastRenewalUnfunded: keccakSel('lastRenewalUnfunded()'),
+ selfBuiltThreshold: keccakSel('selfBuiltThreshold()'),
+ routeAt: keccakSel('routeAt(uint8)'),
+ routesState: keccakSel('routesState()'),
+ route4State: keccakSel('route4State()'),
+ claimDividend: keccakSel('claimDividend()'),
+ nextRoute: keccakSel('nextRoute()'),
+ resetTimerCircuit: keccakSel('resetTimerCircuit()'),
+ balanceOf: keccakSel('balanceOf(address)'),
+ symbol: keccakSel('symbol()'),
+ decimals: keccakSel('decimals()'),
+ mainPool: keccakSel('mainPool()'),
+ getReserves: keccakSel('getReserves()'),
+ dividendContract: keccakSel('dividendContract()'),
+ dividendToken: keccakSel('dividendToken()'),
+ withdrawableDividends: keccakSel('withdrawableDividends(address)'),
+ 
+ lensConfig: keccakSel('launchConfigOf(address)'),
+ lensTimer: keccakSel('timerView(address)'),
+ lensClaimable: keccakSel('claimableDividendOf(address,address)'),
+ lensMinShare: keccakSel('dividendMinShareBalanceOf(address)'),
+ 
+ lensDividendTotal: keccakSel('dividendTotalDistributedOf(address)'),
+ lensConfigView: keccakSel('configView(address)')
+ };
+
+ 
+ function el(id) { return document.getElementById(id); }
+ function esc(s) {
+ return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+ .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+ }
+ function safe(fn) {
+ try { fn(); } catch (e) { if (window.console && console.warn) console.warn('render part skipped', e); }
+ }
+ function isHex(s) { return typeof s === 'string' && /^0x(?:[0-9a-fA-F]{2})*$/.test(s); }
+ function isHexQuantity(s) { return typeof s === 'string' && /^0x[0-9a-fA-F]+$/.test(s); }
+ function isHexAddr(s) { return typeof s === 'string' && /^0x[0-9a-fA-F]{40}$/.test(s); }
+ function lower(a) { return String(a == null ? '' : a).toLowerCase(); }
+ function toQuantity(n) { return '0x' + BigInt(n).toString(16); }
+ function wAddr(a) { return String(a).slice(2).toLowerCase().padStart(64, '0'); }
+ function wordToBig(hex, i) {
+ var p = 2 + i * 64;
+ return (!hex || typeof hex !== 'string' || hex.length < p + 64) ? null : BigInt('0x' + hex.slice(p, p + 64));
+ }
+ function wordToAddr(hex, i) {
+ var v = wordToBig(hex, i);
+ return v == null ? null : '0x' + v.toString(16).padStart(40, '0');
+ }
+ function isZeroAddr(a) { return lower(a) === ZERO_ADDR; }
+ 
+ function readable(n) { return typeof n === 'number' && isFinite(n); }
+ function shortAddr(a) { return isHexAddr(a) ? (a.slice(0, 8) + '…' + a.slice(-6)) : String(a || '读不到'); }
+ 
+ function toCoins(v, decimals) {
+ if (v == null) return null;
+ var d = (decimals == null ? null : Number(decimals));
+ if (!readable(d) || d < 0 || d > 36) return null;
+ var scale = 10n ** BigInt(d);
+ var x = (typeof v === 'bigint') ? v : BigInt(v);
+ var neg = x < 0n; if (neg) x = -x;
+ var whole = x / scale, frac = x % scale;
+ if (whole > 9007199254740991n) return null;
+ var frac8 = Number((frac * 100000000n) / scale) / 1e8;
+ var out = Number(whole) + frac8;
+ return neg ? -out : out;
+ }
+ 
+ function fmtAmt(x, maxDec) {
+ if (!readable(x)) return '读不到';
+ return x.toLocaleString('zh-CN', { minimumFractionDigits: 4, maximumFractionDigits: Math.max(4, maxDec == null ? 8 : maxDec) });
+ }
+ function fmtInt(x) {
+ if (!readable(x)) return '读不到';
+ return Math.round(x).toLocaleString('zh-CN');
+ }
+ function weiToBnb(wei) {
+ if (wei == null) return null;
+ var w = BigInt(wei);
+ var whole = w / 1000000000000000000n;
+ var frac = (w % 1000000000000000000n).toString().padStart(18, '0').replace(/0+$/, '');
+ return frac ? whole.toString() + '.' + frac : whole.toString();
+ }
+ 
+ function fmtCum(weiVal, decimals, unit) {
+ if (weiVal == null) return '读不到';
+ var d = (decimals == null ? null : Number(decimals));
+ if (!readable(d) || d < 0 || d > 36) return '读不到';
+ var n = toCoins(weiVal, d);
+ if (n == null) return '读不到';
+ var u = (unit == null) ? '' : String(unit);
+ return fmtAmt(n, 8) + (u ? (' ' + u) : '');
+ }
+ var RAF = (typeof requestAnimationFrame === 'function')
+ ? requestAnimationFrame
+ : function (cb) { return setTimeout(function () { cb(Date.now()); }, 16); };
+ var REDUCE = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+ 
+
+ 
+ var state = {
+ account: null, authorized: false, chainId: null, rpcChainId: null,
+ read: null, readAt: null, problems: [],
+ txKind: null, txState: TX_STATES[0], txHash: null,
+ 
+ txActive: false,
+ hint: '',
+ claim: { state: 'reading', amount: null, reason: '' }
+ };
+
+ 
+ function buildClaimPayload(from) {
+ return { from: from, to: P013_VAULT, data: SEL.claimDividend, gas: toQuantity(GAS_LIMIT_CLAIM), value: '0x0' };
+ }
+ function buildNextRoutePayload(from) {
+ return { from: from, to: P013_VAULT, data: SEL.nextRoute, gas: toQuantity(STATIC_GAS_LIMIT), value: '0x0' };
+ }
+ function buildResetPayload(from) {
+ return { from: from, to: P013_VAULT, data: SEL.resetTimerCircuit, gas: toQuantity(STATIC_GAS_LIMIT), value: '0x0' };
+ }
+ 
+ function validateTx(p, kind) {
+ var errs = [];
+ if (!p) { errs.push('没有交易'); return errs; }
+ Object.keys(p).forEach(function (k) { if (ALLOWED_FIELDS.indexOf(k) < 0) errs.push('出现了不该有的字段：' + k); });
+ FORBIDDEN_FEE_FIELDS.forEach(function (f) {
+ if (Object.prototype.hasOwnProperty.call(p, f)) errs.push('出现了燃气价格字段：' + f + '（页面绝不设价格）');
+ });
+ if (!isHexAddr(p.from)) errs.push('from 不是合法地址');
+ if (!isHexAddr(p.to)) errs.push('to 不是合法地址');
+ else if (lower(p.to) !== lower(P013_VAULT)) errs.push('to 不是这一页操作的金库：' + p.to);
+ if (!isHex(p.data) || p.data === '0x') errs.push('data 是空的');
+ if (!isHexQuantity(p.gas)) errs.push('gas 不是合法数量');
+ if (p.value !== '0x0') errs.push('value 不是 0x0（这三种交易都不转币）');
+ if (kind === 'claimDividend') {
+ if (String(p.data) !== SEL.claimDividend) errs.push('claimDividend 那一笔的 data 必须是 ' + SEL.claimDividend + '（无参数）');
+ if (isHexQuantity(p.gas) && BigInt(p.gas) < GAS_LIMIT_CLAIM) errs.push('claimDividend 的燃气上限低于 ' + GAS_LIMIT_CLAIM.toString());
+ } else if (kind === 'nextRoute') {
+ if (String(p.data) !== SEL.nextRoute) errs.push('nextRoute 那一笔的 data 必须是 ' + SEL.nextRoute + '（无参数）');
+ if (isHexQuantity(p.gas) && BigInt(p.gas) < NEXT_ROUTE_GAS_FLOOR) {
+ errs.push('nextRoute 的燃气上限 ' + BigInt(p.gas).toString() + ' 低于硬下限 ' + NEXT_ROUTE_GAS_FLOOR.toString() +
+ '（＝ 1,500,000 单路天花板 ＋ 1,200,000 下一路的闸 ＋ 21,000；一对里两路要这么多）');
+ }
+ } else if (kind === 'resetTimerCircuit') {
+ if (String(p.data) !== SEL.resetTimerCircuit) errs.push('resetTimerCircuit 那一笔的 data 必须是 ' + SEL.resetTimerCircuit + '（无参数）');
+ } else {
+ errs.push('这一页只认识三种交易（claimDividend / nextRoute / resetTimerCircuit），不认识：' + kind);
+ }
+ return errs;
+ }
+
+ 
+ function ethCall(to, data) {
+ if (!isHexAddr(to)) return Promise.resolve({ ok: false, message: 'to 不是合法地址' });
+ return rpc('eth_call', [{ to: to, data: data }, 'latest'])
+ .then(function (res) { return { ok: true, result: res }; })
+ .catch(function (e) { return { ok: false, message: (e && e.message) ? e.message : String(e) }; });
+ }
+ function callBig(to, sig, args) {
+ return ethCall(to, sig + (args || []).join('')).then(function (x) {
+ return x.ok ? wordToBig(x.result, 0) : null;
+ });
+ }
+ function callAddr(to, sig, args) {
+ return ethCall(to, sig + (args || []).join('')).then(function (x) {
+ return x.ok ? wordToAddr(x.result, 0) : null;
+ });
+ }
+ function callBool(to, sig, args) {
+ return callBig(to, sig, args).then(function (v) { return v == null ? null : (v !== 0n); });
+ }
+ function callStr(to, sig) {
+ return ethCall(to, sig).then(function (x) {
+ if (!x.ok) return null;
+ var hex = x.result;
+ if (typeof hex !== 'string' || hex.length < 130) return null;
+ var off = Number(BigInt('0x' + hex.slice(2, 66)));
+ if (!(off > 0)) return null;
+ var b = 2 + off * 2;
+ if (b + 64 > hex.length) return null;
+ var len = Number(BigInt('0x' + hex.slice(b, b + 64)));
+ if (len > 128) return null;
+ var bytes = [];
+ var body = hex.slice(b + 64, b + 64 + len * 2);
+ for (var i = 0; i + 1 < body.length; i += 2) bytes.push(parseInt(body.slice(i, i + 2), 16));
+ var out = '', j = 0;
+ while (j < bytes.length) {
+ var c = bytes[j];
+ if (c < 0x80) { out += String.fromCharCode(c); j += 1; }
+ else if ((c & 0xE0) === 0xC0 && j + 1 < bytes.length) { out += String.fromCharCode(((c & 0x1F) << 6) | (bytes[j + 1] & 0x3F)); j += 2; }
+ else if ((c & 0xF0) === 0xE0 && j + 2 < bytes.length) { out += String.fromCharCode(((c & 0x0F) << 12) | ((bytes[j + 1] & 0x3F) << 6) | (bytes[j + 2] & 0x3F)); j += 3; }
+ else { out += String.fromCharCode(c); j += 1; }
+ }
+ return out.replace(/\u0000+$/, '');
+ });
+ }
+ 
+ function soft(p, fallback) {
+ return Promise.resolve(p).then(function (x) { return x; }, function () { return fallback; });
+ }
+ function loadAll() {
+ var V = P013_VAULT;
+ var r = { problems: [], vault: V };
+ if (!isHexAddr(V) || isZeroAddr(V)) {
+ r.problems.push('金库地址不合法或是零地址 ⇒ 这一页一个调用都不发');
+ return Promise.resolve(r);
+ }
+ return soft(rpc('eth_chainId', []), null).then(function (cid) {
+ if (cid == null) r.problems.push('读不到 eth_chainId()（这条只读通道当时答不上话）');
+ else state.rpcChainId = parseInt(cid, 16);
+ return soft(rpc('eth_blockNumber', []), null);
+ }).then(function (bn) {
+ if (bn == null) { r.problems.push('读不到 eth_blockNumber()（块号）'); return null; }
+ var hexBn = '0x' + BigInt(bn).toString(16);
+ r.blockNumber = Number(BigInt(bn));
+ return soft(rpc('eth_getBlockByNumber', [hexBn, false]), null);
+ }).then(function (blk) {
+ if (blk == null) r.problems.push('读不到 eth_getBlockByNumber()（链上那个"现在"）');
+ else r.blockTimestamp = blk.timestamp ? Number(BigInt(blk.timestamp)) : null;
+ return soft(rpc('eth_getCode', [V, 'latest']).then(function (c) { return { got: true, code: c }; }),
+ { got: false, code: null });
+ }).then(function (gc) {
+ if (!gc.got) r.problems.push('读不到 eth_getCode()（金库地址上的代码字节）');
+ else {
+ r.codeBytes = (String(gc.code).length - 2) / 2;
+ if (!r.codeBytes) r.problems.push('金库地址上没有合约代码');
+ }
+ return Promise.all([
+ callAddr(V, SEL.taxToken), callAddr(V, SEL.vaultQuoteToken), callAddr(V, SEL.factory),
+ callBig(V, SEL.accountedQuote), callBig(V, SEL.totalReceived), callBig(V, SEL.totalSpent),
+ callBig(V, SEL.totalDividendDeposited), callBig(V, SEL.totalLiquiditySpent), callBig(V, SEL.totalBurnSpent),
+ callBig(V, SEL.nextRouteCursor), callBool(V, SEL.timerTripped),
+ callBig(V, SEL.lastTriggerRequestedAt), callBig(V, SEL.lastTriggerAt),
+ callBig(V, SEL.failedBatchCount), callBool(V, SEL.lastRenewalUnfunded),
+ callBig(V, SEL.selfBuiltThreshold), ethCall(V, SEL.routesState), ethCall(V, SEL.route4State)
+ ]).then(function (a) {
+ r.taxToken = a[0]; r.quoteToken = a[1]; r.factory = a[2];
+ r.accountedQuote = a[3]; r.totalReceived = a[4]; r.totalSpent = a[5];
+ r.totalDividendDeposited = a[6]; r.totalLiquiditySpent = a[7]; r.totalBurnSpent = a[8];
+ r.nextRouteCursor = a[9]; r.timerTripped = a[10];
+ r.lastTriggerRequestedAt = a[11]; r.lastTriggerAt = a[12];
+ r.failedBatchCount = a[13]; r.lastRenewalUnfunded = a[14];
+ r.selfBuiltThreshold = a[15];
+ var rs = a[16], r4 = a[17];
+ r.routesState = null;
+ if (rs.ok && isHex(rs.result) && rs.result.length >= 2 + 12 * 64) {
+ var g = function (base, i) { return wordToBig(rs.result, base + i); };
+ r.routesState = {
+ reserves: [0, 1, 2].map(function (i) { return g(0, i); }),
+ batchIds: [0, 1, 2].map(function (i) { return g(3, i); }),
+ batchAttempts: [0, 1, 2].map(function (i) { return Number(g(6, i)); }),
+ batchSkipped: [0, 1, 2].map(function (i) { return g(9, i) !== 0n; })
+ };
+ } else r.problems.push('读不到 routesState()（0..2 三路各自的桶）');
+ r.route4State = (r4.ok && isHex(r4.result) && r4.result.length >= 2 + 4 * 64) ? {
+ reserves: wordToBig(r4.result, 0), batchId: wordToBig(r4.result, 1),
+ batchAttempts: Number(wordToBig(r4.result, 2)), batchSkipped: wordToBig(r4.result, 3) !== 0n
+ } : null;
+ if (!r.route4State) r.problems.push('读不到 route4State()（第 4 路自己的四个账）');
+ 
+ if (r.nextRouteCursor == null) r.problems.push('读不到 nextRouteCursor()');
+ return Promise.all([0, 1, 2, 3].map(function (i) {
+ return ethCall(V, SEL.routeAt + BigInt(i).toString(16).padStart(64, '0'));
+ })).then(function (ra) {
+ r.routes = ra.map(function (x) {
+ if (!x.ok || !isHex(x.result)) return null;
+ return { bps: Number(wordToBig(x.result, 0)), target: wordToAddr(x.result, 1), custom: wordToBig(x.result, 2) !== 0n };
+ });
+ if (r.routes.some(function (x) { return x == null; })) r.problems.push('读不到 routeAt(0..3)');
+ });
+ });
+ }).then(function () {
+ 
+ var gToken = soft(r.taxToken ? Promise.all([
+ callStr(r.taxToken, SEL.symbol),
+ callBig(r.taxToken, SEL.decimals),
+ callAddr(r.taxToken, SEL.mainPool),
+ callAddr(r.taxToken, SEL.dividendContract)
+ ]) : Promise.resolve([null, null, null, null]), [null, null, null, null]);
+ var gQuote = soft(r.quoteToken ? Promise.all([
+ callStr(r.quoteToken, SEL.symbol),
+ callBig(r.quoteToken, SEL.decimals),
+ callBig(r.quoteToken, SEL.balanceOf, [wAddr(V)])
+ ]) : Promise.resolve([null, null, null]), [null, null, null]);
+ var gFactory = soft(r.factory ? Promise.all([
+ callAddr(r.factory, keccakSel('owner()')),
+ callAddr(r.factory, keccakSel('gasStation()'))
+ ]) : Promise.resolve([null, null]), [null, null]);
+ var gBnb = soft(rpc('eth_getBalance', [V, 'latest']).then(function (b) { return BigInt(b); }), null);
+ return Promise.all([gToken, gQuote, gFactory, gBnb]);
+ }).then(function (a) {
+ var t = a[0], q = a[1], f = a[2];
+ r.tokenSymbol = t[0]; r.tokenDecimals = (t[1] == null ? null : Number(t[1]));
+ r.mainPool = t[2]; r.dividendContract = t[3];
+ r.quoteSymbol = q[0]; r.quoteDecimals = (q[1] == null ? null : Number(q[1]));
+ r.vaultBalance = q[2];
+ r.factoryOwner = f[0]; r.gasStation = f[1];
+ r.bnbWei = a[3];
+ 
+ if (r.vaultBalance == null) r.problems.push('读不到金库余额（报价币 balanceOf(金库)）');
+ if (r.quoteDecimals == null) r.problems.push('读不到报价币位数（报价币自己的 decimals()）');
+ 
+ r.selfBuilt = r.selfBuiltThreshold;
+ return Promise.all([
+ soft(r.dividendContract ? callAddr(r.dividendContract, SEL.dividendToken) : Promise.resolve(null), null),
+ 
+ Promise.all([
+ soft(callBig(P013_LENS, SEL.lensClaimable, state.account ? [wAddr(V), wAddr(state.account)] : null), null),
+ soft(callBig(P013_LENS, SEL.lensMinShare, [wAddr(V)]), null)
+ ])
+ ]);
+ }).then(function (a) {
+ var d = a[0], lens = a[1];
+ r.dividendToken = d;
+ r.lensClaimable = lens[0]; r.minShareBalance = lens[1];
+ r.dividendTokenDecimals = null;
+ r.dividendTokenSymbol = null;
+ r.withdrawableMine = null;
+ return Promise.all([
+ soft(r.dividendToken ? Promise.all([
+ callBig(r.dividendToken, SEL.decimals),
+ callStr(r.dividendToken, SEL.symbol)
+ ]) : Promise.resolve([null, null]), [null, null]),
+ soft((r.dividendContract && state.account) ? callBig(r.dividendContract, SEL.withdrawableDividends, [wAddr(state.account)]) : Promise.resolve(null), null),
+ soft((r.mainPool && !isZeroAddr(r.mainPool)) ? ethCall(r.mainPool, SEL.getReserves) : Promise.resolve({ ok: false, result: null }), { ok: false, result: null }),
+ soft((r.mainPool && !isZeroAddr(r.mainPool) && r.quoteToken) ? callBig(r.quoteToken, SEL.balanceOf, [wAddr(r.mainPool)]) : Promise.resolve(null), null),
+ soft((r.mainPool && !isZeroAddr(r.mainPool) && r.taxToken) ? callBig(r.taxToken, SEL.balanceOf, [wAddr(r.mainPool)]) : Promise.resolve(null), null)
+ ]);
+ }).then(function (a) {
+ var dt = a[0];
+ r.dividendTokenDecimals = (dt && dt[0] != null) ? Number(dt[0]) : null;
+ r.dividendTokenSymbol = (dt && dt[1]) ? String(dt[1]) : null;
+ r.withdrawableMine = a[1];
+ var rsv = a[2];
+ r.poolReserves = (rsv.ok && isHex(rsv.result) && rsv.result.length >= 2 + 2 * 64)
+ ? [wordToBig(rsv.result, 0), wordToBig(rsv.result, 1)] : null;
+ r.poolQuoteBal = a[3]; r.poolCoinBal = a[4];
+ return null;
+ }).then(function () {
+ 
+ if (!debugOn()) return null;
+ var want = [];
+ if (r.factory) want.push(['factoryCodeBytes', r.factory]);
+ if (r.taxToken) want.push(['tokenCodeBytes', r.taxToken]);
+ if (!want.length) return null;
+ return Promise.all(want.map(function (w) {
+ return soft(rpc('eth_getCode', [w[1], 'latest']), null);
+ })).then(function (cs) {
+ for (var i = 0; i < want.length; i++) {
+ r[want[i][0]] = (cs[i] == null ? null : (String(cs[i]).length - 2) / 2);
+ }
+ return null;
+ });
+ }).then(function () {
+ r.ok = r.problems.length === 0;
+ state.read = r;
+ return r;
+ });
+ }
+ 
+ var P013_LENS = '0xE47D13E7C40BE6383BA5c18643A673CaffE7c95b';
+ function loadLens(r) {
+ if (!isHexAddr(P013_LENS)) { r.lens = null; return Promise.resolve(r); }
+ var arg = wAddr(P013_VAULT);
+ return Promise.all([
+ 
+ rpc('eth_getCode', [P013_LENS, 'latest']).then(function (c) { return { got: true, code: c }; },
+ function () { return { got: false, code: null }; }),
+ ethCall(P013_LENS, SEL.lensConfig + arg),
+ ethCall(P013_LENS, SEL.lensTimer + arg)
+ ]).then(function (a) {
+ var gc = a[0], cfg = a[1], tv = a[2];
+ r.lens = { ok: false, intervalSec: null, selfBuiltThreshold: null, retryLimit: null, gasTopUpTargetWei: null,
+ skippedBatchCount: null, lastTriggerRequestedAt: null, timerTripped: null, failedBatchCount: null };
+ if (!gc.got) { r.problems.push('读不到只读镜的 eth_getCode()（镜地址上的代码字节）'); return r; }
+ r.lensCodeBytes = (String(gc.code).length - 2) / 2;
+ if (!r.lensCodeBytes) { r.problems.push('只读镜地址上没有合约代码（未部署？）'); return r; }
+ if (cfg.ok && isHex(cfg.result) && cfg.result.length >= 2 + 9 * 64) {
+ r.lens.intervalSec = Number(wordToBig(cfg.result, 5));
+ r.lens.selfBuiltThreshold = wordToBig(cfg.result, 6);
+ r.lens.retryLimit = Number(wordToBig(cfg.result, 7));
+ r.lens.gasTopUpTargetWei = wordToBig(cfg.result, 8);
+ } else { r.problems.push('镜的 launchConfigOf 读不到'); }
+ if (tv.ok && isHex(tv.result) && tv.result.length >= 2 + 9 * 64) {
+ r.lens.lastTriggerRequestedAt = wordToBig(tv.result, 1);
+ r.lens.failedBatchCount = Number(wordToBig(tv.result, 3));
+ r.lens.timerTripped = wordToBig(tv.result, 5) !== 0n;
+ r.lens.skippedBatchCount = Number(wordToBig(tv.result, 8));
+ } else { r.problems.push('镜的 timerView 读不到'); }
+ r.lens.ok = r.problems.length === 0;
+ return r;
+ });
+ }
+
+ 
+ function loadCumulative(r) {
+ 
+ if (!r) return Promise.resolve(r);
+ 
+ var pDiv = soft(ethCall(P013_LENS, SEL.lensDividendTotal + wAddr(P013_VAULT)), { ok: false, result: null })
+ .then(function (dt) {
+ r.dividendTotalDistributed = (dt && dt.ok && isHex(dt.result) && dt.result.length >= 2 + 64)
+ ? wordToBig(dt.result, 0) : null;
+ return r;
+ });
+ 
+ var dead = null;
+ if (r.lens && isHexAddr(P013_LENS)) {
+ return pDiv.then(function () {
+ return soft(ethCall(P013_LENS, SEL.lensConfigView + wAddr(P013_VAULT)), { ok: false, result: null });
+ }).then(function (cv) {
+ if (cv && cv.ok && isHex(cv.result) && cv.result.length >= 2 + 13 * 64) {
+ var d = wordToAddr(cv.result, 2);
+ if (d && !isZeroAddr(d)) dead = d;
+ }
+ r.deadAddress = dead;
+ 
+ if (!dead || !isHexAddr(r.taxToken)) { r.tokenDecimals2 = null; r.deadBalance = null; return r; }
+ return Promise.all([
+ soft(callBig(r.taxToken, SEL.decimals), null),
+ soft(callBig(r.taxToken, SEL.balanceOf, [wAddr(dead)]), null)
+ ]).then(function (a) {
+ r.tokenDecimals2 = (a[0] == null) ? null : Number(a[0]);
+ r.deadBalance = a[1];
+ return r;
+ });
+ });
+ }
+ r.deadAddress = null; r.tokenDecimals2 = null; r.deadBalance = null;
+ return pDiv;
+ }
+ 
+ function paintCumulative(r) {
+ if (!r) return;
+ safe(function () {
+ var uq = (r.quoteSymbol == null ? null : String(r.quoteSymbol));
+ var ud = (r.dividendTokenSymbol == null ? null : String(r.dividendTokenSymbol));
+ var ut = (r.tokenSymbol == null ? null : String(r.tokenSymbol));
+ el('v-cum-lp').textContent = fmtCum(r.totalLiquiditySpent, r.quoteDecimals, uq);
+ el('v-cum-burn').textContent = fmtCum(r.totalBurnSpent, r.quoteDecimals, uq);
+ el('v-cum-div').textContent = fmtCum(r.dividendTotalDistributed, r.dividendTokenDecimals, ud);
+ el('v-cum-dead').textContent = fmtCum(r.deadBalance, r.tokenDecimals2, ut);
+ });
+ }
+ 
+ function cumName(sym, fallback) {
+ var s = (sym == null ? '' : String(sym)).trim();
+ return s === '' ? fallback : s;
+ }
+ function paintCoinNames(r) {
+ safe(function () {
+ var x = r || {};
+ var tgt = cumName(x.targetSymbol, '第三方代币');
+ var div = cumName(x.dividendTokenSymbol, '分红币');
+ var sel = cumName(x.tokenSymbol, '本币');
+ el('cum-lp-name').textContent = tgt;
+ el('cum-burn-name').textContent = tgt;
+ el('cum-div-name').textContent = div;
+ el('cum-token-name').textContent = sel;
+ });
+ }
+
+ 
+ function hasWallet() { return typeof window.ethereum !== 'undefined' && window.ethereum != null; }
+ function isLocalFile() { return typeof location !== 'undefined' && String(location.protocol) === 'file:'; }
+ function chainNameOf(id) { return id === BSC_CHAIN_ID ? 'BNB 主网（56）' : ('链 ' + String(id)); }
+ function walletChainId() { return walletRpc('eth_chainId').then(function (v) { return parseInt(v, 16); }); }
+ function setHint(html, tone) { state.hint = html || ''; paintWallet(); }
+ function connect() {
+ if (!hasWallet()) {
+ setHint(isLocalFile()
+ ? '这个浏览器里没有可用的钱包接口。很可能是钱包<b>不支持「直接双击打开的本地文件」</b>，<b>不一定是没装</b> —— 请从<b>本地服务那个 http 网址</b>打开这一页。下面的数字照常显示（读链走公共 RPC，不需要钱包）。'
+ : '这个浏览器里没有检测到钱包插件。请用装了钱包插件（例如 MetaMask / OKX Wallet）的浏览器打开。<b>下面的数字照常显示</b>（读链走公共 RPC，不需要钱包）。');
+ return Promise.resolve(null);
+ }
+ return walletRpc('eth_requestAccounts').then(function (accounts) {
+ state.account = (accounts && accounts[0]) ? accounts[0] : null;
+ return walletChainId();
+ }).then(function (cid) {
+ state.chainId = cid;
+ return walletRpc('eth_accounts').then(function (list) {
+ state.authorized = Boolean(state.account) && (list || []).some(function (a) { return lower(a) === lower(state.account); });
+ return null;
+ }).catch(function () { state.authorized = false; return null; });
+ }).then(function () {
+ if (!state.account) setHint('钱包没有给出任何账户（你可能拒绝了授权）。<b>没有账户就不许发交易</b>。');
+ else if (state.chainId !== BSC_CHAIN_ID) setHint('你的钱包现在不在 <b>BNB 主网（chainId 56）</b>。点上面的「切换到 BNB 主网（56）」再继续。<br>链不对时这一页<b>禁止发送</b>。');
+ else setHint('');
+ return refreshBalance();
+ }).then(function () {
+ return refresh();
+ }).catch(function (e) {
+ setHint('连接失败或你取消了：' + esc((e && e.message) ? e.message : e));
+ return null;
+ });
+ }
+ function switchChain() {
+ return rpc('wallet_switchEthereumChain', [{ chainId: BSC_CHAIN_ID_HEX }]).catch(function (e) {
+ if (e && (e.code === 4902 || /Unrecognized chain/i.test(e.message || ''))) {
+ setHint('你的钱包里还没有 BNB 主网这一条，请先在钱包里手动添加 <b>chainId 56</b> 再回来。');
+ } else {
+ setHint('切链没有成功（你取消了，或钱包不支持）：' + esc((e && e.message) ? e.message : e));
+ }
+ return null;
+ }).then(function () {
+ return walletChainId().then(function (cid) { state.chainId = cid; return null; }).catch(function () { return null; });
+ }).then(function () { return refresh(); });
+ }
+ function refreshBalance() {
+ if (!state.account) return Promise.resolve(null);
+ return rpc('eth_getBalance', [state.account, 'latest']).then(function (b) {
+ state.balanceWei = BigInt(b);
+ return null;
+ }).catch(function () { state.balanceWei = null; return null; });
+ }
+ function autoConnectOnce() {
+ if (!hasWallet()) { setHint('这个浏览器里没有检测到钱包插件 —— <b>下面的数字照常显示</b>（读链走公共 RPC）。'); return Promise.resolve(null); }
+ return walletRpc('eth_accounts').then(function (list) {
+ if (list && list.length) {
+ state.account = list[0];
+ return walletChainId().then(function (cid) { state.chainId = cid; state.authorized = true; return refreshBalance(); });
+ }
+ return null;
+ }).catch(function () { return null; });
+ }
+
+ 
+ function sendTx(payload, kind) {
+ var errs = validateTx(payload, kind);
+ if (errs.length) {
+ state.txState = TX_STATES[3];
+ setTx(kind, TX_STATES[3]);
+ state.problems = state.problems.concat(errs);
+ paintFacts();
+ return Promise.resolve({ ok: false, errors: errs });
+ }
+ state.txKind = kind; state.txHash = null;
+ state.txState = TX_STATES[0]; setTx(kind, TX_STATES[0]);
+ return rpc('eth_sendTransaction', [payload]).then(function (hash) {
+ state.txHash = hash;
+ state.txState = TX_STATES[1]; setTx(kind, TX_STATES[1]);
+ var tries = 0;
+ var poll = function () {
+ if (tries >= 40) { state.txState = TX_STATES[4]; setTx(kind, TX_STATES[4]); return { ok: false, pending: true, hash: hash }; }
+ tries += 1;
+ return rpc('eth_getTransactionReceipt', [hash]).then(function (rc) {
+ if (rc && rc.status) {
+ var good = BigInt(rc.status) === 1n;
+ state.txState = good ? TX_STATES[2] : TX_STATES[3];
+ setTx(kind, state.txState);
+ return { ok: good, hash: hash };
+ }
+ return new Promise(function (r) { setTimeout(r, 3000); }).then(poll);
+ }).catch(function () {
+ return new Promise(function (r) { setTimeout(r, 3000); }).then(poll);
+ });
+ };
+ return poll();
+ }).then(function (out) {
+ return refresh().then(function () { return out; });
+ }).catch(function (e) {
+ var m = (e && e.message) ? String(e.message) : String(e);
+ if (e && String(e.code) === '4001') state.txState = TX_STATES[3];
+ else state.txState = TX_STATES[3];
+ setTx(kind, state.txState);
+ return { ok: false, error: m, code: (e && e.code) ? String(e.code) : '' };
+ });
+ }
+
+ 
+ function fmtWeiOrNull(v, decimals, maxDec) {
+ var n = toCoins(v, decimals);
+ return n == null ? '读不到' : fmtAmt(n, maxDec);
+ }
+ function effThreshold(r) {
+ if (r.selfBuilt != null && r.selfBuilt > 0n) return { wei: r.selfBuilt, from: '金库 selfBuiltThreshold()' };
+ if (r.lens && r.lens.selfBuiltThreshold != null && r.lens.selfBuiltThreshold > 0n) {
+ return { wei: r.lens.selfBuiltThreshold, from: '镜 launchConfigOf(vault).vaultSelfBuiltThreshold（金库自己是 0 ⇒ 用工厂那一档）' };
+ }
+ return { wei: null, from: '读不到（金库 selfBuiltThreshold() 与镜的 launchConfigOf 都没给出）' };
+ }
+ function poolEmpty(r) {
+ var gotR = Array.isArray(r.poolReserves) && r.poolReserves.length === 2 && r.poolReserves[0] != null && r.poolReserves[1] != null;
+ var gotB = r.poolQuoteBal != null && r.poolCoinBal != null;
+ if (!gotR && !gotB) return null; 
+ return (gotR && r.poolReserves[0] === 0n && r.poolReserves[1] === 0n) ||
+ (gotB && r.poolQuoteBal === 0n && r.poolCoinBal === 0n);
+ }
+ function pairNameOf(cursor) {
+ if (cursor == null) return null;
+ var c = Number(cursor);
+ if (c === 0 || c === 1) return '分红 ＋ 加池';
+ if (c === 2 || c === 3) return '销毁第三方 ＋ 销毁本币';
+ return '指针 ' + String(c) + '（这一页不认识）';
+ }
+ function claimView(r) {
+ var addr = state.account;
+ if (!addr) return { state: 'noconn', amount: null, reason: '还没连钱包 —— 连上之后这一格才读得到你自己的可领额' };
+ if (r.withdrawableMine == null) return { state: 'unreadable', amount: null, reason: '读不到官方分红合约的可领额（读不到 ≠ 0）' };
+ var n = toCoins(r.withdrawableMine, r.dividendTokenDecimals);
+ if (r.withdrawableMine === 0n) return { state: 'zero', amount: 0, reason: '现在没有可领的分红（这是行情，不是失败）' };
+ if (n == null) return { state: 'unreadable', amount: null, reason: '可领额读到的是链上整数，但分红币位数读不到 ⇒ 不敢折算' };
+ return { state: 'ready', amount: n, reason: '' };
+ }
+ function countUp(node, target, decimals, suffix) {
+ var unit = '<span class="u">' + esc(suffix) + '</span>';
+ if (!node) return;
+ if (!readable(target)) { node.textContent = '读不到'; return; }
+ if (REDUCE) { node.innerHTML = fmtAmt(target, decimals) + unit; return; }
+ var t0 = 0, DUR = 760;
+ RAF(function step(t) {
+ if (!t0) t0 = t;
+ var k = Math.min((t - t0) / DUR, 1);
+ var e = 1 - Math.pow(1 - k, 3);
+ node.innerHTML = fmtAmt(target * e, decimals) + unit;
+ if (k < 1) RAF(step);
+ else { node.innerHTML = fmtAmt(target, decimals) + unit; popAmount(node); }
+ return undefined;
+ });
+ }
+ function popAmount(node) {
+ try { if (!node.classList) return; node.classList.remove('is-new'); void node.offsetWidth; node.classList.add('is-new'); } catch (e) {}
+ }
+ function paintsHero(r) {
+ var name = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
+ safe(function () { el('token-name').textContent = name; });
+ safe(function () { el('hero-mark').textContent = (name === '读不到') ? '—' : name.slice(0, 1); });
+ safe(function () {
+ var a = el('link-vault');
+ if (a) a.href = EXPLORER_ADDR + P013_VAULT;
+ });
+ 
+ safe(function () {
+ var a = el('link-author');
+ if (a) {
+ if (AUTHOR_LINK) { a.href = AUTHOR_LINK; a.setAttribute('rel', 'noopener noreferrer'); a.setAttribute('target', '_blank'); }
+ else if (a.removeAttribute) a.removeAttribute('href');
+ }
+ var s = el('author-link-text');
+ if (s) s.textContent = authorLinkText();
+ });
+ }
+ 
+ function authorLinkText() { return AUTHOR_LABEL; }
+ function authorClickActions() { return LINK_JUMP_ENABLED ? ['copy', 'jump'] : ['copy']; }
+ 
+ function authorFeedbackText(copied, opened) {
+ return copied ? (opened ? '已复制·已打开' : '已复制') : '复制失败';
+ }
+ var _authorBackTimer = null;
+ 
+ function authorSay(text) {
+ safe(function () {
+ var s = el('author-link-text');
+ if (s) s.textContent = text;
+ });
+ if (_authorBackTimer != null && typeof clearTimeout === 'function') clearTimeout(_authorBackTimer);
+ _authorBackTimer = null;
+ if (typeof setTimeout === 'function') {
+ _authorBackTimer = setTimeout(function () {
+ _authorBackTimer = null;
+ safe(function () {
+ var s = el('author-link-text');
+ if (s) s.textContent = authorLinkText();
+ });
+ }, AUTHOR_FEEDBACK_MS);
+ }
+ }
+ function authorOpen() {
+ var out = { copied: false, opened: false, why: '' };
+ var link = String(AUTHOR_LINK || '');
+ if (!link) {
+ 
+ out.why = '待填';
+ authorSay('待填');
+ setHint('那一格还是<b>待填</b> —— 发行方还没把链接给我，所以既没得复制、也没得跳。');
+ return out;
+ }
+ 
+ var copyP = Promise.resolve(null);
+ try {
+ if (typeof navigator !== 'undefined' && navigator && navigator.clipboard && navigator.clipboard.writeText) {
+ copyP = Promise.resolve(navigator.clipboard.writeText(link)).then(function () { out.copied = true; },
+ function () { out.copied = false; });
+ }
+ } catch (e) { out.copied = false; }
+ 
+ if (LINK_JUMP_ENABLED) {
+ try {
+ if (typeof window !== 'undefined' && typeof window.open === 'function') { window.open(link, '_blank', 'noopener'); out.opened = true; }
+ } catch (e) { out.opened = false; }
+ }
+ 
+ copyP.then(function () {
+ authorSay(authorFeedbackText(out.copied, out.opened));
+ setHint(out.copied
+ ? ('那颗链接<b>复制好了</b>。' + (out.opened ? '<b>也在新窗口打开了</b>。' : '<b>没有跳转</b>。')
+ + '跳转这一项<b>等官方裁定</b> —— 批下来之前先当兜底留着。')
+ : '那颗链接<b>没复制成</b>（浏览器不给剪贴板权限）。跳转这一项<b>等官方裁定</b>。');
+ return null;
+ });
+ return out;
+ }
+ function paintWallet() {
+ var r = state.read;
+ safe(function () {
+ var n = el('chain-note');
+ if (n) {
+ n.textContent = (state.rpcChainId == null) ? '读不到' : chainNameOf(state.rpcChainId);
+ n.className = 'wallet-val' + ((state.rpcChainId !== BSC_CHAIN_ID) ? ' bad' : '');
+ }
+ });
+ safe(function () {
+ var n = el('wallet-note');
+ if (n) {
+ if (!hasWallet()) n.textContent = '没有检测到钱包插件';
+ else if (state.chainId == null) n.textContent = '没连（只读数字照常显示）';
+ else n.textContent = chainNameOf(state.chainId) + (state.chainId === BSC_CHAIN_ID ? '（可以发交易）' : '（链不对 ⇒ 禁止发送）');
+ n.className = 'wallet-val' + ((hasWallet() && state.chainId != null && state.chainId !== BSC_CHAIN_ID) ? ' bad' : '');
+ }
+ });
+ safe(function () { el('acct-note').textContent = state.account ? shortAddr(state.account) : '没连'; });
+ safe(function () {
+ var k = el('key-connect');
+ if (k) {
+ k.hidden = !!(state.account);
+ k.disabled = !hasWallet();
+ k.textContent = hasWallet() ? (state.account ? '已连接' : '连接钱包') : '没有钱包插件';
+ }
+ });
+ safe(function () {
+ var k = el('key-switch');
+ if (k) k.hidden = !(hasWallet() && state.chainId != null && state.chainId !== BSC_CHAIN_ID);
+ });
+ safe(function () {
+ var msg = el('fact-msg');
+ if (msg) {
+ var v = msg.querySelector ? msg.querySelector('.fact-v') : null;
+ var text = state.hint || (r && r.problems && r.problems.length ? ('有几项读不到：' + r.problems.join('；')) : '（还没读）');
+ if (v) v.innerHTML = text; else msg.innerHTML = '<span class="fact-k">这一页现在</span><span class="fact-v">' + text + '</span>';
+ }
+ });
+ }
+ function paintRoutes(r) {
+ var th = effThreshold(r);
+ var rs = r.routesState;
+ var tgtSym = (r.targetSymbol && String(r.targetSymbol).trim()) ? String(r.targetSymbol).trim() : '读不到';
+ var selfSym = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
+ 
+ var labels = [
+ '第 1 路 · 分红发 ' + tgtSym,
+ '第 2 路 · 加 ' + tgtSym + ' 的 LP',
+ '第 3 路 · 销毁 ' + tgtSym,
+ '第 4 路 · 销毁本币 ' + selfSym
+ ];
+ for (var k = 0; k < 4; k++) {
+ (function (idx) {
+ var name, sub, st, ready = false, ratio = 0.06, res = null, attempts = null, skipped = null;
+ var share = (r.routes && r.routes[idx]) ? r.routes[idx].bps : null;
+ if (idx < 3) {
+ res = rs ? rs.reserves[idx] : null;
+ attempts = rs ? rs.batchAttempts[idx] : null;
+ skipped = rs ? rs.batchSkipped[idx] : null;
+ name = labels[idx] + (share == null ? '' : ' ' + (share / 100) + '%');
+ if (res != null && th.wei != null && th.wei > 0n) {
+ ready = res >= th.wei;
+ 
+ var ratioN = Number((res * 100n) / th.wei) / 100;
+ ratio = readable(ratioN) ? Math.max(0, Math.min(1, ratioN)) : 0;
+ }
+ 
+ sub = '桶里 ' + fmtWeiOrNull(res, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || '');
+ if (skipped === true) st = '已跳过';
+ else if (res == null || th.wei == null) st = '读不到';
+ else st = ready ? '等待执行' : '正在积攒';
+ } else {
+ var r4 = r.route4State;
+ res = r4 ? r4.reserves : null;
+ attempts = r4 ? r4.batchAttempts : null;
+ skipped = r4 ? r4.batchSkipped : null;
+ name = labels[idx] + (share == null ? '' : ' ' + (share / 100) + '%');
+ var empty = poolEmpty(r);
+ 
+ if (empty === true) st = '等待池子迁移';
+ else if (skipped === true) st = '已跳过';
+ else if (empty === false) st = (res == null || th.wei == null ? '读不到' : (res >= th.wei ? '等待执行' : '正在积攒'));
+ else st = '池子读不到';
+ if (res != null && th.wei != null && th.wei > 0n) {
+ var ratio4 = Number((res * 100n) / th.wei) / 100;
+ ratio = readable(ratio4) ? Math.max(0, Math.min(1, ratio4)) : 0;
+ ready = (empty === false) && (res >= th.wei);
+ }
+ 
+ sub = '桶里 ' + fmtWeiOrNull(res, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || '');
+ }
+ safe(function () {
+ var row = el('route-' + idx);
+ if (row) {
+ 
+ var tier = ratio <= 0.25 ? 'is-t1' : (ratio <= 0.5 ? 'is-t2' : (ratio < 1 ? 'is-t3' : ''));
+ row.className = 'route' + (ready ? ' is-ready' : (ratio > 0 ? ' ' + tier : ''));
+ row.setAttribute('data-fill', 'scaleY(' + ratio.toFixed(3) + ')');
+ row.setAttribute('data-ready', ready ? '1' : '0');
+ row.setAttribute('data-tier', ready ? '4' : (ratio <= 0 ? '0' : (tier === 'is-t1' ? '1' : (tier === 'is-t2' ? '2' : '3'))));
+ }
+ });
+ 
+ safe(function () {
+ var w = el('fill-' + idx);
+ if (w && w.style) w.style.transform = 'scaleY(' + ratio.toFixed(3) + ')';
+ });
+ safe(function () { var n = el('name-' + idx); if (n) n.textContent = name; });
+ safe(function () { var s = el('line-' + idx); if (s) s.textContent = sub; });
+ safe(function () { var a = el('agent-' + idx); if (a) a.textContent = st; });
+ 
+ safe(function () { var n2 = el('name-' + idx + '-ink'); if (n2) n2.textContent = name; });
+ safe(function () { var s2 = el('line-' + idx + '-ink'); if (s2) s2.textContent = sub; });
+ safe(function () { var a2 = el('agent-' + idx + '-ink'); if (a2) a2.textContent = st; });
+ safe(function () {
+ var ink = el('ink-' + idx);
+ if (!ink || !ink.style) return;
+ var clip = 'inset(' + ((1 - ratio) * 100).toFixed(3) + '% 0 0 0)';
+ ink.style.clipPath = clip;
+ ink.style.webkitClipPath = clip;
+ });
+ })(k);
+ }
+ }
+ function pairLine(r) {
+ var c = r.nextRouteCursor;
+ if (c == null) return '读不到（点「推进金库」之前它会先读一次）';
+ var pair = pairNameOf(c);
+ var line = '指针 nextRouteCursor = ' + String(c) + ' ⇒ 这一按会碰【' + pair + '】';
+ var empty = poolEmpty(r);
+ if ((Number(c) === 2 || Number(c) === 3) && empty === true) {
+ line += '。★ 那一对里有「销毁本币」：本币的池子现在「还是空的」（储备 0/0、两边余额都是 0）⇒ ' +
+ '链上只发一个「我在等池子」，页面状态写「等待池子迁移」，「不花尝试次数、不算失败」（这是新引擎的行为）';
+ } else if ((Number(c) === 2 || Number(c) === 3) && empty === false) {
+ line += '。★ 本币的池子已经有储备 ⇒ 第 4 路这一按有跑通的可能';
+ } else if (Number(c) === 2 || Number(c) === 3) {
+ line += '。★ 本币的池子「读不到」⇒ 第 4 路会怎样，这一页不敢下判断';
+ }
+ return line;
+ }
+ function paintFacts(r) {
+ var set = function (id, html, tone) {
+ safe(function () {
+ var n = el(id);
+ if (!n) return;
+ var v = (n.querySelector ? n.querySelector('.fact-v') : null);
+ if (v) v.innerHTML = html; else n.innerHTML = html;
+ if (tone) n.setAttribute('data-tone', tone); else n.removeAttribute && n.removeAttribute('data-tone');
+ });
+ };
+ var th = effThreshold(r);
+ set('fact-vault', esc(P013_VAULT) + '　·　链上代码 ' + (r.codeBytes == null ? '读不到' : (r.codeBytes + ' 字节')) +
+ '　·　点数 ' + fmtInt(r.blockNumber) + (r.blockTimestamp == null ? '' : ('（块时间 ' + String(r.blockTimestamp) + '）')));
+ 
+ set('fact-proxy', '金库本体是 **beacon 代理**：上面那个 ' + (r.codeBytes == null ? '读不到' : (r.codeBytes + ' 字节')) +
+ ' 是**代理自己**的代码（代理短是正常的）；它背后那份实现体的地址本页不读，所以这里也不写它的字节数。');
+ 
+ set('fact-balance', (r.vaultBalance == null ? '读不到' : (fmtWeiOrNull(r.vaultBalance, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || ''))) +
+ '　—— 用户视图那个「金库余额」：链上 `balanceOf(金库)`（' + String(r.vaultBalance == null ? '读不到' : r.vaultBalance.toString()) + ' wei）',
+ (r.vaultBalance == null ? 'bad' : null));
+ set('fact-received', (r.totalReceived == null ? '读不到' : (fmtWeiOrNull(r.totalReceived, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || ''))) +
+ '　—— 用户视图那个「总税收」：链上累计 `totalReceived()`（' + String(r.totalReceived == null ? '读不到' : r.totalReceived.toString()) + ' wei）',
+ (r.totalReceived == null ? 'bad' : null));
+ set('fact-spent', (r.totalSpent == null ? '读不到' : (fmtWeiOrNull(r.totalSpent, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || ''))) +
+ '　—— 用户视图那个「累计已花」：链上累计 `totalSpent()`（' + String(r.totalSpent == null ? '读不到' : r.totalSpent.toString()) + ' wei）' +
+ '　·　★ 发行方说的「历史总税收」与「总税收」是**同一个字段**（`totalReceived()`）⇒ 不重复摆，这一格换成累计已花',
+ (r.totalSpent == null ? 'bad' : null));
+ 
+ set('fact-cum', '用户视图那四格（起标签瘦身、口径全文只在这里）—— ' +
+ '① 已添加 &lt;目标币&gt; 的 LP 总量 ＝ 金库 `totalLiquiditySpent()`（**报价币口径**，第 2 路累计投入的报价币）：' +
+ (r.totalLiquiditySpent == null ? '读不到' : (r.totalLiquiditySpent.toString() + ' wei')) +
+ '　·　② 已销毁 &lt;目标币&gt; 总量 ＝ 金库 `totalBurnSpent()`（**报价币口径**，第 3 路累计投入的报价币）：' +
+ (r.totalBurnSpent == null ? '读不到' : (r.totalBurnSpent.toString() + ' wei')) +
+ '　·　⚠️ ① ② **都不是「币个数」** —— 链上没有记 LP 个数、也没有记目标币个数（发行方选的「甲」＝只用现有口径）',
+ (r.totalLiquiditySpent == null || r.totalBurnSpent == null) ? 'bad' : null);
+ set('fact-cum-div', '③ 已分红 &lt;分红币&gt; 总量 ＝ 官方分红合约 `totalDividendsDistributed()` 的**累计**' +
+ '（镜 `dividendTotalDistributedOf(vault)` 转发；' + (r.dividendTotalDistributed == null ? '读不到' : r.dividendTotalDistributed.toString()) + ' wei）' +
+ '　·　★ 它是该合约**自部署起一路累加、只增不减**的累计量（官方接口注释：total dividends ever distributed by this contract）' +
+ ' ⇒ 写「历史总量」，⛔ 不是「现在账上还挂着多少」；单位是**分红币自己**，位数问它自己的 `decimals()`：' +
+ (r.dividendTokenDecimals == null ? '读不到' : (String(r.dividendTokenDecimals) + ' 位')),
+ (r.dividendTotalDistributed == null ? 'bad' : null));
+ set('fact-cum-dead', '④ 已销毁 &lt;本币&gt; 总量 ＝ 本币 `balanceOf(死地址)`（' +
+ (r.deadBalance == null ? '读不到' : (r.deadBalance.toString() + ' wei')) + '）' +
+ '　·　死地址（镜 `configView(vault)` 第 [2] 个字段）：' + (r.deadAddress ? esc(r.deadAddress) : '读不到') +
+ '　·　★ 这是**死地址余额口径** —— 量的是死地址里**现在挂着**的本币余额，' +
+ '⛔ 不是「一共销毁过多少枚本币」（链上**没有**本币销毁计数器；发行方拍的「甲」＝不改合约、只用现有口径）' +
+ '　·　位数问本币自己的 `decimals()`：' + (r.tokenDecimals2 == null ? '读不到' : (String(r.tokenDecimals2) + ' 位')),
+ (r.deadBalance == null ? 'bad' : null));
+ set('fact-token', esc(r.tokenSymbol || '读不到') + '　·　' + esc(r.taxToken || '读不到') +
+ '　·　代码 ' + (r.tokenCodeBytes == null ? '读不到' : (r.tokenCodeBytes + ' 字节')) +
+ '　·　金库自己说它指向这枚币（taxToken()）');
+ set('fact-quote', esc(r.quoteSymbol || '读不到') + '　·　位数 ' + (r.quoteDecimals == null ? '读不到' : String(r.quoteDecimals)) +
+ '　·　' + esc(r.quoteToken || '读不到') + '（vaultQuoteToken()）');
+ 
+ set('fact-factory', (r.factory ? esc(r.factory) : '读不到') +
+ '　·　代码 ' + (r.factoryCodeBytes == null ? '读不到（只在 ?debug=1 时才多读这一发）' : (r.factoryCodeBytes + ' 字节')) +
+ '　·　owner ' + (r.factoryOwner ? esc(r.factoryOwner) : '读不到') +
+ '　·　gasStation ' + (r.gasStation ? esc(r.gasStation) : '读不到') +
+ '　·　出处：金库 factory() 自己说的 ＋ owner()／gasStation()');
+ set('fact-threshold', (th.wei == null ? '读不到' : (fmtWeiOrNull(th.wei, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || '') +
+ '（' + th.wei.toString() + ' wei）')) + '　·　出处：' + esc(th.from));
+ set('fact-cursor', esc(pairLine(r)), (r.nextRouteCursor == null ? 'bad' : null));
+ set('fact-trip', r.timerTripped == null ? '读不到（读不到 ≠ 没跳闸）'
+ : (r.timerTripped
+ ? 'true —— 「现在就是跳闸」：顺序是硬的，先按「复位熔断」，再按「推进金库」。只按推进救不回来。'
+ : 'false —— 没有跳闸，推进那一颗直接按就行。'), (r.timerTripped === true ? 'bad' : null));
+ set('fact-queue', (r.lastTriggerRequestedAt == null ? '读不到' : ('上一次排队 lastTriggerRequestedAt = ' + r.lastTriggerRequestedAt.toString())) +
+ '　·　间隔 triggerRequestInterval = ' + (r.lens && r.lens.intervalSec != null ? (String(r.lens.intervalSec) + ' 秒') : '读不到') +
+ '（出处：只读镜 launchConfigOf(vault) 第 6 个字段）');
+ set('fact-gas', (r.bnbWei == null ? '读不到' : (r.bnbWei.toString() + ' wei（' + weiToBnb(r.bnbWei) + ' BNB）—— 金库这条路是开的')) +
+ '　·　你自己钱包的 BNB（用户视图里原来那一行已按发行方口谕删掉，读数挪到这里）：' +
+ (state.balanceWei == null ? '读不到（没连钱包就没读）' : (weiToBnb(state.balanceWei) + ' BNB')),
+ (r.bnbWei != null && r.bnbWei < 100000000000000n) ? 'bad' : null);
+ set('fact-dividend', (r.dividendContract ? esc(r.dividendContract) : '读不到') +
+ '　·　分红币 ' + esc(r.dividendTokenSymbol || r.targetSymbol || '读不到') + '（' + esc(r.dividendToken || '读不到') + '）' +
+ '　·　★ 位数 ' + (r.dividendTokenDecimals == null ? '读不到' : (String(r.dividendTokenDecimals) + ' 位')) +
+ '（发行方：用户视图那一行**只留币名、不显示位数** ⇒ 位数挪到这里）' +
+ '　·　出处：本币自己说的 dividendContract()');
+ var cv = claimView(r);
+ set('fact-mine', cv.state === 'ready' ? (fmtAmt(cv.amount, 8) + ' ' + String(r.dividendTokenSymbol || ''))
+ : (cv.state === 'zero' ? ('0 ' + String(r.dividendTokenSymbol || '') + ' —— ' + cv.reason)
+ : (cv.state === 'unreadable' ? ('读不到 —— ' + cv.reason) : ('未接入 —— ' + cv.reason))),
+ (cv.state === 'unreadable' ? 'bad' : null));
+ set('fact-minShare', '镜 claimableDividendOf 交叉核对 ' +
+ (r.lensClaimable == null ? '读不到' : (r.lensClaimable.toString() + ' wei')) +
+ '　·　分红门槛（份额）' + (r.minShareBalance == null ? '读不到' : r.minShareBalance.toString()) +
+ '　·　出处：只读镜（可领额的正主是官方分红合约那一格）');
+ set('fact-limits', '重试上限 ' + (r.lens && r.lens.retryLimit != null ? String(r.lens.retryLimit) : '读不到') +
+ '　·　镜说已跳过批次 skippedBatchCount = ' + (r.lens && r.lens.skippedBatchCount != null ? String(r.lens.skippedBatchCount) : '读不到') +
+ '　·　金库自报失败数 failedBatchCount = ' + (r.failedBatchCount == null ? '读不到' : r.failedBatchCount.toString()));
+ set('fact-totals', '累计进金库 ' + fmtWeiOrNull(r.totalReceived, r.quoteDecimals, 8) +
+ '　/　已花 ' + fmtWeiOrNull(r.totalSpent, r.quoteDecimals, 8) +
+ '　（分给分红 ' + fmtWeiOrNull(r.totalDividendDeposited, r.quoteDecimals, 8) +
+ ' · 加池 ' + fmtWeiOrNull(r.totalLiquiditySpent, r.quoteDecimals, 8) +
+ ' · 销毁 ' + fmtWeiOrNull(r.totalBurnSpent, r.quoteDecimals, 8) + '）');
+ var r4 = r.route4State;
+ set('fact-route4', r4 == null ? '读不到'
+ : ('桶 ' + fmtWeiOrNull(r4.reserves, r.quoteDecimals, 8) + '　·　批次号 ' + r4.batchId.toString() +
+ '　·　试了 ' + r4.batchAttempts + ' 次　·　' + (r4.batchSkipped ? '已跳过' : '没被跳过') +
+ '（出处：金库 route4State() —— 四条 [3] 数组装不下第 4 路，链上给它单开了一道门）'));
+ var empty = poolEmpty(r);
+ 
+ var pool4Note = (empty === true ? '（本币的池子还是空的 ⇒ 只发一个「我在等池子」，不算失败）' : '');
+ set('fact-pool4', (r.mainPool ? esc(r.mainPool) : '读不到') +
+ '　·　储备 ' + (r.poolReserves ? (r.poolReserves[0].toString() + ' / ' + r.poolReserves[1].toString()) : '读不到') +
+ '　·　池里报价币 ' + (r.poolQuoteBal == null ? '读不到' : r.poolQuoteBal.toString()) +
+ '　·　池里本币 ' + (r.poolCoinBal == null ? '读不到' : r.poolCoinBal.toString()) +
+ '　⇒　' + (empty === null ? '「读不到」（读不到就不下判断）' : (empty ? '「等待池子迁移」（它是空的）' : '池子有储备了')) +
+ (pool4Note ? ('　·　' + pool4Note) : ''),
+ (empty === null ? 'bad' : null));
+ paintWallet();
+ }
+ function setBtn(st, label) {
+ safe(function () {
+ var b = el('claim-btn'), s = el('claim-stage');
+ if (b) { b.setAttribute('data-state', st); b.disabled = (st === 'blocked' || st === 'confirming' || st === 'submitted'); }
+ if (s) {
+ var ic = st === 'confirming' ? '<span class="spinner" aria-hidden="true"></span>'
+ : st === 'submitted' ? '<svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>'
+ : st === 'done' ? '<svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>'
+ : '<svg class="icon" aria-hidden="true"><use href="#i-gift"></use></svg>';
+ s.innerHTML = ic + '<span id="claim-btn-text">' + esc(label) + '</span>';
+ }
+ });
+ }
+ 
+ var TX_SAY = {
+ '待签名': '请在钱包里确认',
+ '待确认': '已提交，等确认',
+ '成功': '成了',
+ '失败': '没成',
+ '未确认/卡住': '还没确认'
+ };
+ var TX_FINAL = ['成功', '失败', '未确认/卡住'];
+ var PILL_LINGER_MS = 6000; 
+ var pillTimer = null;
+ function txSay(label) { return TX_SAY[label] || null; }
+ function showPill(text) {
+ safe(function () {
+ var p = el('claim-state-pill');
+ if (!p) return;
+ p.textContent = String(text);
+ p.hidden = false;
+ });
+ }
+ function hidePill() {
+ safe(function () {
+ var p = el('claim-state-pill');
+ if (!p) return;
+ p.hidden = true;
+ p.textContent = '';
+ });
+ }
+ 
+ function restoreBtn() {
+ state.txActive = false;
+ safe(function () { paintClaim(state.read || {}); });
+ }
+ function setTx(kind, label) {
+ safe(function () {
+ var m = el('fact-msg');
+ if (m) {
+ var v = m.querySelector ? m.querySelector('.fact-v') : null;
+ var text = '交易「' + esc(kind) + '」状态：' + esc(label) + (state.txHash ? ('　·　' + esc(state.txHash)) : '');
+ if (v) v.innerHTML = text; else m.innerHTML = '<span class="fact-k">这一页现在</span><span class="fact-v">' + text + '</span>';
+ }
+ });
+ 
+ var say = txSay(label);
+ var isFinal = TX_FINAL.indexOf(label) >= 0;
+ if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; }
+ state.txActive = true; 
+ if (say) showPill(say);
+ if (isFinal) {
+ 
+ pillTimer = setTimeout(function () { pillTimer = null; hidePill(); restoreBtn(); }, PILL_LINGER_MS);
+ }
+ }
+ function paintClaim(r) {
+ var cv = claimView(r);
+ 
+ var sym = (r.dividendTokenSymbol && String(r.dividendTokenSymbol).trim()) ? String(r.dividendTokenSymbol).trim() : '分红币';
+ safe(function () {
+ var t = el('claim-token');
+ if (t) t.textContent = sym;
+ });
+ 
+ var amtNode = el('claim-amount');
+ var rightChain = (state.chainId === BSC_CHAIN_ID);
+ var canSend = Boolean(state.account) && rightChain;
+ if (cv.state === 'ready') {
+ countUp(amtNode, cv.amount, 8, sym);
+ } else if (cv.state === 'zero') {
+ safe(function () { if (amtNode) amtNode.innerHTML = '0<span class="u">' + esc(sym) + '</span>'; });
+ } else if (cv.state === 'unreadable') {
+ safe(function () { if (amtNode) amtNode.textContent = '读不到'; });
+ } else {
+ safe(function () { if (amtNode) amtNode.textContent = '未接入'; });
+ }
+ 
+ if (!state.txActive) {
+ 
+ if (!canSend) {
+ setBtn('blocked', !state.account ? '先连钱包' : '链不对（禁止发送）');
+ } else if (cv.state === 'ready') {
+ setBtn('idle', '领取我的分红');
+ } else if (cv.state === 'zero') {
+ setBtn('blocked', '现在没得领（领到 0，不是失败）');
+ } else if (cv.state === 'unreadable') {
+ setBtn('blocked', '读不到可领额 —— 不假装是 0');
+ } else {
+ setBtn('blocked', '未接入（连上钱包才读得到你自己的可领额）');
+ }
+ }
+ safe(function () {
+ var b = el('push-next');
+ if (b) b.textContent = '推进金库';
+ });
+ }
+ function render() {
+ var r = state.read;
+ if (!r) return;
+ paintsHero(r);
+ safe(function () { el('risk-pill').textContent = '风险状态未接入'; });
+ safe(function () { el('risk-note').textContent = '风险等级由官方页给 · 这里取不到'; });
+ 
+ safe(function () {
+ var u = String(r.quoteSymbol || '');
+ var bal = toCoins(r.vaultBalance, r.quoteDecimals);
+ var tax = toCoins(r.totalReceived, r.quoteDecimals);
+ el('v-reserved').textContent = (bal == null ? '读不到' : (fmtAmt(bal, 8) + ' ' + u));
+ el('v-progress').textContent = (tax == null ? '读不到' : (fmtAmt(tax, 8) + ' ' + u));
+ });
+ 
+ paintCumulative(r);
+ 
+ paintCoinNames(r);
+ paintRoutes(r);
+ paintFacts(r);
+ paintClaim(r);
+ paintControls(r);
+ }
+ function paintControls(r) {
+ var canSend = Boolean(state.account) && state.chainId === BSC_CHAIN_ID;
+ safe(function () {
+ var b = el('push-reset');
+ if (b) {
+ 
+ b.hidden = !(r.timerTripped === true);
+ b.disabled = !canSend;
+ b.textContent = canSend ? '复位熔断（先按这一颗）' : (!state.account ? '复位熔断（先连钱包）' : '复位熔断（链不对，禁止发送）');
+ }
+ });
+ safe(function () {
+ var b = el('push-next');
+ if (b) {
+ b.disabled = !canSend;
+ b.textContent = canSend ? '推进金库' : (!state.account ? '推进金库（先连钱包）' : '推进金库（链不对，禁止发送）');
+ }
+ });
+ }
+
+ 
+ 
+ function debugOn() {
+ try {
+ var s = String((typeof location !== 'undefined' && location.search) || '') + '&' +
+ String((typeof location !== 'undefined' && location.href) || '');
+ return /[?&]debug=1(&|$|[&#])/.test(s);
+ } catch (e) { return false; }
+ }
+ function applyDebug() {
+ safe(function () {
+ var f = el('facts');
+ if (f) f.hidden = !debugOn();
+ });
+ }
+ var reading = false;
+ function refresh() {
+ if (reading) return Promise.resolve(state.read);
+ reading = true;
+ 
+ return loadAll().then(function (r) { return loadLens(r); }).then(function (r) { return loadCumulative(r); }).then(function (r) {
+ return Promise.all([
+ (r.routes && r.routes[0] && isHexAddr(r.routes[0].target) ? callStr(r.routes[0].target, SEL.symbol) : Promise.resolve(null))
+ ]).then(function (a) {
+ r.targetSymbol = a[0];
+ reading = false;
+ state.read = r; state.readAt = Date.now();
+ render();
+ return r;
+ });
+ }).catch(function (e) {
+ reading = false;
+ var msg = '读链失败：' + String((e && e.message) || e) + '（读不到 ≠ 0）';
+ state.problems = [msg];
+ var r = state.read || { problems: [msg], vault: P013_VAULT };
+ if (r.problems.indexOf(msg) < 0) r.problems.push(msg);
+ state.read = r; state.readAt = Date.now();
+ safe(function () { render(); });
+ safe(function () { el('fact-msg').innerHTML = '<span class="fact-k">这一页现在</span><span class="fact-v">' + esc(msg) + '</span>'; });
+ return null;
+ });
+ }
+ function claimFlow() {
+ if (!state.account) { setHint('还没有连钱包 —— 先点上面的「连接钱包」。'); return Promise.resolve(null); }
+ if (state.chainId !== BSC_CHAIN_ID) { setHint('你的钱包不在 <b>BNB 主网（56）</b> ⇒ 这一页禁止发送。先切链。'); return Promise.resolve(null); }
+ var cv = claimView(state.read || {});
+ if (cv.state !== 'ready') { setHint('现在不能领：' + esc(cv.reason || '可领额不是正数')); return Promise.resolve(null); }
+ 
+ var bt = el('claim-btn-text');
+ setBtn('confirming', (bt && bt.textContent) ? String(bt.textContent) : '领取我的分红');
+ return sendTx(buildClaimPayload(state.account), 'claimDividend').then(function (out) {
+ return out;
+ });
+ }
+ function nextRouteFlow() {
+ if (!state.account) { setHint('还没有连钱包 —— 先点上面的「连接钱包」。'); return Promise.resolve(null); }
+ if (state.chainId !== BSC_CHAIN_ID) { setHint('你的钱包不在 <b>BNB 主网（56）</b> ⇒ 这一页禁止发送。先切链。'); return Promise.resolve(null); }
+ return sendTx(buildNextRoutePayload(state.account), 'nextRoute');
+ }
+ function resetFlow() {
+ if (!state.account) { setHint('还没有连钱包 —— 先点上面的「连接钱包」。'); return Promise.resolve(null); }
+ if (state.chainId !== BSC_CHAIN_ID) { setHint('你的钱包不在 <b>BNB 主网（56）</b> ⇒ 这一页禁止发送。先切链。'); return Promise.resolve(null); }
+ return sendTx(buildResetPayload(state.account), 'resetTimerCircuit');
+ }
+ function boot() {
+ var bind = function (id, fn) {
+ var n = el(id);
+ if (n && n.addEventListener) n.addEventListener('click', fn);
+ else state.problems.push('标记里没有 id=' + id + ' —— 这颗键点不到，这一页等于不能用');
+ };
+ bind('key-connect', function () { connect(); });
+ bind('key-switch', function () { switchChain(); });
+ bind('claim-btn', function () {
+ var b = el('claim-btn');
+ if (b && b.disabled) return;
+ claimFlow();
+ });
+ bind('push-next', function () { nextRouteFlow(); });
+ bind('push-reset', function () { resetFlow(); });
+ 
+ bind('link-author', function (e) {
+ if (e && typeof e.preventDefault === 'function') e.preventDefault();
+ authorOpen();
+ });
+ 
+ applyDebug();
+ 
+ hidePill();
+ 
+ autoConnectOnce().then(function () { return refresh(); });
+ if (typeof setInterval === 'function') {
+ setInterval(function () { refresh(); }, REFRESH_MS);
+ }
+ }
+ 
+ window.__dshGold = {
+ state: state,
+ sel: SEL,
+ vault: P013_VAULT,
+ va: validateTx,
+ buildClaimPayload: buildClaimPayload,
+ buildNextRoutePayload: buildNextRoutePayload,
+ buildResetPayload: buildResetPayload,
+ debugOn: debugOn,
+ applyDebug: applyDebug,
+ authorLinkText: authorLinkText,
+ authorClickActions: authorClickActions,
+ authorOpen: authorOpen,
+ 
+ authorLabel: AUTHOR_LABEL,
+ authorFeedbackMs: AUTHOR_FEEDBACK_MS,
+ authorFeedbackText: authorFeedbackText,
+ authorSay: authorSay,
+ claimView: claimView,
+ 
+ fmtCum: fmtCum,
+ paintCumulative: paintCumulative,
+ 
+ cumName: cumName,
+ paintCoinNames: paintCoinNames,
+ pairNameOf: pairNameOf,
+ refresh: refresh,
+ claimFlow: claimFlow,
+ nextRouteFlow: nextRouteFlow,
+ resetFlow: resetFlow,
+ txStates: TX_STATES,
+ 
+ txSay: txSay,
+ txSayTable: TX_SAY,
+ setTx: setTx,
+ showPill: showPill,
+ hidePill: hidePill,
+ pillLingerMs: PILL_LINGER_MS,
+ gas: { claim: GAS_LIMIT_CLAIM.toString(), static: STATIC_GAS_LIMIT.toString(), floor: NEXT_ROUTE_GAS_FLOOR.toString() }
+ };
+ if (document.readyState === 'loading' && document.addEventListener) {
+ document.addEventListener('DOMContentLoaded', boot);
+ } else {
+ boot();
+ }
+})();
+</script>
+</body>
+</html>
