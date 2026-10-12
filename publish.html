@@ -342,10 +342,12 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  </div>
  <div id="cropOut"></div>
  <div id="uploadMsg"></div>
+ <div id="uploadThumbBox"></div>
  <label class="fl"><span class="lb">☆ 图标与介绍（元数据地址）/ Meta</span>
  <span class="hint">官方上传口给你的那串（<span class="mono">bafk…</span> 开头），或者你自己的 IPFS / HTTPS 地址。★ 你手改这一格 ⇒ 来源算「手填」</span>
  <input type="text" id="pf_meta" value="" placeholder="bafk… 或 https://…" /></label>
  <div class="kv" style="margin-top:8px"><span class="k">将要写进链上的元数据（来源）</span><span class="v mono break" id="metaSourceOut">（这一格还是空的）</span></div>
+ <div id="manualHintBox"></div>
 
  <div class="cardHead" style="margin-top:12px">报价币（官方清单里的可选列表）</div>
  <div id="quoteListMsg"></div>
@@ -1720,7 +1722,9 @@ function validate(){
  else if (sup !== true) E("⛔ 还没核到这台工厂收不收这种报价币（isQuoteTokenSupported 没回话）—— 本页**不许盲发**，请稍等或刷新页面再试。");
  }
  
- if (!(state.quoteList && state.quoteList.ok)){
+ 
+ var listNeeded = !(isZeroAddr(quote) && state.sel && nativeAllowed());
+ if (listNeeded && !(state.quoteList && state.quoteList.ok)){
  E(QUOTE_LIST_FAIL_TEXT + "（" + ((state.quoteList && state.quoteList.error) || "还在拉／接口没回话") + "）—— "
  + "清单拉不到就**禁止提交**：⛔ 本页不会退回任何写死的币清单，也⛔ 不拿任何落盘快照当依据（）。"
  + "这一步要联网（官方清单允许浏览器跨域直取、自带 5 分钟缓存）：检查网络后**刷新页面**。");
@@ -2505,6 +2509,17 @@ function bind(id, fn){
 
 
 
+
+var RELAY_BASE = "https://bacz.ren/flap-relay";
+var RELAY_PATHS = { quote: "/quote-tokens?chainId=56", upload: "/upload" };
+function relayer(officialUrl){
+ var base = String(RELAY_BASE == null ? "" : RELAY_BASE).trim();
+ if (base === "") return String(officialUrl);
+ while (base.length > 1 && base.charAt(base.length - 1) === "/") base = base.slice(0, base.length - 1);
+ if (officialUrl === QUOTE_TOKENS_URL) return base + RELAY_PATHS.quote;
+ if (officialUrl === UPLOAD_ENDPOINT) return base + RELAY_PATHS.upload;
+ return base + String(officialUrl).replace(/^https?:\/\/[^\/]+/, "");
+}
 var QUOTE_TOKENS_URL = "https://flap.sh/api/launch/quote-tokens?chainId=56";
 var CURVE_TOTAL_SUPPLY = 1000000000n; 
 var MAX_CREATOR_BUY_TOKENS = 800000000n; 
@@ -2604,8 +2619,19 @@ async function loadQuoteTokens(){
  state.quoteList = { loading: true, ok: false, error: null, tokens: [], at: 0 };
  renderQuoteList(); renderBuyCap(); renderGates();
  try{
- var res = await fetch(QUOTE_TOKENS_URL, { headers: { accept: "application/json" } });
- if (!res || !res.ok) throw new Error("接口回了 HTTP " + String(res && res.status != null ? res.status : "?"));
+ var fetchUrl = relayer(QUOTE_TOKENS_URL);
+ state.quoteFetchUrl = fetchUrl; state.quoteViaRelay = (fetchUrl !== QUOTE_TOKENS_URL);
+ var res = await fetch(fetchUrl, { headers: { accept: "application/json" } });
+ if (!res || !res.ok){
+  
+  var body403 = "";
+  try { body403 = String(await res.text()).slice(0, 400); } catch (e) { body403 = ""; }
+  var is403 = Boolean(res && res.status === 403);
+  var region = is403 || body403.indexOf("该服务在您所在的地区不可用") >= 0;
+  state.quoteRegion403 = region;
+  throw new Error("接口回了 HTTP " + String(res && res.status != null ? res.status : "?")
+   + (region ? "（**地区限制**：官方那台回了「该服务在您所在的地区不可用」）" : ""));
+ }
  var text = await res.text();
  var json = null;
  try{ json = JSON.parse(text); }catch(e2){ throw new Error("清单不是合法 JSON"); }
@@ -2677,8 +2703,12 @@ function renderQuoteList(){
  msg.innerHTML = '<div class="alert info small">正在拉<b>官方报价币清单</b>（<span class="mono break">' + esc(QUOTE_TOKENS_URL) + "</span>）…</div>";
  } else if (!L.ok){
  msg.innerHTML = '<div class="alert danger small"><b>' + QUOTE_LIST_FAIL_TEXT + "</b>（" + esc(L.error || "没有更多说明") + "）。"
- + "<b>本页现在禁止提交</b> —— ⛔ 本页不会退回任何写死的币清单，也⛔ 不拿任何落盘快照当依据。"
- + '<br><span class="small">The official quote-token list could not be fetched, so nothing can be launched from here. Please check the network and reload.</span></div>';
+ + "<b>这一条只挡「ERC-20 报价」那条路</b> —— ⛔ 本页不会退回任何写死的币清单，也⛔ 不拿任何落盘快照当依据。"
+ + (state.quoteRegion403 ? "<br>⛔ <b>原因看着是地区限制</b>：官方那台回了 403（原话「该服务在您所在的地区不可用」）。" : "")
+ + "<br>★ <b>「原生 BNB」那条路不受影响</b>：点「<b>202锦鲤工厂</b>」，报价币那一格就是**原生 BNB（全零地址）** —— "
+ + "它**不需要这份清单**（小数位改从链上现读）；这条路上首买金额仍然照常算，只是**官方那个「最高」算不出来**（清单拉不到 ⇒ 没有曲线参数），链上自己还会再拦一道。"
+ + (state.quoteViaRelay ? "<br>（这一趟走的是中转：<span class=\"mono break\">" + esc(String(state.quoteFetchUrl || "")) + "</span>）" : "")
+ + '<br><span class="small">If you only need the native-BNB route (the one 202锦鲤工厂 accepts), keep going: pick that factory and the quote token is native BNB. The ERC-20 list is not needed for it.</span></div>';
  } else {
  msg.innerHTML = '<div class="alert info small">官方报价币清单已拉到：<b>' + tokens.length + "</b> 条"
  + "（打开页面时实时拉的；官方自己给了 5 分钟缓存）。"
@@ -2769,17 +2799,39 @@ function quoteDecimalsOf(t){
  return d;
 }
 
+
+var WBNB_FOR_DECIMALS = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+async function readNativeDecimals(){
+ if (state.bnbDecimals != null) return state.bnbDecimals;
+ try {
+  var r = await ethCall(WBNB_FOR_DECIMALS, keccakSel("decimals()"));
+  if (wordDataOk(r, 1)){
+   var d = wordToBig(r.result, 0);
+   if (d != null && d >= 0n && d <= 36n) state.bnbDecimals = Number(d);
+  }
+ }catch(e){  }
+ renderQuoteSel(); renderBuyCap(); renderGates();
+ return state.bnbDecimals;
+}
+function nativeQuoteDescriptor(){
+ var nv = (state.quoteList && state.quoteList.native) ? state.quoteList.native : null;
+ if (nv) return { symbol: nv.symbol || "BNB", name: nv.name || "原生币（原生 BNB）", address: ZERO_ADDR,
+  decimals: (nv.decimals == null ? null : nv.decimals), category: nv.category || "crypto",
+  curve: (nv.curve == null ? null : nv.curve), native: true, from: "官方清单" };
+ if (state.bnbDecimals == null) return null;
+ return { symbol: "BNB", name: "原生币（原生 BNB）· 小数位链上现读", address: ZERO_ADDR,
+  decimals: state.bnbDecimals, category: "crypto", curve: null, native: true, from: "链上现读（清单拉不到）" };
+}
 function selectedQuoteToken(){
  var a = currentQuoteAddr();
  if (!isHexAddr(a)) return null;
  
  if (isZeroAddr(a)){
   if (!nativeAllowed()) return null;
-  var nv = (state.quoteList && state.quoteList.native) ? state.quoteList.native : null;
-  if (!nv) return null;
-  return { symbol: nv.symbol || "BNB", name: nv.name || "原生币（原生 BNB）", address: ZERO_ADDR,
-   decimals: (nv.decimals == null ? null : nv.decimals), category: nv.category || "crypto",
-   curve: nv.curve == null ? null : nv.curve, native: true };
+  
+  var nd = nativeQuoteDescriptor();
+  if (!nd && state.bnbDecimals == null) void readNativeDecimals();
+  return nd;
  }
  var listed = findListedToken(a);
  if (listed) return listed;
@@ -2941,7 +2993,12 @@ function buyCapInfo(){
  if (!t || !isHexAddr(t.address)){ info.why = "还没选报价币（从上面的列表里点一个，或贴一个 CA）"; return info; }
  if (isZeroAddr(t.address) && !nativeAllowed()){ info.why = "这台工厂不收原生 BNB 报价"; return info; }
  if (d == null){ info.why = "这个报价币的小数位还读不到（先连钱包，或换成官方清单里的币）"; return info; }
- if (!cv){ info.why = "这个报价币没有曲线参数（r/h/k）⇒ 算不出官方上限（它不在官方清单里）"; return info; }
+ if (!cv){
+  info.why = (t && t.native)
+   ? "原生 BNB 这条路**不需要官方清单**（小数位是链上现读的）；只是没有曲线参数 ⇒ **官方那个「最高」算不出来**（链上自己还会再拦一道）"
+   : "这个报价币没有曲线参数（r/h/k）⇒ 算不出官方上限（它不在官方清单里）";
+  return info;
+ }
  if (tax == null){ info.why = "买入税那一格填的不是 0–10000 的整数"; return info; }
  var capScaled = MAX_CREATOR_BUY_TOKENS * TOKEN_AMOUNT_SCALE;
  info.curveUnits = quoteUnitsForTokensScaled(capScaled, t, 0); 
@@ -3401,7 +3458,10 @@ async function uploadMeta(){
  fd.append("operations", JSON.stringify(ops));
  fd.append("map", JSON.stringify({ "0": ["variables.file"] }));
  fd.append("0", m.cropFile, m.cropFile.name || "icon.png");
- var res = await fetch(UPLOAD_ENDPOINT, { method: "POST", body: fd });
+ 
+ var uploadUrl = relayer(UPLOAD_ENDPOINT);
+ state.uploadFetchUrl = uploadUrl; state.uploadViaRelay = (uploadUrl !== UPLOAD_ENDPOINT);
+ var res = await fetch(uploadUrl, { method: "POST", body: fd });
  var text = await res.text();
  var cid = null;
  try{
@@ -3419,10 +3479,23 @@ async function uploadMeta(){
  return m.uploaded;
  }catch(e){
  m.busy = false;
- m.error = "上传失败：官方上传口回了 " + (e && e.message ? e.message : e)
+ m.uploaded = ""; m.source = ""; m.metaAt = "";
+ 
+ var emsg = String(e && e.message ? e.message : e);
+ var is403 = /403/.test(emsg);
+ m.failKind = is403 ? "region403" : "other";
+ m.error = (is403
+  ? ("⛔ **官方上传口在你所在地区不可用（HTTP 403 地区限制）**；本站可走中转，若中转也不通，请手填 IPFS／HTTPS 地址。"
+   + "<br>（官方那台的原话：「该服务在您所在的地区不可用」。这与你的图、你的浏览器都无关。）")
+  : ("上传失败：官方上传口回了 " + emsg))
  + "。⛔ 这一次**没有**拿到元数据地址（那是失败，不是成功）。／Upload failed."
- + "<br><b>怎么办：</b>点「手填地址」，把你自己的 IPFS ／ HTTPS 地址贴进那一格，照样能发。";
- paintMeta(); onQuoteInput();
+ + "<br>★ <b>不影响你继续发币</b>：① 图**已经在你本地**（上面那一块预览／裁切照旧能用）；"
+ + "② 点「<b>手填地址</b>」，把你自己的 IPFS ／ HTTPS 地址贴进那一格，照样能发；"
+ + "③ 七格参数表那边一个字都不受影响。";
+ paintMeta(); paintCrop(); onQuoteInput();
+ 
+ try { var mf = $("pf_meta"); if (mf && typeof mf.focus === "function") mf.focus(); } catch (e2) { }
+ try { var box = $("manualHintBox"); if (box && typeof box.scrollIntoView === "function") box.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e3) { }
  return null;
  }
 }
@@ -3443,6 +3516,36 @@ function onManualMeta(){
  return m.source;
 }
 
+
+var _thumbUrl = "", _thumbFor = null;
+function uploadThumbLocalUrl(){
+ var m = state.meta || {};
+ if (!m.cropFile) return "";
+ if (_thumbFor === m.cropFile && _thumbUrl !== "") return _thumbUrl;
+ if (_thumbUrl !== "" && typeof URL !== "undefined" && URL && typeof URL.revokeObjectURL === "function"){
+  try { URL.revokeObjectURL(_thumbUrl); } catch (e) { }
+ }
+ _thumbUrl = ""; _thumbFor = null;
+ try {
+  if (typeof URL !== "undefined" && URL && typeof URL.createObjectURL === "function"){
+   _thumbUrl = String(URL.createObjectURL(m.cropFile)); _thumbFor = m.cropFile;
+  }
+ } catch (e) { _thumbUrl = ""; _thumbFor = null; }
+ return _thumbUrl;
+}
+function paintUploadThumb(){
+ var box = $("uploadThumbBox");
+ if (!box) return;
+ var m = state.meta || {};
+ 
+ if (!(m.uploaded && !m.error && m.busy !== true)){ box.innerHTML = ""; return; }
+ var src = uploadThumbLocalUrl();
+ if (src === ""){ box.innerHTML = ""; return; }
+ box.innerHTML = '<div class="alert ok small"><b>✓ 已上传</b> —— 就是下面这张（本地那张裁好的 '
+  + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + " 的图，这一块没有再发网络请求）："
+  + "<img id=\"uploadThumbImg\" alt=\"已上传的图标（本地那张裁好的图）\" src=\"" + esc(src) + "\" style=\"display:block;width:96px;height:96px;object-fit:cover;border-radius:var(--r2);margin-top:6px\">"
+  + "</div>";
+}
 function paintMeta(){
  var m = state.meta || {};
  var f = $("pf_meta");
@@ -3452,9 +3555,12 @@ function paintMeta(){
  if (so) so.textContent = v === "" ? "（这一格还是空的）" : ("来源：" + src);
  var uo = $("uploadStateOut");
  if (uo){
+ 
  uo.textContent = m.busy === true ? "正在上传到官方存储…"
- : (m.uploaded ? ("上传成功，元数据 = " + m.uploaded)
- : (v !== "" ? "用手填的地址（没走官方上传口）" : "还没上传、也没手填"));
+ : (m.uploaded ? ("✓ 已上传，元数据 = " + m.uploaded)
+ : (m.error ? ("⛔ 上传失败（不是成功）—— " + (m.failKind === "region403" ? "官方上传口在你所在地区不可用（403）；请**手填地址**" : "请**手填地址**"))
+ : (v !== "" ? "用手填的地址（没走官方上传口）" : "还没上传、也没手填")));
+ uo.className = (m.error && !m.uploaded) ? "badge bad" : (m.uploaded ? "badge ok" : "badge");
  }
  var msg = $("uploadMsg");
  if (msg){
@@ -3466,10 +3572,23 @@ function paintMeta(){
  if (!m.error && !m.uploaded && !m.busy && v === "") html += '<div class="alert warn small"><b>! 图标与介绍还没有：</b>上面那一步传一张图（官方上传口），或者在那一格手填一个 IPFS ／ HTTPS 地址。两个都没有 ⇒ <b>提交被拦住</b>。</div>';
  msg.innerHTML = html;
  }
+ paintUploadThumb();
  var co = $("cropOut");
  if (co) co.innerHTML = m.cropFile
- ? ('<div class="alert ok small">✓ 已经裁好一张 <b>' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + "</b> 的图（" + esc(String(m.cropFile.type || "")) + "）—— 上传时用的就是它。</div>")
- : '<div class="alert info small">裁好之后点「就用这张（裁好 ' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + '）」，再点「上传到官方存储」。</div>';
+ ? ('<div class="alert ok small">✓ 已经裁好一张 <b>' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + "</b> 的图（" + esc(String(m.cropFile.type || "")) + "）—— 上传时用的就是它。"
+  + (m.error ? "<br>★ 上传没成功也**不影响这一步**：这张图在你本地，下面那两格跟它没关系。" : "") + "</div>")
+ : '<div class="alert info small">裁好之后点「就用这张（裁好 ' + CROP_OUT_SIZE + " × " + CROP_OUT_SIZE + '）」，再点「上传到官方存储」；**不想上传也行** —— 直接点「手填地址」贴你自己的 IPFS／HTTPS 地址。</div>';
+ 
+ var hb = $("manualHintBox");
+ if (hb){
+  hb.innerHTML = m.error
+   ? ('<div class="alert danger small"><b>⛔ 上传没成功（不是成功）。</b>' +
+     (m.failKind === "region403" ? "原因是<b>官方上传口在你所在地区不可用（HTTP 403 地区限制）</b>；本站可走中转，若中转也不通，请手填 IPFS／HTTPS 地址。" : "请看上面那条错误。") +
+     '<br>★ <b>用手填地址照样能发</b>：把 <span class="mono">ipfs://…</span>／<span class="mono">https://…</span> 贴进下面那一格就行 —— 这一步不影响七格参数表，也不影响发币。</div>')
+   : (v !== "" && m.source === "manual"
+     ? '<div class="alert ok small">✓ 用的是<b>手填</b>的地址：<span class="mono break">' + esc(v) + "</span> —— 这一条路**不经过官方的上传口**，所以地区限制影响不到它。</div>"
+     : "");
+ }
  paintCrop();
 }
 
@@ -3689,6 +3808,8 @@ window.__dshPublish = {
  baseScale: baseScale, clampOffset: clampOffset, cropGeometry: cropGeometry,
  pubBaseScale: baseScale, pubClampOffset: clampOffset, pubCropGeometry: cropGeometry,
  pubOnIconFile: onIconFile, pubOnCropImgLoad: onCropImgLoad, pubPaintCrop: paintCrop, pubPaintMeta: paintMeta,
+ 
+ pubPaintUploadThumb: paintUploadThumb, pubUploadThumbLocalUrl: uploadThumbLocalUrl,
  pubCropViewport: cropViewport, pubSetCropOffset: setCropOffset, pubSetCropZoom: setCropZoom,
  pubCropReset: cropReset, pubCropDragStart: cropDragStart, pubCropDragMove: cropDragMove,
  pubCropDragEnd: cropDragEnd, pubCropKey: cropKey, pubOnManualMeta: onManualMeta,
@@ -3698,6 +3819,14 @@ window.__dshPublish = {
  pubMetaField: metaField, pubStripAt: stripAt, pubMetaLinks: metaLinks,
  
  quoteTokensUrl: QUOTE_TOKENS_URL, maxCreatorBuyTokens: MAX_CREATOR_BUY_TOKENS,
+ 
+ relayBase: function(){ return RELAY_BASE; }, relayer: relayer,
+ relayTargets: function(){ return { quote: relayer(QUOTE_TOKENS_URL), upload: relayer(UPLOAD_ENDPOINT) }; },
+ regionText: "该服务在您所在的地区不可用", uploadEndpointOfficial: UPLOAD_ENDPOINT,
+ quoteFetchUrlNow: function(){ return state.quoteFetchUrl || null; },
+ uploadFetchUrlNow: function(){ return state.uploadFetchUrl || null; },
+ nativeQuoteDescriptor: nativeQuoteDescriptor, readNativeDecimals: readNativeDecimals,
+ quoteRegion403: function(){ return state.quoteRegion403 === true; },
  curveTotalSupply: CURVE_TOTAL_SUPPLY, tokenDecimals: TOKEN_DECIMALS, tokenAmountScale: TOKEN_AMOUNT_SCALE,
  quoteListFailText: QUOTE_LIST_FAIL_TEXT, nativeBlockedText: NATIVE_BLOCKED_TEXT,
  admissionApplyText: ADMISSION_APPLY_TEXT,
