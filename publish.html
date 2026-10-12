@@ -254,6 +254,8 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  <div class="row between" style="margin-top:10px">
  <span class="pill" id="verPill">版本…</span>
  <span class="pill" id="chainPill">链号…</span>
+ 
+ <button id="btnSwitch" class="ghost" hidden>切换到 BNB 主网（56）</button>
  </div>
 
  <div class="card">
@@ -895,7 +897,12 @@ var state = { account: null, authorized: false, chainId: null, rpcChainId: null,
 window.__dshState = state;
 function hasWallet(){ return typeof window.ethereum !== "undefined"; }
 function isLocalFileOpen(){ return typeof location !== "undefined" && String(location.protocol) === "file:"; }
-function setWalletMsg(html, tone){ $("walletMsg").innerHTML = html ? '<div class="alert ' + (tone || "info") + '">' + html + "</div>" : ""; }
+
+function setWalletMsg(html, tone){
+ var wm = $("walletMsg");
+ if (!wm) return;
+ wm.innerHTML = html ? '<div class="alert ' + (tone || "info") + '">' + html + "</div>" : "";
+}
 
 function chainNameOf(id){ return id === BSC_CHAIN_ID ? "BNB 主网（56）" : ("链 " + id); }
 function setChainPill(){
@@ -908,7 +915,9 @@ function setChainPill(){
  
  pill.style.color = (readBad || wallBad) ? "var(--danger)" : "var(--ok)";
  
- $("btnSwitch").hidden = !(state.chainId != null && state.chainId !== BSC_CHAIN_ID);
+ 
+ var swBtn = $("btnSwitch");
+ if (swBtn) swBtn.hidden = !(state.chainId != null && state.chainId !== BSC_CHAIN_ID);
  renderGates();
 }
 
@@ -948,8 +957,11 @@ async function connect(preAccounts){
  var accounts = preAccounts || await walletRpc("eth_requestAccounts");
  state.account = accounts && accounts[0] ? accounts[0] : null;
  state.chainId = await walletChainId(); 
- $("acct").textContent = state.account || "—";
- $("btnRefresh").hidden = false;
+ 
+ var acctEl = $("acct");
+ if (acctEl) acctEl.textContent = state.account || "—";
+ var refreshEl = $("btnRefresh");
+ if (refreshEl) refreshEl.hidden = false;
  await checkAuthorized();
  setChainPill();
  if (!state.account) setWalletMsg("钱包没有给出任何账户（你可能拒绝了授权）。<b>没有账户就不许发</b>：在钱包里重新授权这一页，或刷新这一页再来。", "danger");
@@ -978,8 +990,10 @@ async function switchChain(){
 }
 async function refreshBalance(){
  if (!state.account) return;
- try{ $("bal").textContent = weiToBnb(await rpc("eth_getBalance", [state.account, "latest"])) + " BNB"; }
- catch(e){ $("bal").textContent = "读不到余额（不影响发送）"; }
+ 
+ var balEl = $("bal");
+ try{ if (balEl) balEl.textContent = weiToBnb(await rpc("eth_getBalance", [state.account, "latest"])) + " BNB"; }
+ catch(e){ if (balEl) balEl.textContent = "读不到余额（不影响发送）"; }
 }
 
 async function ethCall(to, data){
@@ -3755,6 +3769,8 @@ void (async function boot(){
  if (typeof readRpcChainId === "function") void readRpcChainId();
  if (typeof autoConnect === "function") void autoConnect();
  
+ 
+ bind("btnSwitch", function(){ void switchChain(); });
  bindMeta();
  
  applyWalletGuide();
@@ -3810,6 +3826,8 @@ window.__dshPublish = {
  pubOnIconFile: onIconFile, pubOnCropImgLoad: onCropImgLoad, pubPaintCrop: paintCrop, pubPaintMeta: paintMeta,
  
  pubPaintUploadThumb: paintUploadThumb, pubUploadThumbLocalUrl: uploadThumbLocalUrl,
+ 
+ pubSetChainPill: setChainPill,
  pubCropViewport: cropViewport, pubSetCropOffset: setCropOffset, pubSetCropZoom: setCropZoom,
  pubCropReset: cropReset, pubCropDragStart: cropDragStart, pubCropDragMove: cropDragMove,
  pubCropDragEnd: cropDragEnd, pubCropKey: cropKey, pubOnManualMeta: onManualMeta,
