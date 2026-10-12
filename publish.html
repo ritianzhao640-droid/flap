@@ -393,6 +393,7 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  <span class="hint">持币到这个数才有分红（本页按 18 位小数换算，必须 &gt; 0）</span>
  <input type="text" class="mono" id="pf_minShare" value="100000" /></label>
 
+ <div id="pf_fourroute_only">
  <div class="cardHead" style="margin-top:12px">四路比例（四条加起来必须恰好 10000）</div>
  <div class="grid3">
  <label class="fl"><span class="lb">☆ 第 1 路 · 分红 bps</span><input type="number" id="pf_r1" value="2000" min="0" max="10000" /></label>
@@ -420,6 +421,48 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  <input type="text" class="mono" id="pf_t3" value="" placeholder="必填" /></label>
  </div>
 
+ </div>
+ <div id="pf_koi_box">
+ <div class="cardHead" style="margin-top:12px">202锦鲤工厂 · 建库 7 格（算力与领航那一套）</div>
+ <p class="muted small" style="margin:4px 0 0">这一台是<b>另一套参数表</b>：7 格 × 32 字节 ＝ <b>224 字节</b>（选 202 四路金库时是 10 格／320 字节）。
+ 下面每一格的名字都与链上 <span class="mono">vaultDataSchema()</span> 自称的字段<b>逐字相同</b> —— 页面不自己编名字。</p>
+ <div class="grid3">
+ <label class="fl"><span class="lb">☆ 金库管理员 vaultAdminWallet（第 1 格）</span>
+ <span class="hint">＝金库 admin ＋ 升级权初始持有者。<b>必须就是发币人本人</b>（工厂拿 <span class="mono">creator</span> 当升级权持有人 ⇒ 不相等建库必被拒）</span>
+ <input type="text" class="mono" id="pf_kvaultAdmin" value="" placeholder="0x…（40 位）" /></label>
+ <label class="fl"><span class="lb">☆ 合约交互管理 adminWallet（第 2 格）</span>
+ <span class="hint">填数字、提交的那个人（销毁／回购触发／小游戏兜底注资）</span>
+ <input type="text" class="mono" id="pf_kadmin" value="" placeholder="0x…（40 位）" /></label>
+ <label class="fl"><span class="lb">☆ 营销地址 marketingAddress（第 3 格）</span>
+ <span class="hint">＝那个「桶」本身（收钱的地方）。必须与运维地址不同</span>
+ <input type="text" class="mono" id="pf_kmarketing" value="" placeholder="0x…（40 位）" /></label>
+ </div>
+ <div class="grid3">
+ <label class="fl"><span class="lb">☆ 运维地址 opsWallet（第 4 格）</span>
+ <span class="hint">桶里那 20 点由金库自动转给它（只收钱）。⛔ 必须与营销地址不同</span>
+ <input type="text" class="mono" id="pf_kops" value="" placeholder="0x…（40 位）" /></label>
+ <label class="fl"><span class="lb">☆ 算力合约 hashrateContractAddress（第 5 格）</span>
+ <span class="hint">只读来源（不是收款方）。<b>只读核对</b>：有代码 ＋ 答得出 <span class="mono">totalEffectiveWeight()</span></span>
+ <input type="text" class="mono" id="pf_khashrate" value="" placeholder="0x…（40 位）" /></label>
+ <label class="fl"><span class="lb">☆ 领航 NFT navigatorNftAddress（第 6 格）</span>
+ <span class="hint">只读来源（不是收款方）。<b>只读核对</b>：有代码 ＋ 答得出 <span class="mono">slotsIssued()</span></span>
+ <input type="text" class="mono" id="pf_knft" value="" placeholder="0x…（40 位）" /></label>
+ </div>
+ <div class="grid2">
+ <label class="fl"><span class="lb">算力门槛 hashrateThreshold（第 7 格 · 选填）</span>
+ <span class="hint">单位是<b>「点」</b>（1 枚 Koi ＝ 1 点，⛔ 不是 wei、不乘 10^18）。<b>留空或填 0 ⇒ 工厂补默认 100000 点（10 万点）</b>；部署后不可改</span>
+ <input type="text" class="mono" id="pf_kthreshold" value="" placeholder="留空 = 工厂默认 100000 点" /></label>
+ <div>
+ <div class="row" style="margin-top:14px">
+ <button class="ghost" id="btnKoiFillSelf">用当前钱包填「金库管理员」</button>
+ </div>
+ <div class="muted small" style="margin-top:6px">金库管理员必须 ＝ 发币人本人（＝ <span class="mono">newVault</span> 的 <span class="mono">creator</span>）。</div>
+ </div>
+ </div>
+ <div id="koiSrcMsg"></div>
+ <div class="alert danger small">⛔ <b>两条硬前置（如实说，不藏）</b>：这一台的建库参数里，<b>算力合约地址</b>与<b>领航 NFT 地址都不许是零地址</b>，而且<b>运维地址必须与营销地址不同</b>、<b>算力门槛必须大于 0</b> —— 这是金库 <span class="mono">initialize</span> 里的硬判，<b>建库那一刻就会响</b>。⇒ 选这一台之前，<b>你手里必须已经有那两样</b>。本页只帮你<b>只读核对</b>（有代码 ＋ 答得出金库期望的那一口），⛔ 不帮你造、也不替你填。</div>
+ <div class="alert info small">★ <b>报价币这一条已接好（原生 BNB）</b>：202锦鲤工厂<b>只收原生 BNB</b>报价（链上现读 <span class="mono">isQuoteTokenSupported(0x0)=true</span>、<span class="mono">WBNB／USDT=false</span>）——选中这一台时，下面那份清单里<b>只会出现它链上现读真收的那一条（原生 BNB）</b>，默认就落在它上面。<b>原生那条腿没有授权那一步：发币是「一笔」，金额走交易的 <span class="mono">value</span>。</b>⛔ 若哪天链上这台工厂改成收别的币，页面会**自己跟着变**（支持与否是现读的，不是写死的名单）。</div>
+ </div>
  <div class="cardHead" style="margin-top:12px">两个时长（★ 本页**不假装校验**，把关在官方通道）</div>
  <div class="grid2">
  <label class="fl"><span class="lb">收税时长 / taxDuration（秒）</span>
@@ -440,10 +483,12 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  </div>
  <div id="mineMsg"></div>
 
- <div class="cardHead" style="margin-top:12px">vaultData（10 格 / 320 字节）</div>
+ <div class="cardHead" id="pf_vdHead" style="margin-top:12px">vaultData（10 格 / 320 字节）</div>
  <div class="kv"><span class="k">格数 ／ 字节数</span><span class="v mono" id="vdataLen">—</span></div>
+ <div id="pf_fourroute_only2">
  <div class="kv"><span class="k">第 4 路份额（第 9 格）</span><span class="v mono" id="r4Out">—</span></div>
  <div class="kv"><span class="k">四路之和（必须恰好 10000）</span><span class="v mono" id="routeSum">—</span></div>
+ </div>
  <div id="pfGate"></div>
 
  <div id="pubDetail" class="small" style="margin-top:8px"></div>
@@ -976,6 +1021,18 @@ var EXT = {
  "note": "本次升级用的就是这一台（four-route）。",
  "expectOwner": "0x2e77c9382c8d103434d8122f9352684ef8369101",
  "expectBeaconImpl": "0x9522810362e6272c8eecc49641c85f8f1b1e503b"
+ },
+
+ {
+ "id": "koi",
+ "label": "202锦鲤工厂",
+ "factory": "0x4247add56250536859460a4c659c6a094c917772",
+ "vaultDataSchemaId": "koi7",
+ "note": "202 的第二台机器：固定实现体（没有 beaconImpl）、只认原生 BNB 报价、vaultData 是 7 格 224 字节。",
+ "quoteModes": ["native"],
+ "expectBeaconImpl": null,
+ "expectVaultImplementation": "0xe47dd7a36449443e2809356fccc2583e055ebad1",
+ "expectSpecVersion": "v2.3"
  }
  ],
  "routes": {
@@ -987,11 +1044,17 @@ var EXT = {
  }
  },
  "disclosures": {
+ "koiHardPrereq": "202锦鲤工厂（固定实现体那一支）建库有两条硬前置：算力合约地址与领航 NFT 地址**都不许是零地址**，而且运维地址必须与营销地址不同、算力门槛必须大于 0 —— 这是金库 initialize 里的硬判，**建库那一刻就会响**。⇒ 选这一台之前，发币的人手里必须已经有那两样（本页把它们做成**只读核对**：有代码 ＋ 答得出金库期望的那一口）。",
+ "koiQuote": "202锦鲤工厂 只收**原生 BNB**报价（链上现读 isQuoteTokenSupported(0x0)=true、WBNB/USDT=false）。本页已接上「原生 BNB 报价」那条腿：选中这一台时清单里只会出现它链上现读真收的那一条、默认落在它上面；发币是**一笔**（没有授权那一步，金额走 value）。支持与否是**链上现读**的、⛔ 不是写死的名单 ⇒ 哪天工厂改了收什么，页面自己跟着变。",
+ "koiThreshold": "第 7 格（算力门槛）留空或填 0 ⇒ 工厂补默认 100000 点（1 枚 Koi = 1 点；⛔ 不是 wei、不乘 10^18）；填了就是填的数。",
  "registry": "本页所接的**工厂不在 Flap 官方登记册**里 —— 官方界面会把这类工厂标成 UNOFFICIAL／UNVERIFIED（风险等级 UNVERIFIED）。",
  "commission": "协议佣金：金库说明里那句 —— **税率 ≤ 1% 时收 6% 的税收；税率更高时按「税收 × 6 ÷ 税率」收**。",
  "officialListSlot": "官方金库列表状态：**未登记（UNOFFICIAL）** —— 拿到官方登记之后这里会换成链接。"
  },
  "vaultData": {
+ "id": "fourroute10",
+ "label": "202 税收四路金库",
+ "factory": "0x40f70632d1aa433f26033a2c9fff80e909c07e21",
  "fields": [
  "route1_dividend_bps",
  "route2_lp_bps",
@@ -1014,10 +1077,73 @@ var EXT = {
  "slot10MustEqual": "taxToken",
  "_note": "⛔ 少送（9 格 288 字节）多送都被链上拒；第 10 格必须＝本币地址（链上强制）。"
  },
+ "vaultDataSchemas": [
+ {
+ "id": "fourroute10",
+ "label": "202 税收四路金库",
+ "factory": "0x40f70632d1aa433f26033a2c9fff80e909c07e21",
+ "variant": "fourroute",
+ "wordCount": 10,
+ "byteLength": 320,
+ "hexLength": 642,
+ "fields": [
+ "route1_dividend_bps",
+ "route2_lp_bps",
+ "route3_burn_bps",
+ "route1_target_token",
+ "route2_target_token",
+ "route3_target_token",
+ "vaultFallbackBps",
+ "vaultSelfBuiltThreshold",
+ "route4_burn_own_bps",
+ "route4_target_token"
+ ]
+ },
+ {
+ "id": "koi7",
+ "label": "202锦鲤工厂",
+ "factory": "0x4247add56250536859460a4c659c6a094c917772",
+ "variant": "koi",
+ "wordCount": 7,
+ "byteLength": 224,
+ "hexLength": 450,
+ "note": "链上现读 vaultDataSchema() 自称 7 条字段、顺序逐字相同；工厂 newVault 硬判 224 字节。第 7 格填 0 ⇒ 工厂补默认 100000 点（点（1 枚 Koi = 1 点；⛔ 不是 wei、不乘 10^18））。",
+ "fields": [
+ "vaultAdminWallet",
+ "adminWallet",
+ "marketingAddress",
+ "opsWallet",
+ "hashrateContractAddress",
+ "navigatorNftAddress",
+ "hashrateThreshold"
+ ]
+ }
+ ],
+
  "gas": {
  "approve": 200000,
  "launch": 8700000
  },
+ "koiReadonlySources": {
+ "note": "这两格是【只读】的：金库建库后只拿它们取数与判资格，**不是收款方**。发币的人**必须手里已经有这两样**，否则建库必被拒。",
+ "hashrateContract": {
+ "field": "hashrateContractAddress",
+ "probe": "totalEffectiveWeight()",
+ "probeWhy": "金库建库后按它取有效算力/权重当 50% 分红的分母 —— 这是金库真会调的那一口",
+ "liveExample": "0xab7577063460fABC9267B07C470939b65bAB0444",
+ "liveExampleNote": "本产线自己的算力合约（只作示例，⛔ 页面不替你别的东西填）"
+ },
+ "navigatorNft": {
+ "field": "navigatorNftAddress",
+ "probe": "slotsIssued()",
+ "probeWhy": "金库建库后按它判「有没有人持有名额」并算 NFT 那 15 点的逐户应得",
+ "liveExample": "0x5Ee50a44a216a6d7BfEF547fD5270AFe9646A410",
+ "liveExampleNote": "本产线自己的领航 NFT＋市场（只作示例）"
+ },
+ "vaultImplementationProbe": {"probe": "vaultSpecVersion()", "expect": "v3",
+  "probeWhy": "固定实现体那一支没有 beaconImpl ⇒ 改核 vaultImplementation() 有代码 ＋ 逐字相同 ＋ 它自己答得出规格版本"}
+ },
+
  "vanity": {
  "suffix": "7777",
  "create2Deployer": "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0"
@@ -1167,6 +1293,12 @@ var DESIGN = {
 };
 var SEL_OWNER = keccakSel("owner()");
 var SEL_BEACON_IMPL = keccakSel("beaconImplementation()");
+
+var SEL_VAULT_IMPL = keccakSel("vaultImplementation()");
+var SEL_FACTORY_SPEC = keccakSel("factorySpecVersion()");
+var SEL_VAULT_SPEC = keccakSel("vaultSpecVersion()");
+
+var SEL_TOTAL_WEIGHT = keccakSel("totalEffectiveWeight()");
 var SEL_QUOTE_OK = keccakSel("isQuoteTokenSupported(address)");
 var SEL_APPROVE = "0x095ea7b3"; 
 var SEL_LAUNCH = keccakSel("newTokenV6WithVault((string,string,string,uint8,bytes32,uint8,address,uint256,bytes,bytes32,bytes,uint8,uint8,uint16,uint16,uint64,uint64,uint16,uint16,uint16,uint16,uint256,address,address,uint8,address,bytes))");
@@ -1176,10 +1308,29 @@ var TOTAL_BPS = Number((EXT.limits || {}).totalBps);
 var MAX_TAX_BPS = Number((EXT.limits || {}).maxTaxRateBps);
 var MAX_FALLBACK_BPS = Number((EXT.limits || {}).maxVaultFallbackBps);
 var MAX_SELF_BUILT = BigInt(String((EXT.limits || {}).maxSelfBuiltThreshold));
-var VLIST = (EXT.vaultData || {}).fields;
-var VSLOTS = Number((EXT.vaultData || {}).wordCount);
-var VBYTES = Number((EXT.vaultData || {}).byteLength);
-var VHEXCHARS = Number((EXT.vaultData || {}).hexLength);
+
+var VSCHEMAS = {};
+(function(){
+ var rows = Array.isArray(EXT.vaultDataSchemas) ? EXT.vaultDataSchemas : [];
+ for (var i = 0; i < rows.length; i++) if (rows[i] && rows[i].id) VSCHEMAS[String(rows[i].id)] = rows[i];
+})();
+var DEFAULT_SCHEMA_ID = "fourroute10";
+var KOI_SCHEMA_ID = "koi7";
+var KOI_LIVE = EXT.koiReadonlySources || {};
+function schemaById(id){ return VSCHEMAS[String(id)] || null; }
+function currentFactory(){ return state && state.sel ? state.sel : null; }
+function schemaIdOfFactory(f){
+ if (!f) return DEFAULT_SCHEMA_ID;
+ var id = f.vaultDataSchemaId || f.vaultDataSchema;
+ if (id && schemaById(id)) return String(id);
+ return DEFAULT_SCHEMA_ID;
+}
+function currentSchema(){ return schemaById(schemaIdOfFactory(currentFactory())) || schemaById(DEFAULT_SCHEMA_ID); }
+function schemaFieldNamesOf(sch){ return (sch && sch.fields) ? sch.fields : []; }
+var VLIST = schemaFieldNamesOf(schemaById(DEFAULT_SCHEMA_ID));
+var VSLOTS = Number((schemaById(DEFAULT_SCHEMA_ID) || {}).wordCount);
+var VBYTES = Number((schemaById(DEFAULT_SCHEMA_ID) || {}).byteLength);
+var VHEXCHARS = Number((schemaById(DEFAULT_SCHEMA_ID) || {}).hexLength);
 var R4_AT = (EXT.vaultData || {}).route4AtSlots || [];
 var APPROVE_GAS = BigInt(String((EXT.gas || {}).approve));
 var LAUNCH_GAS = BigInt(String((EXT.gas || {}).launch));
@@ -1192,6 +1343,8 @@ var TOKEN_VERSION = Number((EXT.blockFacts || {}).tokenVersion);
 var DEF = (EXT.blockFacts || {}).defaults || {};
 var TOKEN_IMPL = String(EXT.tokenImplRef);
 var ONE_GWEI = 1000000000n;
+
+var KOI_LAUNCH_SLOTS = { mktBps: 10000, deflationBps: 0, dividendBps: 0, lpBps: 0 };
 var MAGIC_DIVIDEND_COMPUTED = String((EXT.blockFacts || {}).dividendToken);
 var ZERO_ADDR = "0x0000000000000000000000000000000000000000";
 var BSC_CHAIN_ID = Number((EXT.chain || {}).id);
@@ -1212,7 +1365,9 @@ function syncRatio(){
  el.value = String(v);
 }
 function readForm(){
- var need = ["pf_name", "pf_symbol", "pf_meta", "pf_quote", "pf_buyTax", "pf_sellTax", "pf_quoteAmt", "pf_minShare", "pf_selfBuilt", "pf_taxDuration", "pf_antiFarmer", "pf_r1", "pf_r2", "pf_r3", "pf_r4", "pf_t1", "pf_t2", "pf_t3", "pf_fallback"];
+ 
+ var need = ["pf_name", "pf_symbol", "pf_meta", "pf_quote", "pf_buyTax", "pf_sellTax", "pf_quoteAmt", "pf_minShare", "pf_selfBuilt", "pf_taxDuration", "pf_antiFarmer", "pf_r1", "pf_r2", "pf_r3", "pf_r4", "pf_t1", "pf_t2", "pf_t3", "pf_fallback",
+ "pf_kvaultAdmin", "pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"];
  var o = {};
  for (var i = 0; i < need.length; i++){
  var id = need[i];
@@ -1225,8 +1380,25 @@ function readForm(){
  quoteAmtText: o.pf_quoteAmt, minShare: o.pf_minShare, selfBuilt: o.pf_selfBuilt,
  taxDuration: o.pf_taxDuration, antiFarmer: o.pf_antiFarmer,
  r1: o.pf_r1, r2: o.pf_r2, r3: o.pf_r3, r4: o.pf_r4,
- t1: o.pf_t1, t2: o.pf_t2, t3: o.pf_t3, fallback: o.pf_fallback
+ t1: o.pf_t1, t2: o.pf_t2, t3: o.pf_t3, fallback: o.pf_fallback,
+ kvaultAdmin: o.pf_kvaultAdmin, kadmin: o.pf_kadmin, kmarketing: o.pf_kmarketing,
+ kops: o.pf_kops, khashrate: o.pf_khashrate, knft: o.pf_knft, kthreshold: o.pf_kthreshold
  };
+}
+
+function currentQuoteMode(){ return (currentFactory() && currentFactory().quoteModes && currentFactory().quoteModes.length) ? String(currentFactory().quoteModes[0]) : "erc20"; }
+function koiGeometryFromForm(f){
+ return {
+ vaultAdminWallet: f.kvaultAdmin, adminWallet: f.kadmin, marketingAddress: f.kmarketing,
+ opsWallet: f.kops, hashrateContractAddress: f.khashrate, navigatorNftAddress: f.knft,
+ hashrateThreshold: f.kthreshold
+ };
+}
+
+
+function quoteModeErrors(v, f){
+ var errs = [];
+ return errs;
 }
 
 
@@ -1261,7 +1433,8 @@ function encodeTuple(fields){
 }
 
 function predictedTokenAddr(){ return state.vanityAddress || null; }
-function vaultDataWords(g){
+
+function fourRouteWords(g){
  return [
  w32(g.route1_bps), w32(g.route2_bps), w32(g.route3_bps),
  wAddr(g.route1_target_token), wAddr(g.route2_target_token), wAddr(g.route3_target_token),
@@ -1272,21 +1445,64 @@ function vaultDataWords(g){
  ];
 }
 
-function buildVaultData(g){
+function koiWords(g){
+ var th = (g.hashrateThreshold == null || String(g.hashrateThreshold).trim() === "" || String(g.hashrateThreshold).trim() === "0") ? 0 : g.hashrateThreshold;
+ return [
+ wAddr(g.vaultAdminWallet), wAddr(g.adminWallet), wAddr(g.marketingAddress), wAddr(g.opsWallet),
+ wAddr(g.hashrateContractAddress), wAddr(g.navigatorNftAddress), w32(th)
+ ];
+}
+function wordsForSchema(sch, g){
+ var v = String((sch || {}).variant || "fourroute");
+ if (v === "koi") return koiWords(g || {});
+ return fourRouteWords(g || {});
+}
+
+function vaultDataWords(g){ return fourRouteWords(g || {}); }
+
+function buildVaultData(g, schIn){
+ var sch = schIn || currentSchema();
+ var variant = String((sch || {}).variant || "fourroute");
+ var names = schemaFieldNamesOf(sch);
+ var wantSlots = Number(sch.wordCount), wantBytes = Number(sch.byteLength), wantHex = Number(sch.hexLength);
  var problems = [], words = [];
- try{ words = vaultDataWords(g || {}); }
- catch(e){ return { ok: false, hex: "0x", words: [], wordCount: 0, bytes: 0, problems: ["那 10 格编不出来：" + e.message] }; }
- if (words.length !== VLIST.length) problems.push("vaultData 格数不对：编码器拼出 " + words.length + " 格，造册要求 " + VLIST.length + " 格");
+ var who = (sch && sch.label) ? String(sch.label) : "（口径读不到）";
+ try{ words = wordsForSchema(sch, g || {}); }
+ catch(e){ return { ok: false, hex: "0x", words: [], wordCount: 0, bytes: 0, schemaId: sch && sch.id ? sch.id : null, problems: [who + " 那 " + wantSlots + " 格编不出来：" + e.message] }; }
+ if (words.length !== names.length) problems.push("vaultData 格数不对：编码器拼出 " + words.length + " 格，" + who + " 的造册要求 " + names.length + " 格");
  if (words.some(function(x){ return typeof x !== "string" || x.length !== 64; })) problems.push("vaultData 有字不是 32 字节");
  var hex = "0x" + words.join("");
  var bytes = hex.length > 2 ? (hex.length - 2) / 2 : 0;
- if (hex.length !== VHEXCHARS) problems.push("vaultData 长度不对：" + hex.length + " 个字符（应当是 " + VHEXCHARS + " 个）");
- if (bytes !== VBYTES) problems.push("vaultData 字节数不对：" + bytes + "（应当是 " + VBYTES + " 字节）");
- var r4t = String(g && g.route4_target_token != null ? g.route4_target_token : "");
- if (isZeroAddr(r4t)) problems.push("第 10 格 route4_target_token 是空地址（0x0）—— 链上强制它必须 ＝ 本币地址");
- else if (!isHexAddr(r4t)) problems.push("第 10 格 route4_target_token 不是合法地址：" + r4t);
+ if (hex.length !== wantHex) problems.push("vaultData 长度不对：" + hex.length + " 个字符（" + who + " 应当是 " + wantHex + " 个）");
+ if (bytes !== wantBytes) problems.push("vaultData 字节数不对：" + bytes + "（" + who + " 应当是 " + wantBytes + " 字节）");
+ if (variant === "koi"){
+  var kv = [["第 1 格 vaultAdminWallet", g.vaultAdminWallet], ["第 2 格 adminWallet", g.adminWallet],
+   ["第 3 格 marketingAddress", g.marketingAddress], ["第 4 格 opsWallet", g.opsWallet],
+   ["第 5 格 hashrateContractAddress", g.hashrateContractAddress], ["第 6 格 navigatorNftAddress", g.navigatorNftAddress]];
+  for (var ki = 0; ki < kv.length; ki++){
+   var kt = String(kv[ki][1] == null ? "" : kv[ki][1]);
+   if (isZeroAddr(kt)) problems.push(kv[ki][0] + " 是空地址（0x0）—— " + who + " 建库必被拒（金库 initialize 里有硬判）");
+   else if (!isHexAddr(kt)) problems.push(kv[ki][0] + " 不是合法地址：" + kt);
+  }
+  if (lower(String(g.marketingAddress || "")) !== "" && lower(String(g.opsWallet || "")) !== "" &&
+      lower(String(g.marketingAddress || "")) === lower(String(g.opsWallet || "")))
+   problems.push("第 3 格 marketingAddress 与第 4 格 opsWallet 是同一个地址 —— " + who + " 建库必被拒（金库 initialize 里有硬判）");
+ }
+ if (variant !== "koi"){
+  var r4t = String(g && g.route4_target_token != null ? g.route4_target_token : "");
+  if (isZeroAddr(r4t)) problems.push("第 10 格 route4_target_token 是空地址（0x0）—— 链上强制它必须 ＝ 本币地址");
+  else if (!isHexAddr(r4t)) problems.push("第 10 格 route4_target_token 不是合法地址：" + r4t);
+ }
  return { hex: hex, words: words, wordCount: words.length, bytes: bytes, problems: problems,
- ok: problems.length === 0 && words.length === VLIST.length && bytes === VBYTES };
+ schemaId: sch && sch.id ? String(sch.id) : null, variant: variant,
+ ok: problems.length === 0 && words.length === names.length && bytes === wantBytes };
+}
+
+function vaultDataTargetOk(built, schIn){
+ var sch = schIn || currentSchema();
+ if (String((sch || {}).variant || "fourroute") === "koi") return true;
+ return Boolean(built && built.words && state.vanityAddress &&
+  built.words.join("").indexOf(wAddr(state.vanityAddress)) >= 0);
 }
 
 function route4AppearsInVaultData(g){
@@ -1397,6 +1613,25 @@ function saltSeed(){
  if (typeof window !== "undefined" && typeof window.__dshSaltSource === "string" && /^0x[0-9a-fA-F]{64}$/.test(window.__dshSaltSource)) return window.__dshSaltSource.toLowerCase();
  return randomSaltHex();
 }
+
+var _recheckTimer = null;
+function scheduleRecheckSources(){ if (_recheckTimer) clearTimeout(_recheckTimer); _recheckTimer = setTimeout(function(){ void recheckSources(); }, 600); }
+async function recheckSources(){
+ if (!state.sel || schemaIdOfFactory(state.sel) !== KOI_SCHEMA_ID) return;
+ var st = $("pickState"); if (st) { st.className = "badge"; st.textContent = "核对中…"; }
+ state.check = await verifyFactory(state.sel);
+ if (st) { st.className = state.check.ok ? "badge ok" : "badge bad"; st.textContent = state.check.ok ? "已核对" : "没通过"; }
+ var box = $("koiSrcMsg");
+ if (box){
+ var rows = (state.check.sources || []).map(function(s){
+  return "<div class=\"kv\"><span class=\"k\">" + esc2(s.label) + "</span><span class=\"v mono\">" +
+   (s.readable ? ("有代码 " + s.codeBytes + " 字节 · " + esc2(String(s.answer)) ) : (s.codeBytes ? ("有代码 " + s.codeBytes + " 字节 · 但答不出金库要的那一口") : "这个地址上没有代码")) +
+   "</span></div>";
+ }).join("");
+ box.innerHTML = rows ? ("<div class=\"small\">只读核对（⛔ 不发任何交易）：</div>" + rows) : "";
+ }
+ paintList(); paintPublish(); renderGates();
+}
 var mineStop = false;
 function setMineState(text, cls){
  var el = $("mineState"); if (!el) return;
@@ -1467,10 +1702,20 @@ function validate(){
  if (!f.symbol) E("币代号没填。");
  if (!f.meta) E("图标与介绍还没填（元数据地址）：官方上传口那串，或你自己的 IPFS ／ HTTPS 地址。");
  var quote = normAddr(f.quoteToken);
- if (f.quoteToken === "") E("报价币没填。请从下面的**官方清单**里点一个，或直接在**上面「报价币合约地址」那一格**里贴一个普通代币的合约地址（不能用 BNB）。");
+ if (f.quoteToken === "") E("报价币没填。请从下面的清单里点一个（清单里**只有这台工厂链上现读真收**的那些）。");
  else if (quote === null) E("报价币不是合法的合约地址（要 0x 开头、后面 40 个十六进制字符）。");
- else if (quote === ZERO_ADDR) E("⛔ " + NATIVE_BLOCKED_TEXT + " —— 全零地址就是原生币 BNB，本页**当场拦下**，这一笔不许发。"
- + "（这一条与「准入」无关：原生币是本模版**按设计不支持**。）");
+ else if (quote === ZERO_ADDR){
+ 
+ if (!state.sel) {  }
+ else if (nativeAllowed()) {  }
+ else if (quoteSupportOf(ZERO_ADDR) === false) E("⛔ 原生币（全零地址）＝ BNB：**这台工厂不收**（链上现读 isQuoteTokenSupported(0x0)=false）—— 本页当场拦下，这一笔不许发。要发就换成这台工厂收得下的报价币。");
+ else E("⛔ 还没核到这台工厂收不收原生 BNB（isQuoteTokenSupported 没回话）—— 本页**不许盲发**，请稍等或刷新页面再试。");
+ } else if (state.sel){
+ 
+ var sup = quoteSupportOf(quote);
+ if (sup === false) E("⛔ 这台工厂**不收**这种报价币（链上现读 isQuoteTokenSupported(" + quote + ")=false）—— 链上一定会拒这一笔，本页当场拦下。");
+ else if (sup !== true) E("⛔ 还没核到这台工厂收不收这种报价币（isQuoteTokenSupported 没回话）—— 本页**不许盲发**，请稍等或刷新页面再试。");
+ }
  
  if (!(state.quoteList && state.quoteList.ok)){
  E(QUOTE_LIST_FAIL_TEXT + "（" + ((state.quoteList && state.quoteList.error) || "还在拉／接口没回话") + "）—— "
@@ -1521,28 +1766,64 @@ function validate(){
  if (t2 === null) E("第 2 路目标币不是合法地址。");
  if (t3 === null) E("第 3 路目标币不是合法地址。");
  var predicted = predictedTokenAddr();
- var geometry = {
- route1_bps: Number(r1), route2_bps: Number(r2), route3_bps: Number(r3),
- route1_target_token: t1 || ZERO_ADDR, route2_target_token: t2 || ZERO_ADDR, route3_target_token: t3 || ZERO_ADDR,
- vaultFallbackBps: Number(fb), vaultSelfBuiltThreshold: sb.toString(),
- route4_burn_own_bps: Number(r4), route4_target_token: predicted || ZERO_ADDR
- };
- if (!predicted) E("第 10 格（第 4 路的目标币 ＝ 本币地址）**还没有值**：请先点「开始找靓号」—— ⛔ 不许手打、也不许留空。");
- if (!t3 || t3 === ZERO_ADDR) E("第 3 路目标币必填：留空的话这一路的钱会掉进官方销毁口袋（与第 4 路同一条管道），四槽之和也就不是 " + TOTAL_BPS + "，链上一定拒。");
- else if (predicted && lower(t3) === lower(predicted)) E("第 3 路目标币填成了本币：那会与第 4 路重复销毁（同一枚币被烧两遍）。");
+ var sch = currentSchema();
+ var variant = String((sch || {}).variant || "fourroute");
+ var geometry = null;
+ if (variant === "koi"){
+  
+  geometry = koiGeometryFromForm(f);
+  if (!f.kvaultAdmin) E("第 1 格 金库管理员（vaultAdminWallet）没填：它必须就是**发币人本人**（工厂拿 creator 当升级权持有人）。");
+  else if (normAddr(f.kvaultAdmin) === null) E("第 1 格 金库管理员不是合法地址。");
+  else if (state.account && lower(String(f.kvaultAdmin)) !== lower(state.account))
+   E("第 1 格 金库管理员（" + String(f.kvaultAdmin) + "）与当前钱包（" + String(state.account) + "）不是同一个地址 —— "
+    + "工厂把 `newVault` 的 creator（＝你的钱包）当升级权持有人，两者不等建库必被拒。请改成你自己的地址。");
+  if (!f.kadmin) E("第 2 格 合约交互管理（adminWallet）没填。");
+  else if (normAddr(f.kadmin) === null) E("第 2 格 合约交互管理不是合法地址。");
+  if (!f.kmarketing) E("第 3 格 营销地址（marketingAddress）没填。");
+  else if (normAddr(f.kmarketing) === null) E("第 3 格 营销地址不是合法地址。");
+  if (!f.kops) E("第 4 格 运维地址（opsWallet）没填。");
+  else if (normAddr(f.kops) === null) E("第 4 格 运维地址不是合法地址。");
+  if (f.kmarketing && f.kops && normAddr(f.kmarketing) !== null && normAddr(f.kops) !== null &&
+      lower(String(f.kmarketing)) === lower(String(f.kops)))
+   E("第 3 格 营销地址与第 4 格 运维地址是同一个地址 —— 金库 initialize 里明写必须不同，建库必被拒。");
+  if (!f.khashrate) E("第 5 格 算力合约（hashrateContractAddress）没填 —— 金库硬前置：不许是零地址。");
+  else if (normAddr(f.khashrate) === null) E("第 5 格 算力合约不是合法地址。");
+  if (!f.knft) E("第 6 格 领航 NFT（navigatorNftAddress）没填 —— 金库硬前置：不许是零地址。");
+  else if (normAddr(f.knft) === null) E("第 6 格 领航 NFT 不是合法地址。");
+  var kth = String(f.kthreshold == null ? "" : f.kthreshold).trim();
+  if (kth !== "" && !/^\d+$/.test(kth)) E("第 7 格 算力门槛只许填整数「点」（留空 ＝ 走工厂默认 100000 点）。");
+  else if (kth === "0") W("第 7 格 算力门槛填了 0 ⇒ 工厂侧补默认 100000 点（10 万点）。");
+ }
+ else {
+  geometry = {
+  route1_bps: Number(r1), route2_bps: Number(r2), route3_bps: Number(r3),
+  route1_target_token: t1 || ZERO_ADDR, route2_target_token: t2 || ZERO_ADDR, route3_target_token: t3 || ZERO_ADDR,
+  vaultFallbackBps: Number(fb), vaultSelfBuiltThreshold: sb.toString(),
+  route4_burn_own_bps: Number(r4), route4_target_token: predicted || ZERO_ADDR
+  };
+  if (!predicted) E("第 10 格（第 4 路的目标币 ＝ 本币地址）**还没有值**：请先点「开始找靓号」—— ⛔ 不许手打、也不许留空。");
+  if (!t3 || t3 === ZERO_ADDR) E("第 3 路目标币必填：留空的话这一路的钱会掉进官方销毁口袋（与第 4 路同一条管道），四槽之和也就不是 " + TOTAL_BPS + "，链上一定拒。");
+  else if (predicted && lower(t3) === lower(predicted)) E("第 3 路目标币填成了本币：那会与第 4 路重复销毁（同一枚币被烧两遍）。");
+ }
+ 
+ var qe = quoteModeErrors(null, currentFactory());
+ for (var qi = 0; qi < qe.length; qi++) E(qe[qi]);
  var built = null;
- try{ built = buildVaultData(geometry); if (!built.ok) E("vaultData 格数 / 长度不对：" + built.wordCount + " 格 / " + built.bytes + " 字节（必须 " + VSLOTS + " 格 / " + VBYTES + " 字节）—— " + built.problems.join("；")); }
+ try{ built = buildVaultData(geometry, sch); if (!built.ok) E("vaultData 格数 / 长度不对：" + built.wordCount + " 格 / " + built.bytes + " 字节（" + String((sch || {}).label || "") + " 必须 " + Number((sch || {}).wordCount) + " 格 / " + Number((sch || {}).byteLength) + " 字节）—— " + built.problems.join("；")); }
  catch(e){ E("vaultData 编不出来：" + (e && e.message ? e.message : e)); }
  var model = null;
- try { model = computeModel(geometry); } catch(e){ E("四个官方槽算不出来：" + (e && e.message ? e.message : e)); }
- if (model){
- if (!model.routeSumOk) E("第①②③④路之和是 " + model.split.routeSum + "，不是 " + TOTAL_BPS + "。四路必须恰好填满 " + TOTAL_BPS + "。");
- if (fb > 0n) W("现在有金库自建路（第 4 路恒自建），而兜底留额是 " + fb.toString() + "（> 0）—— 链上会拒这个几何。这一条页面不拦你。");
- if (!model.deflationIsZero) E("官方 deflationBps 算出来是 " + model.slots.deflationBps + "（必须为 0：第 4 路由我们自己的金库执行）。");
+ if (variant !== "koi"){
+  try { model = computeModel(geometry); } catch(e){ E("四个官方槽算不出来：" + (e && e.message ? e.message : e)); }
+  if (model){
+  if (!model.routeSumOk) E("第①②③④路之和是 " + model.split.routeSum + "，不是 " + TOTAL_BPS + "。四路必须恰好填满 " + TOTAL_BPS + "。");
+  if (fb > 0n) W("现在有金库自建路（第 4 路恒自建），而兜底留额是 " + fb.toString() + "（> 0）—— 链上会拒这个几何。这一条页面不拦你。");
+  if (!model.deflationIsZero) E("官方 deflationBps 算出来是 " + model.slots.deflationBps + "（必须为 0：第 4 路由我们自己的金库执行）。");
+  }
  }
  return { errors: errors, warnings: warnings, form: f, quoteToken: quote, buyTax: buyTax, sellTax: sellTax,
  quoteAmtWei: quoteAmt, minShareWei: minShare, taxDuration: taxDuration, antiFarmer: antiFarmer,
  r1: r1, r2: r2, r3: r3, r4: r4, fallback: fb, geometry: geometry, model: model, built: built,
+ schema: sch, schemaId: schemaIdOfFactory(currentFactory()), variant: variant,
  capInfo: capInfo, buyUnits: buyUnitsInfo };
 }
 function normAddr(s){
@@ -1567,10 +1848,13 @@ function buildLaunchParams(over){
  dexId: 0, lpFeeProfile: 0,
  buyTaxRate: v.buyTax, sellTaxRate: v.sellTax,
  taxDuration: v.taxDuration, antiFarmerDuration: v.antiFarmer,
- mktBps: v.model.slots.mktBps, deflationBps: v.model.slots.deflationBps,
- dividendBps: v.model.slots.dividendBps, lpBps: v.model.slots.lpBps,
+ mktBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.mktBps : v.model.slots.mktBps),
+ deflationBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.deflationBps : v.model.slots.deflationBps),
+ dividendBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.dividendBps : v.model.slots.dividendBps),
+ lpBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.lpBps : v.model.slots.lpBps),
  minimumShareBalance: v.minShareWei,
- dividendToken: MAGIC_DIVIDEND_COMPUTED,
+ 
+ dividendToken: (v.variant === "koi" ? ZERO_ADDR : MAGIC_DIVIDEND_COMPUTED),
  commissionReceiver: COMMISSION,
  tokenVersion: TOKEN_VERSION,
  vaultFactory: launchFactory(),
@@ -1582,7 +1866,10 @@ function buildCalldata(over){
  var vd = buildVaultData(p.vaultData);
  if (!vd.ok) throw new Error("vaultData 必须是 " + VSLOTS + " 格 / " + VBYTES + " 字节。");
  if (BigInt(p.deflationBps) !== 0n) throw new Error("官方 deflationBps 必须为 0（第 4 路由我们自己的金库执行）。");
- if (lower(String(p.vaultData.route4_target_token)) !== lower(String(state.vanityAddress))) throw new Error("第 10 格（第 4 路目标币）不等于本币地址 —— 链上一定会拒这一笔。");
+ 
+ if (currentSchema() && String(currentSchema().variant) !== "koi"){
+  if (lower(String(p.vaultData.route4_target_token)) !== lower(String(state.vanityAddress))) throw new Error("第 10 格（第 4 路目标币）不等于本币地址 —— 链上一定会拒这一笔。");
+ }
  var data = encodeNewTokenV6WithVault(p, vd.words);
  return { params: p, data: data, bytes: (data.length - 2) / 2, sha256: sha256AsciiOf(data), vaultData: vd };
 }
@@ -1606,8 +1893,21 @@ function validateApprovePayload(p, quoteToken, quoteAmtWei){
  return errs;
 }
 
-function computeValueWei(quoteAmtWei){ return BigInt(quoteAmtWei || 0) > 0n ? ONE_GWEI : 0n; }
-function valueAllowed(wei){ var v = BigInt(wei); return v === 0n || v === ONE_GWEI; }
+
+function isNativeQuoteMode(){
+ return Boolean(state.sel) && quoteModeOfFactory(state.sel) === "native" && lower(currentQuoteAddr()) === ZERO_ADDR;
+}
+function computeValueWei(quoteAmtWei){
+ var q = BigInt(quoteAmtWei || 0);
+ if (isNativeQuoteMode()) return q > 0n ? q : 0n;
+ return q > 0n ? ONE_GWEI : 0n;
+}
+function valueAllowed(wei){
+ var v = BigInt(wei);
+ if (v === 0n || v === ONE_GWEI) return true;
+ if (isNativeQuoteMode() && state.built && state.built.params) return v === BigInt(state.built.params.quoteAmt || 0);
+ return false;
+}
 function buildLaunchPayload(from){
  var v = validate();
  if (v.errors.length) throw new Error("表单还没填好：" + v.errors.join("；"));
@@ -1624,7 +1924,7 @@ function validateLaunchPayload(p){
  if (!isHex(p.data) || p.data === "0x") errs.push("data 是空的");
  if (String(p.data).slice(0, 10) !== SEL_LAUNCH) errs.push("⛔ data 不是 newTokenV6WithVault 那个选择器");
  if (p.gas !== toQuantity(LAUNCH_GAS)) errs.push("⛔ gas 不是页面那个固定上限");
- if (p.value !== "0x0" && p.value !== toQuantity(ONE_GWEI)) errs.push("⛔ value 只许 0 或 1 gwei");
+ if (!valueAllowed(BigInt(p.value))) errs.push("⛔ value 不对：ERC-20 报价时只许 0 或 1 gwei；原生 BNB 报价时必须**恰好等于首买金额**（现在 " + String(p.value) + "）");
  var built = state.built;
  if (built && built.vaultData && (built.vaultData.wordCount !== VSLOTS || built.vaultData.bytes !== VBYTES)) errs.push("vaultData 格数 / 长度不对（必须 " + VSLOTS + " 格 / " + VBYTES + " 字节）");
  if (built && built.params && BigInt(built.params.deflationBps) !== 0n) errs.push("官方 deflationBps 必须为 0");
@@ -1648,9 +1948,13 @@ async function refreshBalance(){
  state.quoteBal = null;
  var f = readForm();
  var q = normAddr(f.quoteToken);
- if (state.account && q && q !== ZERO_ADDR){
+ if (state.account && q && isZeroAddr(q)){
+ 
+ try{ var bal = await rpc("eth_getBalance", [state.account, "latest"]); state.quoteBal = (bal == null ? null : BigInt(bal)); }
+ catch(e){ state.quoteBal = null; }
+ } else if (state.account && q){
  var r = await ethCall(q, keccakSel("balanceOf(address)") + wAddr(state.account));
- if (r.ok) state.quoteBal = wordToBig(r.result, 0);
+ if (wordDataOk(r, 1)) state.quoteBal = wordToBig(r.result, 0);
  }
  paintTop();
 }
@@ -1682,8 +1986,13 @@ function publishGates(){
  var v = null;
  try { v = validate(); } catch (e){ v = { errors: [String(e && e.message ? e.message : e)] }; }
  if (v.errors.length) r.push("表单还有没填好的：" + v.errors[0]);
+ if (isNativeQuoteMode()){
+ 
+ if (state.launch.ok === true) r.push("那一笔已经成功过了");
+ } else {
  if (state.approve.ok !== true) r.push("第 1 笔（授权）还没有成功回执");
  if (state.launch.ok === true) r.push("第 2 笔已经成功过了");
+ }
  return r;
 }
 function setBadge(id, phase){
@@ -1703,9 +2012,36 @@ async function waitReceipt(hash, tries){
  }
  return null;
 }
+
+async function doPublishNative(){
+ var errs0 = publishGates();
+ if (errs0.length){ setMsg("pubMsg", "还不能发：" + esc2(errs0.join(" · ")), "danger"); return; }
+ var v = validate();
+ if (v.errors.length){ setMsg("pubMsg", "递钱包之前自检没过，<b>不发</b>：" + esc2(v.errors.join("；")), "danger"); return; }
+ var lp = buildLaunchPayload(state.account);
+ var lerrs = validateLaunchPayload(lp);
+ if (lerrs.length){ setMsg("pubMsg", "自检没过，<b>不发</b>：" + esc2(lerrs.join("；")), "danger"); return; }
+ state.busy = true; setBadge("pubState", "sign");
+ setMsg("pubMsg", "<b>发币（一笔）。</b>这台工厂走<b>原生 BNB</b>报价 ⇒ <b>没有授权那一步</b>；" +
+  "这一笔带着 <span class=\"mono\">value = " + BigInt(lp.value).toString() + " wei</span>（＝你填的首买金额）交给你的钱包了 —— 核对后点确认。", "warn");
+ var h;
+ try { h = await sendTx(lp); }
+ catch(e){ state.busy = false; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("发币"), "danger"); renderGates(); return; }
+ state.launch.hash = h; state.launch.phase = "sent";
+ setMsg("pubMsg", "已广播：<span class=\"mono break\">" + esc2(h) + "</span><br>等链上确认…", "info");
+ var rc = await waitReceipt(h);
+ state.busy = false;
+ if (!rc){ state.launch.phase = "stuck"; setBadge("pubState", "stuck"); setMsg("pubMsg", "这一笔没等到确认 —— 去 BscScan 看，<b>别重复发</b>。", "warn"); renderGates(); return; }
+ if (BigInt(rc.status) !== 1n){ state.launch.phase = "fail"; setBadge("pubState", "fail"); setMsg("pubMsg", humanFail("发币"), "danger"); renderGates(); return; }
+ state.launch.ok = true; state.launch.phase = "ok";
+ setBadge("pubState", "ok");
+ setMsg("pubMsg", "<b>发币成功。</b>新币 = <span class=\"mono break\">" + esc2(String(state.vanityAddress)) + "</span>（就是 vaultData 里那一格本币地址）。", "ok");
+ renderGates();
+}
 function humanFail(what){ return what + "失败了。<b>没有广播第二次</b> —— 去钱包 / BscScan 看清楚，再点一次。"; }
 
 async function doPublish(){
+ if (isNativeQuoteMode()) return doPublishNative();
  var errs0 = publishGates();
  if (errs0.length){ setMsg("pubMsg", "还不能发：" + esc2(errs0.join(" · ")), "danger"); return; }
  var v = validate();
@@ -1754,20 +2090,116 @@ function launchFactory(){
  return state.sel ? String(state.sel.factory) : "";
 }
 function facById(id){ for (var i = 0; i < EXT.factories.length; i++) if (EXT.factories[i].id === id) return EXT.factories[i]; return null; }
+
+function wordDataOk(res, nWords){
+ if (!res || res.ok !== true || typeof res.result !== "string") return false;
+ var want = 2 + 64 * Number(nWords || 1);
+ return res.result.length >= want;
+}
+function stringDataOk(res){
+ if (!res || res.ok !== true || typeof res.result !== "string" || res.result.length < 130) return false;
+ try { return decodeAbiStringStrict(res.result) !== null; } catch (e){ return false; }
+}
+
+function decodeAbiStringStrict(hex){
+ try{
+  var h = String(hex || "");
+  if (h.slice(0, 2) !== "0x" || h.length < 130) return null;
+  var off = Number(BigInt("0x" + h.slice(2, 66)));
+  if (!isFinite(off) || off !== 32) return null;
+  var len = Number(BigInt("0x" + h.slice(66, 130)));
+  if (!isFinite(len) || len < 0 || len > 4096) return null;
+  var end = 130 + len * 2;
+  if (h.length < end) return null;
+  return unescapeUtf8Hex(h.slice(130, end));
+ }catch(e){ return null; }
+}
+function unescapeUtf8Hex(hex){
+ var out = "";
+ for (var i = 0; i + 1 < hex.length; i += 2) out += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+ try { return decodeURIComponent(escape(out)); } catch (e){ return out; }
+}
+
+function koiSourceDefs(){
+ return [
+ { key: "pf_khashrate", label: "算力合约（第 5 格）", sig: SEL_TOTAL_WEIGHT, name: "totalEffectiveWeight()", why: (KOI_LIVE.hashrateContract || {}).probeWhy || "" },
+ { key: "pf_knft", label: "领航 NFT（第 6 格）", sig: keccakSel("slotsIssued()"), name: "slotsIssued()", why: (KOI_LIVE.navigatorNft || {}).probeWhy || "" }
+ ];
+}
+
+async function verifyKoiSources(){
+ var res = { reads: [], problems: [] };
+ var defs = koiSourceDefs();
+ for (var i = 0; i < defs.length; i++){
+  var d = defs[i], el = $(d.key), addr = el && el.value ? String(el.value).trim() : "";
+  var rec = { key: d.key, label: d.label, addr: addr, codeBytes: 0, readable: false, answer: null, why: d.why };
+  if (!isHexAddr(addr)) { res.problems.push(d.label + " 还没填一个像样的合约地址"); res.reads.push(rec); continue; }
+  if (isZeroAddr(addr)) { res.problems.push(d.label + " 是空地址（0x0）—— 锦鲤金库建库必被拒"); res.reads.push(rec); continue; }
+  var code = null;
+  try { code = await rpc("eth_getCode", [addr, "latest"]); } catch (e){ code = null; }
+  rec.codeBytes = code ? (code.length - 2) / 2 : 0;
+  if (!rec.codeBytes) { res.problems.push(d.label + "（" + addr + "）这个地址上没有代码 —— 它不可能答金库的 " + d.name); res.reads.push(rec); continue; }
+  var r = await ethCall(addr, d.sig);
+  rec.readable = wordDataOk(r, 1);
+  if (rec.readable) rec.answer = BigInt(wordToBig(r.result, 0)).toString();
+  if (!rec.readable) res.problems.push(d.label + "（" + addr + "）有代码，但答不出金库会问的 " + d.name + " —— 它不像金库要的那个来源");
+  res.reads.push(rec);
+ }
+ return res;
+}
 async function verifyFactory(f){
- var p = [];
- var out = { id: f.id, factory: f.factory, codeBytes: 0, owner: null, beaconImpl: null, problems: p };
+ var p = [], notes = [], reads = [];
+ var sch = schemaById(schemaIdOfFactory(f));
+ var variant = (sch && String(sch.variant) === "koi") ? "fixedImpl" : "beacon";
+ var out = { id: f.id, factory: f.factory, variant: variant, schemaId: schemaIdOfFactory(f),
+ codeBytes: 0, owner: null, beaconImpl: null, vaultImplementation: null, vaultImplCodeBytes: 0,
+ specVersion: null, vaultSpecVersion: null, reads: reads, notes: notes, problems: p };
  var code = null;
  try { code = await rpc("eth_getCode", [f.factory, "latest"]); } catch (e) { code = null; }
  out.codeBytes = code ? (code.length - 2) / 2 : 0;
  if (!out.codeBytes) p.push("这个地址上没有代码");
+ 
+ var sv = await ethCall(f.factory, SEL_FACTORY_SPEC);
+ out.specVersion = stringDataOk(sv) ? decodeAbiStringStrict(sv.result) : null;
+ 
  var own = await ethCall(f.factory, SEL_OWNER);
- out.owner = own.ok ? wordToAddr(own.result, 0) : null;
- if (!out.owner) p.push("读不到 owner()");
- else if (f.expectOwner && lower(out.owner) !== lower(f.expectOwner)) p.push("owner() 不是列表里那个地址");
+ out.owner = wordDataOk(own, 1) ? wordToAddr(own.result, 0) : null;
  var be = await ethCall(f.factory, SEL_BEACON_IMPL);
- out.beaconImpl = be.ok ? wordToAddr(be.result, 0) : null;
- if (f.expectBeaconImpl && lower(String(out.beaconImpl)) !== lower(f.expectBeaconImpl)) p.push("beaconImplementation() 与列表里的期望值不符");
+ out.beaconImpl = wordDataOk(be, 1) ? wordToAddr(be.result, 0) : null;
+ if (variant === "beacon"){
+  
+  if (!out.owner) p.push("读不到 owner()");
+  else if (f.expectOwner && lower(out.owner) !== lower(f.expectOwner)) p.push("owner() 不是列表里那个地址");
+  if (f.expectBeaconImpl && lower(String(out.beaconImpl)) !== lower(f.expectBeaconImpl)) p.push("beaconImplementation() 与列表里的期望值不符");
+ } else {
+  
+  notes.push("这一台是**固定实现体**写法（链上现读：owner()／beaconImplementation()／gasStation() 都无此口）⇒ 按它自己的核对项核 —— ⛔ 不是「没通过」，也⛔ 没有为了让绿灯亮起来放宽任何核对口径。");
+  var vi = await ethCall(f.factory, SEL_VAULT_IMPL);
+  out.vaultImplementation = wordDataOk(vi, 1) ? wordToAddr(vi.result, 0) : null;
+  if (!out.vaultImplementation) p.push("读不到 vaultImplementation()（固定实现体的地址口）");
+  else {
+   if (f.expectVaultImplementation && lower(out.vaultImplementation) !== lower(f.expectVaultImplementation))
+    p.push("vaultImplementation() 与列表里记的地址不符（链上 " + out.vaultImplementation + "）");
+   var vic = null;
+   try { vic = await rpc("eth_getCode", [out.vaultImplementation, "latest"]); } catch (e){ vic = null; }
+   out.vaultImplCodeBytes = vic ? (vic.length - 2) / 2 : 0;
+   if (!out.vaultImplCodeBytes) p.push("vaultImplementation() 指到的那个地址上没有代码");
+   else {
+    var vs = await ethCall(out.vaultImplementation, SEL_VAULT_SPEC);
+    out.vaultSpecVersion = stringDataOk(vs) ? decodeAbiStringStrict(vs.result) : null;
+    if (!out.vaultSpecVersion) p.push("那支金库实现体答不出 vaultSpecVersion()");
+   }
+  }
+  if (!out.specVersion) p.push("这一台答不出 factorySpecVersion()");
+  if (f.expectSpecVersion && out.specVersion && out.specVersion !== f.expectSpecVersion)
+   p.push("factorySpecVersion() 与列表里记的不符（链上 " + out.specVersion + "）");
+  
+  var src = await verifyKoiSources();
+  out.sources = src.reads;
+  var sp = src.problems.slice(0);
+  state.sourceProblems = sp;
+  for (var si = 0; si < sp.length; si++) p.push(sp[si]);
+ }
  out.ok = (p.length === 0);
  return out;
 }
@@ -1790,7 +2222,7 @@ function paintList(){
  return "<div class=\"row\" style=\"margin:6px 0\">" +
  "<button class=\"ghost\" style=\"flex:1;text-align:left\" id=\"pick_" + esc2(f.id) + "\">" + esc2(f.label) + "</button>" +
  "<span class=\"" + cls + "\">" + dot + "</span></div>" +
- "<div class=\"muted small\" style=\"margin:0 0 6px 4px\">" + esc2(EXT.chain.name) + "　·　<span class=\"mono break\">" + esc2(f.factory) + "</span>" + (f.note ? "<br>" + esc2(f.note) : "") + "</div>";
+ "<div class=\"muted small\" style=\"margin:0 0 6px 4px\">" + esc2(EXT.chain.name) + "　·　<span class=\"mono break\">" + esc2(f.factory) + "</span>" + (f.note ? "<br>" + esc2(f.note) : "") + "<br>参数表：" + esc2((schemaById(schemaIdOfFactory(f)) || {}).label || "") + "（" + String((schemaById(schemaIdOfFactory(f)) || {}).wordCount) + " 格 / " + String((schemaById(schemaIdOfFactory(f)) || {}).byteLength) + " 字节）</div>";
  }).join("");
  EXT.factories.forEach(function(f){
  var b = $("pick_" + f.id);
@@ -1811,7 +2243,10 @@ function paintPublish(){
  : "<div class=\"alert danger small\">⛔ 这台工厂**没通过核对**： " + esc2(c ? c.problems.join("；") : "还没核对") + "</div>";
  }
  var d = $("pubDetail");
- if (d) d.innerHTML = "<div class=\"mono break\">" + esc2("选中的工厂：" + String(state.sel.factory)) + "</div>";
+ if (d) d.innerHTML = "<div class=\"mono break\">" + esc2("选中的工厂：" + String(state.sel.factory)) + "</div>" +
+ (schemaIdOfFactory(state.sel) === KOI_SCHEMA_ID
+ ? "<div class=\"small\">这一台的口径：<b>7 格 / 224 字节</b>（字段名与链上 vaultDataSchema() 逐字相同）</div>"
+ : "<div class=\"small\">这一台的口径：<b>10 格 / 320 字节</b>（四路）</div>");
 }
 function renderGates(){
  var pg = null;
@@ -1828,6 +2263,9 @@ function renderGates(){
  }
  var len = $("vdataLen");
  if (len) len.textContent = (pg && pg.built) ? (pg.built.wordCount + " 格 · " + pg.built.bytes + " 字节") : "—";
+ var vdh = $("pf_vdHead");
+ if (vdh && state.sel && state.sel.id === "koi") vdh.textContent = "vaultData（7 格 / 224 字节 —— 202锦鲤工厂那一套）";
+ else if (vdh) vdh.textContent = "vaultData（10 格 / 320 字节）";
  var r4o = $("r4Out");
  if (r4o) r4o.textContent = (pg && pg.model) ? String(pg.model.r4) : "—";
  var rs = $("routeSum");
@@ -1836,33 +2274,45 @@ function renderGates(){
  renderReflexive();
 }
 
+
+function pubBtnLabel(){ return isNativeQuoteMode() ? "一键发布（一笔：发币）" : "一键发布（两笔）"; }
 function renderReflexive(){
  var big = $("blkActBig"), btn = $("blkActBtn"), risk = $("blkRiskText");
  if (!big || !btn || !risk) return;
+ var NL = pubBtnLabel();
  if (!state.sel){
  big.textContent = "选一台工厂";
- btn.textContent = "一键发布（两笔）";
+ btn.textContent = NL;
  btn.disabled = true;
  } else if (state.pubLaunch.ok){
  big.textContent = "发完了 —— 去 BscScan 看那个新币";
- btn.textContent = "一键发布（两笔）";
+ btn.textContent = NL;
  btn.disabled = true;
+ } else if (isNativeQuoteMode()){
+ big.textContent = state.vanityAddress ? "按下面的按钮发币（这一台只需一笔）" : "先按上面「开始找靓号」";
+ btn.textContent = NL;
+ btn.disabled = (publishGates().length > 0) || state.busy === true;
  } else if (state.pubApprove.ok){
  big.textContent = "按下面的按钮发第 2 笔（发币）";
- btn.textContent = "一键发布（两笔）";
+ btn.textContent = NL;
  btn.disabled = (publishGates().length > 0) || state.busy === true;
  } else if (state.vanityAddress){
  big.textContent = "按下面的按钮发第 1 笔（授权）";
- btn.textContent = "一键发布（两笔）";
+ btn.textContent = NL;
  btn.disabled = (publishGates().length > 0) || state.busy === true;
  } else {
  big.textContent = "先按上面「开始找靓号」";
- btn.textContent = "一键发布（两笔）";
+ btn.textContent = NL;
  btn.disabled = true;
  }
- risk.innerHTML = "发出去的币<b>上链不可逆</b>：四路份额、税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。"
- + "工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。第 1 笔授权**只批「刚好你要花的那个数」**（不是无限授权）；"
- + "第 1 笔没成功，第 2 笔**点都点不动**。第 10 格（第 4 路目标币 ＝ 本币地址）由**现场挖靓号**算出来，⛔ 不许手打、也不许留空。";
+ risk.innerHTML = isNativeQuoteMode()
+ ? ("发出去的币<b>上链不可逆</b>：税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。"
+  + "工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。这一台走**原生 BNB**报价 ⇒ **没有授权那一步**："
+  + "发币是**一笔**，<b>value 必须恰好等于你填的首买金额</b>（多一 wei 少一 wei 链上都会拒）。"
+  + "本币地址那一格由**现场挖靓号**算出来，⛔ 不许手打、也不许留空。")
+ : ("发出去的币<b>上链不可逆</b>：四路份额、税率、时长都是你此刻填的那几个数，链上没有「撤回」这一说。"
+  + "工厂不在官方登记册里（官方界面标 UNOFFICIAL／UNVERIFIED）。第 1 笔授权**只批「刚好你要花的那个数」**（不是无限授权）；"
+  + "第 1 笔没成功，第 2 笔**点都点不动**。第 10 格（第 4 路目标币 ＝ 本币地址）由**现场挖靓号**算出来，⛔ 不许手打、也不许留空。");
 }
 function paintMisc(){
  var el = $("verPill");
@@ -1879,9 +2329,31 @@ function paintMisc(){
  else cp.textContent = "链不对（当前 " + state.chainId + "）";
  }
 }
+
+function applySchemaVisibility(){
+ var isKoi = Boolean(state.sel && schemaIdOfFactory(state.sel) === KOI_SCHEMA_ID);
+ ["pf_fourroute_only", "pf_fourroute_only2"].forEach(function(id){ var el = $(id); if (el) el.hidden = isKoi; });
+ var kb = $("pf_koi_box"); if (kb) kb.hidden = !isKoi;
+ var vd = $("pf_vdHead");
+ if (vd) vd.textContent = isKoi ? "vaultData（7 格 / 224 字节 —— 202锦鲤工厂那一套）" : "vaultData（10 格 / 320 字节）";
+ var st = $("pf_kvaultAdminState");
+ if (st) st.textContent = (state.account && $("pf_kvaultAdmin") && lower(String($("pf_kvaultAdmin").value).trim()) === lower(state.account))
+  ? "＝当前钱包（发币人本人）✔" : "必须填发币人本人的地址";
+}
+
+function resetQuoteForFactory(){
+ var f = $("pf_quote");
+ if (f) f.value = "";
+ state.quoteSupport = null; state.quoteSupportFactory = null; state.quoteMeta = null;
+ void refreshQuoteSupport(true);
+}
 async function selectFactory(id){
  var f = facById(id); if (!f) return;
  state.sel = f; state.check = null;
+ applySchemaVisibility();
+ if (typeof resetQuoteForFactory === "function") resetQuoteForFactory();
+ state.sourceProblems = [];
+ var srcBox = $("koiSrcMsg"); if (srcBox) srcBox.innerHTML = "";
  state.approve = { hash: null, ok: false, phase: "idle" };
  state.launch = { hash: null, ok: false, phase: "idle" };
  paintList(); paintPublish(); renderGates();
@@ -1891,19 +2363,45 @@ async function selectFactory(id){
  state.check = await verifyFactory(f);
  if (st) { st.className = state.check.ok ? "badge ok" : "badge bad"; st.textContent = state.check.ok ? "已核对" : "没通过"; }
  paintList(); paintPublish(); renderGates();
+ var nts = (state.check.notes && state.check.notes.length) ? "<br>" + esc2(state.check.notes.join(" ")) : "";
  if (msg) msg.innerHTML = state.check.ok
- ? "<div class=\"alert ok small\">★ 核对通过 —— 接下来在下面「第 2 步」发币。</div>"
+ ? "<div class=\"alert ok small\">★ 核对通过 —— 接下来在下面「第 2 步」发币。" + nts + "</div>"
  : "<div class=\"alert danger small\">⛔ 核对没通过：" + esc2(state.check.problems.join("；")) + "</div>";
  var big = $("pickBig"); if (big) big.textContent = state.check.ok ? "填表 → 挖靓号 → 发币" : "换一台工厂";
+ applySchemaVisibility();
 }
 function renderAudit(){
  var items = [];
  var add = function(okv, title, detail){ items.push({ ok: okv, title: title, detail: detail || "" }); };
  var vm = buildVaultData({ route1_bps: 1, route2_bps: 1, route3_bps: 1, route1_target_token: ZERO_ADDR, route2_target_token: ZERO_ADDR, route3_target_token: ZERO_ADDR, vaultFallbackBps: 0, vaultSelfBuiltThreshold: 0, route4_burn_own_bps: 1, route4_target_token: "0x" + "7".repeat(40) });
  add(vm.wordCount === VSLOTS && vm.bytes === VBYTES, "★★★ vaultData 就是 " + VSLOTS + " 格 / " + VBYTES + " 字节（第 9 格份额 ＋ 第 10 格本币地址都在里面）", vm.wordCount + " 格 / " + vm.bytes + " 字节");
+ var ksch = schemaById(KOI_SCHEMA_ID);
+ var koiBuilt = null;
+ try { koiBuilt = buildVaultData(koiWordsProbe(), ksch); } catch (e){ koiBuilt = null; }
+ add(Boolean(ksch) && ksch.variant === "koi" && ksch.wordCount === 7 && ksch.byteLength === 224 && ksch.hexLength === 226 && ksch.fields.length === 7,
+ "★★★ 按工厂分派口径：202锦鲤工厂那一套是 7 格 / 224 字节 / 226 个十六进制字符",
+ (ksch ? (ksch.fields.join("／")) : "口径读不到"));
+ add(Boolean(koiBuilt) && koiBuilt.ok === true && koiBuilt.bytes === 224 && koiBuilt.words.length === 7 && koiBuilt.schemaId === KOI_SCHEMA_ID,
+ "★★★ 锦鲤的 vaultData 用**它自己那支编码器**编出来确实是 224 字节（不是拿四路那套编的）",
+ (koiBuilt ? (koiBuilt.wordCount + " 格 / " + koiBuilt.bytes + " 字节") : "编不出来"));
+ add(ksch && ksch.fields.indexOf("vaultAdminWallet") === 0 && ksch.fields.indexOf("hashrateContractAddress") === 4 && ksch.fields.indexOf("navigatorNftAddress") === 5 && ksch.fields.indexOf("hashrateThreshold") === 6,
+ "★★★ 锦鲤 7 格的**名字与顺序**＝链上 vaultDataSchema() 自称的那 7 条", (ksch ? ksch.fields.join("／") : "—"));
+ add(DEFAULT_SCHEMA_ID === "fourroute10" && schemaById(DEFAULT_SCHEMA_ID).wordCount === 10 && schemaById(DEFAULT_SCHEMA_ID).byteLength === 320,
+ "★★★ 四路那一套仍是 10 格 / 320 字节（⛔ 没被动过）", (schemaById(DEFAULT_SCHEMA_ID).fields || []).length + " 格 / " + schemaById(DEFAULT_SCHEMA_ID).byteLength + " 字节");
+ var koiQ = schemaById(KOI_SCHEMA_ID), fourQ = schemaById(DEFAULT_SCHEMA_ID);
+ add(quoteModeOfFactory(EXT.factories[0]) === "erc20" && quoteModeOfFactory(EXT.factories[1]) === "native",
+ "★★ 报价币模式按工厂分派（202 四路 ＝ erc20；202锦鲤工厂 ＝ native）",
+ quoteModeOfFactory(EXT.factories[0]) + " / " + quoteModeOfFactory(EXT.factories[1]));
+ add(buildVaultData(fourRouteProbe(), fourQ).bytes === 320 && buildVaultData(koiWordsProbe(), fourQ).bytes !== 224,
+ "★★★ 反向用例（页面内真跑）：把锦鲤那 7 格喂给**四路口径** ⇒ 编不出 224 字节",
+ "四路口径吃锦鲤那 7 格 ⇒ " + buildVaultData(koiWordsProbe(), fourQ).bytes + " 字节");
  add(APPROVE_GAS === BigInt(String(EXT.gas.approve)) && LAUNCH_GAS === BigInt(String(EXT.gas.launch)), "★★★ 两笔 gas 都是**固定上限**（从配方取）", APPROVE_GAS.toString() + " / " + LAUNCH_GAS.toString());
  add(String(SEL_APPROVE) === "0x095ea7b3", "★★★ 第 1 笔的 selector 是 approve（0x095ea7b3）", SEL_APPROVE);
- add(valueAllowed(0n) && valueAllowed(ONE_GWEI) && computeValueWei(0) === 0n && computeValueWei(1) === ONE_GWEI, "★★ value 只许 0 或 1 gwei（买入 > 0 ⇒ 1 gwei）");
+ add(valueAllowed(0n) && valueAllowed(ONE_GWEI) && computeValueWei(0) === 0n && computeValueWei(1) === ONE_GWEI, "★★ ERC-20 那条腿：value 只许 0 或 1 gwei（买入 > 0 ⇒ 1 gwei）");
+ add(typeof isNativeQuoteMode === "function" && typeof computeValueWei === "function" && typeof quoteSupportedBy === "function" && typeof refreshQuoteSupport === "function",
+ "★★★ 原生 BNB 那条腿在位：链上现读支持与否 ＋ 付款形状按模式分派");
+ add(pubBtnLabel() === "一键发布（两笔）" || pubBtnLabel() === "一键发布（一笔：发币）",
+ "★★ 主按钮文案按模式分派（ERC-20 两笔 ／ 原生一笔）", pubBtnLabel());
  add(TX_STATES.length === 5, "★★ 状态是**五态机**", TX_STATES.join(" / "));
  var poison = { from: "0x" + "1".repeat(40), to: LAUNCH_CONTRACT, data: SEL_LAUNCH + "00", gas: toQuantity(LAUNCH_GAS), value: "0x0" };
  poison[FORBIDDEN_FEE_FIELDS[0]] = "0x1";
@@ -1916,6 +2414,10 @@ function renderAudit(){
  return "<div class=\"alert " + (it.ok ? "ok" : "danger") + " small\"><b>" + (it.ok ? "✓ " : "✗ ") + it.title + "</b>" + (it.detail ? "<br>" + esc2(it.detail) : "") + "</div>";
  }).join("");
 }
+
+function fourRouteProbe(){ return { route1_bps: 1, route2_bps: 1, route3_bps: 1, route1_target_token: ZERO_ADDR, route2_target_token: ZERO_ADDR, route3_target_token: ZERO_ADDR, vaultFallbackBps: 0, vaultSelfBuiltThreshold: 0, route4_burn_own_bps: 1, route4_target_token: "0x" + "7".repeat(40) }; }
+function koiWordsProbe(){ return { vaultAdminWallet: "0x" + "1".repeat(40), adminWallet: "0x" + "2".repeat(40), marketingAddress: "0x" + "3".repeat(40), opsWallet: "0x" + "4".repeat(40), hashrateContractAddress: "0x" + "5".repeat(40), navigatorNftAddress: "0x" + "6".repeat(40), hashrateThreshold: 0 }; }
+function quoteModeOfFactory(f){ return (f && f.quoteModes && f.quoteModes.length) ? String(f.quoteModes[0]) : "erc20"; }
 function scriptText(){
  try{ if (typeof document !== "undefined" && document.querySelector){ var s = document.querySelector("script"); if (s && typeof s.textContent === "string") return s.textContent; } }catch(e){}
  return "";
@@ -1994,7 +2496,16 @@ function parseQuoteTokens(json){
  for (var j = 0; j < rows.length; j++){
  var t = rows[j];
  if (!t || !isHexAddr(t.address)) continue;
- if (isZeroAddr(t.address)) continue; 
+ 
+ if (isZeroAddr(t.address)){
+  var nd = Number(t.decimals);
+  if (isFinite(nd) && Math.floor(nd) === nd && nd >= 0 && nd <= 36){
+   out.native = { symbol: String(t.symbol == null ? "BNB" : t.symbol), name: String(t.name == null ? "原生币（原生 BNB）" : t.name),
+    address: lower(t.address), decimals: Math.floor(nd), category: String(t.category == null ? "" : t.category),
+    curve: (t.curve == null ? null : t.curve), native: true };
+  }
+  continue;
+ }
  var dd = Number(t.decimals);
  if (!isFinite(dd) || dd < 0 || dd > 36) continue;
  out.push({ symbol: String(t.symbol == null ? "" : t.symbol), name: String(t.name == null ? "" : t.name),
@@ -2024,19 +2535,67 @@ async function loadQuoteTokens(){
  try{ json = JSON.parse(text); }catch(e2){ throw new Error("清单不是合法 JSON"); }
  var tokens = parseQuoteTokens(json);
  if (tokens.length === 0) throw new Error("清单里一条可用的 ERC-20 报价币都没有");
- state.quoteList = { loading: false, ok: true, error: null, tokens: tokens, at: Date.now() };
+ state.quoteList = { loading: false, ok: true, error: null, tokens: tokens, native: tokens.native || null, at: Date.now() };
  }catch(e){
  
  state.quoteList = { loading: false, ok: false, error: (e && e.message ? e.message : String(e)), tokens: [], at: Date.now() };
  }
  if (currentQuoteAddr() !== "") onQuoteInput(currentQuoteAddr());
  renderQuoteList(); renderBuyCap(); renderGates();
+ 
+ if (state.sel) void refreshQuoteSupport(true);
+}
+
+async function quoteSupportedBy(factory, token){
+ var r = await ethCall(factory, SEL_QUOTE_OK + wAddr(token));
+ if (!wordDataOk(r, 1)) return null;
+ return Boolean(wordToBool(r.result, 0));
+}
+function quoteSupportOf(addr){
+ var a = lower(String(addr == null ? "" : addr).trim());
+ if (!state.quoteSupport) return undefined;
+ return Object.prototype.hasOwnProperty.call(state.quoteSupport, a) ? state.quoteSupport[a] : undefined;
+}
+function quoteSupportOk(addr){ return quoteSupportOf(addr) === true; }
+function nativeAllowed(){ return quoteSupportOf(ZERO_ADDR) === true; }
+function quoteSupportReading(){ return state.quoteSupportBusy === true; }
+
+async function refreshQuoteSupport(force){
+ var f = currentFactory();
+ if (!f) return null;
+ var id = String(f.id);
+ if (!force && state.quoteSupport && state.quoteSupportFactory === id) return state.quoteSupport;
+ var list = (state.quoteList && state.quoteList.tokens) ? state.quoteList.tokens : [];
+ var addrs = [ZERO_ADDR];
+ for (var i = 0; i < list.length; i++) addrs.push(lower(list[i].address));
+ state.quoteSupportBusy = true; state.quoteSupport = {}; state.quoteSupportFactory = id;
+ try{
+  for (var at = 0; at < addrs.length; at += 6){
+   var slice = addrs.slice(at, at + 6);
+   var got = await Promise.all(slice.map(function(a){ return quoteSupportedBy(f.factory, a); }));
+   for (var k = 0; k < slice.length; k++) state.quoteSupport[slice[k]] = got[k];
+  }
+ }catch(e){  }
+ state.quoteSupportBusy = false;
+ 
+ var qf = $("pf_quote");
+ if (qf && String(qf.value || "").trim() === "" && nativeAllowed()) qf.value = ZERO_ADDR;
+ renderQuoteList(); renderQuoteSel(); renderBuyCap(); renderGates();
+ return state.quoteSupport;
 }
 function renderQuoteList(){
  var box = $("quoteListBox"), msg = $("quoteListMsg"), cnt = $("quoteCount");
  var L = state.quoteList || { loading: false, ok: false, error: null, tokens: [] };
  var tokens = L.tokens || [];
- if (cnt) cnt.textContent = L.loading ? "正在拉官方清单…" : (L.ok ? (tokens.length + " 条可选（原生币已过滤）") : "清单没拉到");
+ if (cnt){
+  var nOk = 0;
+  for (var ci = 0; ci < tokens.length; ci++) if (quoteSupportOk(tokens[ci].address)) nOk += 1;
+  var nativeTxt = nativeAllowed() ? 1 : 0;
+  cnt.textContent = L.loading ? "正在拉官方清单…"
+   : (!L.ok ? "清单没拉到"
+   : (state.quoteSupportBusy ? "正在链上核这台工厂收哪些报价币…"
+   : (nOk + nativeTxt) + " 条可选（＝这台工厂**链上现读真收**的那些" + (nativeTxt ? "，含原生 BNB" : "") + "）"));
+ }
  if (msg){
  if (L.loading){
  msg.innerHTML = '<div class="alert info small">正在拉<b>官方报价币清单</b>（<span class="mono break">' + esc(QUOTE_TOKENS_URL) + "</span>）…</div>";
@@ -2047,7 +2606,9 @@ function renderQuoteList(){
  } else {
  msg.innerHTML = '<div class="alert info small">官方报价币清单已拉到：<b>' + tokens.length + "</b> 条"
  + "（打开页面时实时拉的；官方自己给了 5 分钟缓存）。"
- + "★ <b>原生币（BNB）不在列表里</b>。另外：不在准入名单里的币，官方会拦下（" + esc(ADMISSION_APPLY_TEXT) + "）。</div>";
+ + "★ 下面**只列这台工厂链上现读真收的那些**（含原生 BNB 这条，只要它收）："
+ + "页面会拿每一个候选去问工厂 <span class=\"mono\">isQuoteTokenSupported(addr)</span>，答不收的**不进列表**。"
+ + "不在准入名单里的币，官方会拦下（" + esc(ADMISSION_APPLY_TEXT) + "）。</div>";
  }
  }
  if (!box) return;
@@ -2060,6 +2621,7 @@ function renderQuoteList(){
  var order = [], groups = {};
  for (var i = 0; i < tokens.length; i++){
  var t = tokens[i];
+ if (!quoteSupportOk(t.address)) continue;
  if (q !== ""){
  var hay = lower(t.symbol + " " + t.name + " " + t.address);
  if (hay.indexOf(q) < 0) continue;
@@ -2072,6 +2634,13 @@ function renderQuoteList(){
  return (rank(a) - rank(b)) || String(a).localeCompare(String(b));
  });
  var html = "";
+ 
+ var nv = (state.quoteList && state.quoteList.native) ? state.quoteList.native : null;
+ if (nativeAllowed() && nv && (q === "" || lower(nv.symbol + " " + nv.name + " " + ZERO_ADDR).indexOf(q) >= 0)){
+ html += '<div class="qgroup">原生币（这台工厂链上现读**收**）</div>'
+  + '<div class="qitem' + (lower(selAddr) === ZERO_ADDR ? " sel" : "") + '" role="button" tabindex="0" data-addr="' + ZERO_ADDR + '">'
+  + '<span class="qs">' + esc(nv.symbol) + "</span> <span class=\"qd\">" + esc(nv.name) + "　·　" + nv.decimals + " 位小数　·　全零地址</span></div>";
+ }
  for (var k = 0; k < order.length; k++){
  var cat = order[k];
  html += '<div class="qgroup">' + esc(quoteCategoryLabel(cat)) + "（" + groups[cat].length + "）</div>";
@@ -2126,7 +2695,16 @@ function quoteDecimalsOf(t){
 
 function selectedQuoteToken(){
  var a = currentQuoteAddr();
- if (!isHexAddr(a) || isZeroAddr(a)) return null;
+ if (!isHexAddr(a)) return null;
+ 
+ if (isZeroAddr(a)){
+  if (!nativeAllowed()) return null;
+  var nv = (state.quoteList && state.quoteList.native) ? state.quoteList.native : null;
+  if (!nv) return null;
+  return { symbol: nv.symbol || "BNB", name: nv.name || "原生币（原生 BNB）", address: ZERO_ADDR,
+   decimals: (nv.decimals == null ? null : nv.decimals), category: nv.category || "crypto",
+   curve: nv.curve == null ? null : nv.curve, native: true };
+ }
  var listed = findListedToken(a);
  if (listed) return listed;
  var m = state.quoteMeta;
@@ -2153,8 +2731,17 @@ function renderQuoteSel(){
  if (a === ""){ out.textContent = "还没选（从下面的列表里点一个，或直接在**上面那一格**里贴一个 CA）"; return; }
  if (!isHexAddr(a)){ out.innerHTML = '<span style="color:var(--danger)">这不是合法的合约地址（要 0x ＋ 40 个十六进制字符）</span>'; return; }
  if (isZeroAddr(a)){
- out.innerHTML = '<span style="color:var(--danger)"><b>' + NATIVE_BLOCKED_TEXT + "</b> —— 全零地址就是原生币 BNB，本页当场拦下。"
- + "（这一条与「准入」无关：原生币是本模版**按设计不支持**。）</span>";
+ if (!nativeAllowed()){
+  out.innerHTML = '<span style="color:var(--danger)"><b>这台工厂不收原生 BNB 报价</b>（链上现读 isQuoteTokenSupported(0x0)=false）—— 本页当场拦下。</span>';
+  return;
+ }
+ var nvt = selectedQuoteToken();
+ var ndd = nvt ? quoteDecimalsOf(nvt) : null;
+ out.innerHTML = "<b>" + esc((nvt && nvt.symbol) || "BNB") + "（原生币）</b>　·　小数位 "
+  + (ndd == null ? '<span style="color:var(--warn)">还读不到（官方清单里 BNB 那一条没拉到）</span>' : ("<b>" + ndd + "</b>"))
+  + "　·　<b>这台工厂链上现读收原生 BNB</b>"
+  + '<br><span class="mono break">' + esc(ZERO_ADDR) + "</span>"
+  + '<br><span class="small">原生那条腿**没有授权那一步**：发币是**一笔**、金额走 <span class="mono">value</span>。</span>';
  return;
  }
  var t = selectedQuoteToken();
@@ -2276,7 +2863,7 @@ function buyCapInfo(){
  curveUnits: null, lowerUnits: null, officialUnits: null,
  clampUnits: null, clampIsLowerBound: false, why: "" };
  if (!t || !isHexAddr(t.address)){ info.why = "还没选报价币（从上面的列表里点一个，或贴一个 CA）"; return info; }
- if (isZeroAddr(t.address)){ info.why = NATIVE_BLOCKED_TEXT; return info; }
+ if (isZeroAddr(t.address) && !nativeAllowed()){ info.why = "这台工厂不收原生 BNB 报价"; return info; }
  if (d == null){ info.why = "这个报价币的小数位还读不到（先连钱包，或换成官方清单里的币）"; return info; }
  if (!cv){ info.why = "这个报价币没有曲线参数（r/h/k）⇒ 算不出官方上限（它不在官方清单里）"; return info; }
  if (tax == null){ info.why = "买入税那一格填的不是 0–10000 的整数"; return info; }
@@ -2937,6 +3524,14 @@ void (async function boot(){
  paintRouteTable(); paintList(); paintPublish(); paintMisc(); renderGates(); renderAudit();
  bind("btnMine", function(){ void startMine(); });
  bind("btnStopMine", stopMine);
+ bind("btnKoiFillSelf", function(){
+ var el = $("pf_kvaultAdmin");
+ if (!state.account){ var m = $("koiSrcMsg"); if (m) m.innerHTML = "<div class=\"alert info small\">先连钱包，再点这一颗。</div>"; return; }
+ if (el) el.value = String(state.account);
+ applySchemaVisibility(); renderGates(); void recheckSources();
+ });
+ [["pf_khashrate"], ["pf_knft"]].forEach(function(t){ var el = $(t[0]); if (el && el.addEventListener) el.addEventListener("input", scheduleRecheckSources); });
+ var kv = $("pf_kvaultAdmin"); if (kv && kv.addEventListener) kv.addEventListener("input", function(){ applySchemaVisibility(); renderGates(); });
  bind("blkActBtn", function(){ void doPublish(); });
  
  bind("btnBuyMax", function(){ fillBuyMax(); });
@@ -2970,6 +3565,19 @@ window.__dshPublish = {
  selectFactory: selectFactory, paintList: paintList, paintPublish: paintPublish, paintMisc: paintMisc,
  keccakSel: keccakSel, sha256AsciiOf: sha256AsciiOf,
  vaultDataFields: VLIST, vaultDataSlots: VSLOTS, vaultDataBytes: VBYTES, route4AtSlots: R4_AT,
+
+ vaultDataSchemas: EXT.vaultDataSchemas, schemaById: schemaById, currentSchema: currentSchema,
+ schemaIdOfFactory: schemaIdOfFactory, koiSchemaId: KOI_SCHEMA_ID, defaultSchemaId: DEFAULT_SCHEMA_ID,
+ koiWords: koiWords, fourRouteWords: fourRouteWords, buildVaultDataForSchema: buildVaultData,
+ vaultDataTargetOk: vaultDataTargetOk, quoteModeOfFactory: quoteModeOfFactory,
+ koiReadonlySources: EXT.koiReadonlySources, koiSourceDefs: koiSourceDefs, verifyKoiSources: verifyKoiSources,
+ wordDataOk: wordDataOk, stringDataOk: stringDataOk, decodeAbiStringStrict: decodeAbiStringStrict,
+ koiFormFieldIds: ["pf_kvaultAdmin", "pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"],
+
+ isNativeQuoteMode: isNativeQuoteMode, pubBtnLabel: pubBtnLabel,
+ quoteSupportedBy: quoteSupportedBy, quoteSupportOf: quoteSupportOf, quoteSupportOk: quoteSupportOk,
+ nativeAllowed: nativeAllowed, refreshQuoteSupport: refreshQuoteSupport, resetQuoteForFactory: resetQuoteForFactory,
+ doPublishNative: doPublishNative, selQuoteOk: SEL_QUOTE_OK,
  approveGas: APPROVE_GAS, launchGas: LAUNCH_GAS, vanitySuffix: VANITY_SUFFIX, create2Deployer: CREATE2_DEPLOYER,
  launchContract: LAUNCH_CONTRACT, launchContractName: LAUNCH_CONTRACT_NAME,
  syncRatio: syncRatio, readForm: readForm, validate: validate, normAddr: normAddr,
