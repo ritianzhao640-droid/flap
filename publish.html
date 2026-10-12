@@ -430,6 +430,7 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  <label class="fl"><span class="lb">☆ 金库管理员 vaultAdminWallet（第 1 格）</span>
  <span class="hint">＝金库 admin ＋ 升级权初始持有者。<b>必须就是发币人本人</b>（工厂拿 <span class="mono">creator</span> 当升级权持有人 ⇒ 不相等建库必被拒）</span>
  <input type="text" class="mono" id="pf_kvaultAdmin" value="" placeholder="0x…（40 位）" /></label>
+ <div class="muted small" id="pf_kvaultAdminState" style="margin:2px 0 6px 4px">必须＝发币人本人的钱包地址</div>
  <label class="fl"><span class="lb">☆ 合约交互管理 adminWallet（第 2 格）</span>
  <span class="hint">填数字、提交的那个人（销毁／回购触发／小游戏兜底注资）</span>
  <input type="text" class="mono" id="pf_kadmin" value="" placeholder="0x…（40 位）" /></label>
@@ -1028,7 +1029,7 @@ var EXT = {
  "label": "202锦鲤工厂",
  "factory": "0x4247add56250536859460a4c659c6a094c917772",
  "vaultDataSchemaId": "koi7",
- "note": "202 的第二台机器：固定实现体（没有 beaconImpl）、只认原生 BNB 报价、vaultData 是 7 格 224 字节。",
+ "note": "202 的第二台机器：固定实现体（没有 beaconImpl）、只认原生 BNB 报价、vaultData 是 7 格 224 字节。★ 选中它之后，在下面「第 2 步」填那 7 格（金库管理员／合约交互管理／营销地址／运维地址／算力合约／领航 NFT／算力门槛）—— 我们**不预填**任何一格。",
  "quoteModes": ["native"],
  "expectBeaconImpl": null,
  "expectVaultImplementation": "0xe47dd7a36449443e2809356fccc2583e055ebad1",
@@ -1480,8 +1481,10 @@ function buildVaultData(g, schIn){
    ["第 3 格 marketingAddress", g.marketingAddress], ["第 4 格 opsWallet", g.opsWallet],
    ["第 5 格 hashrateContractAddress", g.hashrateContractAddress], ["第 6 格 navigatorNftAddress", g.navigatorNftAddress]];
   for (var ki = 0; ki < kv.length; ki++){
-   var kt = String(kv[ki][1] == null ? "" : kv[ki][1]);
-   if (isZeroAddr(kt)) problems.push(kv[ki][0] + " 是空地址（0x0）—— " + who + " 建库必被拒（金库 initialize 里有硬判）");
+   var kt = String(kv[ki][1] == null ? "" : kv[ki][1]).trim();
+   
+   if (kt === "") problems.push(kv[ki][0] + " 是空的（**没填**）—— " + who + " 建库必被拒");
+   else if (isZeroAddr(kt)) problems.push(kv[ki][0] + " 是空地址（0x0）—— " + who + " 建库必被拒（金库 initialize 里有硬判）");
    else if (!isHexAddr(kt)) problems.push(kv[ki][0] + " 不是合法地址：" + kt);
   }
   if (lower(String(g.marketingAddress || "")) !== "" && lower(String(g.opsWallet || "")) !== "" &&
@@ -1790,6 +1793,19 @@ function validate(){
   else if (normAddr(f.khashrate) === null) E("第 5 格 算力合约不是合法地址。");
   if (!f.knft) E("第 6 格 领航 NFT（navigatorNftAddress）没填 —— 金库硬前置：不许是零地址。");
   else if (normAddr(f.knft) === null) E("第 6 格 领航 NFT 不是合法地址。");
+  
+  var srcReady = f.khashrate && f.knft && normAddr(f.khashrate) !== null && normAddr(f.knft) !== null &&
+   !isZeroAddr(f.khashrate) && !isZeroAddr(f.knft);
+  if (srcReady){
+   var sv = state.sourceVerified || {};
+   var same = lower(String(sv.pf_khashrate || "")) === lower(String(f.khashrate)) &&
+    lower(String(sv.pf_knft || "")) === lower(String(f.knft));
+   if (!same){
+    var sps = state.sourceProblems || [];
+    E("算力合约／领航 NFT 的**只读核对还没过**（" + (sps.length ? sps.join("；") : "还没核完 —— 稍稍等一下，或改一下那两格再改回来") + "）。"
+     + "核对要看两件事：① 那个地址上**有代码**；② 它**答得出**金库会问的那一口（算力合约答 totalEffectiveWeight()；领航 NFT 答 slotsIssued()）。");
+   }
+  }
   var kth = String(f.kthreshold == null ? "" : f.kthreshold).trim();
   if (kth !== "" && !/^\d+$/.test(kth)) E("第 7 格 算力门槛只许填整数「点」（留空 ＝ 走工厂默认 100000 点）。");
   else if (kth === "0") W("第 7 格 算力门槛填了 0 ⇒ 工厂侧补默认 100000 点（10 万点）。");
@@ -2132,17 +2148,20 @@ async function verifyKoiSources(){
  var defs = koiSourceDefs();
  for (var i = 0; i < defs.length; i++){
   var d = defs[i], el = $(d.key), addr = el && el.value ? String(el.value).trim() : "";
-  var rec = { key: d.key, label: d.label, addr: addr, codeBytes: 0, readable: false, answer: null, why: d.why };
-  if (!isHexAddr(addr)) { res.problems.push(d.label + " 还没填一个像样的合约地址"); res.reads.push(rec); continue; }
-  if (isZeroAddr(addr)) { res.problems.push(d.label + " 是空地址（0x0）—— 锦鲤金库建库必被拒"); res.reads.push(rec); continue; }
+  
+  var rec = { key: d.key, label: d.label, addr: addr, state: "empty", codeBytes: 0, readable: false, answer: null, why: d.why };
+  if (addr === ""){ res.reads.push(rec); continue; }
+  if (!isHexAddr(addr)){ rec.state = "bad"; res.problems.push(d.label + " 不是合法的合约地址：" + addr); res.reads.push(rec); continue; }
+  if (isZeroAddr(addr)){ rec.state = "zero"; res.problems.push(d.label + " 是空地址（0x0）—— 锦鲤金库建库必被拒"); res.reads.push(rec); continue; }
   var code = null;
   try { code = await rpc("eth_getCode", [addr, "latest"]); } catch (e){ code = null; }
   rec.codeBytes = code ? (code.length - 2) / 2 : 0;
-  if (!rec.codeBytes) { res.problems.push(d.label + "（" + addr + "）这个地址上没有代码 —— 它不可能答金库的 " + d.name); res.reads.push(rec); continue; }
+  if (!rec.codeBytes){ rec.state = "nocode"; res.problems.push(d.label + "（" + addr + "）这个地址上没有代码 —— 它不可能答金库的 " + d.name); res.reads.push(rec); continue; }
   var r = await ethCall(addr, d.sig);
   rec.readable = wordDataOk(r, 1);
   if (rec.readable) rec.answer = BigInt(wordToBig(r.result, 0)).toString();
-  if (!rec.readable) res.problems.push(d.label + "（" + addr + "）有代码，但答不出金库会问的 " + d.name + " —— 它不像金库要的那个来源");
+  if (!rec.readable){ rec.state = "noanswer"; res.problems.push(d.label + "（" + addr + "）有代码，但答不出金库会问的 " + d.name + " —— 它不像金库要的那个来源"); }
+  else rec.state = "ok";
   res.reads.push(rec);
  }
  return res;
@@ -2194,11 +2213,17 @@ async function verifyFactory(f){
   if (f.expectSpecVersion && out.specVersion && out.specVersion !== f.expectSpecVersion)
    p.push("factorySpecVersion() 与列表里记的不符（链上 " + out.specVersion + "）");
   
+  
   var src = await verifyKoiSources();
   out.sources = src.reads;
-  var sp = src.problems.slice(0);
-  state.sourceProblems = sp;
-  for (var si = 0; si < sp.length; si++) p.push(sp[si]);
+  out.sourceProblems = src.problems.slice(0);
+  out.sourceAllOk = (src.reads.length === 2 && src.reads.every(function(x){ return x.state === "ok"; }));
+  out.sourceEmpty = (src.reads.length === 2 && src.reads.every(function(x){ return x.state === "empty"; }));
+  state.sourceProblems = out.sourceProblems;
+  state.sourceReads = src.reads;
+  state.sourceOk = out.sourceAllOk;
+  state.sourceVerified = {};
+  for (var vi = 0; vi < src.reads.length; vi++) if (src.reads[vi].state === "ok") state.sourceVerified[src.reads[vi].key] = lower(src.reads[vi].addr);
  }
  out.ok = (p.length === 0);
  return out;
@@ -2330,15 +2355,57 @@ function paintMisc(){
  }
 }
 
+
+function factorySummaryHtml(c){
+ var bits = [];
+ if (c.variant === "fixedImpl"){
+  bits.push("固定实现体 <span class=\"mono break\">" + esc2(String(c.vaultImplementation)) + "</span>（<b>有代码 " + c.vaultImplCodeBytes + " 字节</b>）");
+  if (c.vaultSpecVersion) bits.push("vaultSpecVersion = <b>" + esc2(String(c.vaultSpecVersion)) + "</b>");
+  bits.push("factorySpecVersion = <b>" + esc2(String(c.specVersion || "?")) + "</b>");
+  bits.push("工厂自身落地码 " + c.codeBytes + " 字节");
+ } else {
+  bits.push("owner = <span class=\"mono break\">" + esc2(String(c.owner)) + "</span>");
+  bits.push("beaconImplementation = <span class=\"mono break\">" + esc2(String(c.beaconImpl)) + "</span>");
+ }
+ if (quoteSupportOk(ZERO_ADDR) === true) bits.push("<b>只认原生 BNB 报价</b>（链上现读 isQuoteTokenSupported(0x0)=true）");
+ else if (quoteSupportOf(ZERO_ADDR) === false) bits.push("不收原生 BNB（链上现读）");
+ else bits.push("报价币支持：还在核");
+ var sch = schemaById(c.schemaId);
+ if (sch) bits.push("vaultData 口径 <b>" + esc2(String(sch.label || "")) + "：" + sch.wordCount + " 格 / " + sch.byteLength + " 字节</b>");
+ return '<div class="alert ok small">★ <b>这台机器核对通过</b>（工厂这一层）：' + bits.join("　·　") + "</div>";
+}
+
+function paramsTodoHtml(){
+ if (!state.sel) return "";
+ var miss = [];
+ if (schemaIdOfFactory(state.sel) === KOI_SCHEMA_ID){
+  var ids = [["pf_kvaultAdmin", "① 金库管理员"], ["pf_kadmin", "② 合约交互管理"], ["pf_kmarketing", "③ 营销地址"],
+   ["pf_kops", "④ 运维地址"], ["pf_khashrate", "⑤ 算力合约"], ["pf_knft", "⑥ 领航 NFT"]];
+  for (var i = 0; i < ids.length; i++){ var el = $(ids[i][0]); var v = el && el.value != null ? String(el.value).trim() : ""; if (v === "") miss.push(ids[i][1]); }
+ } else {
+  var ids4 = [["pf_quote", "报价币"], ["pf_t3", "第 3 路目标币"]];
+  for (var j = 0; j < ids4.length; j++){ var e4 = $(ids4[j][0]); var v4 = e4 && e4.value != null ? String(e4.value).trim() : ""; if (v4 === "") miss.push(ids4[j][1]); }
+ }
+ if (!miss.length) return '';
+ return '<div class="alert warn small"><b>↓ 这是【参数】那一层：下面「第 2 步」还有 ' + miss.length + ' 格要你填</b> —— '
+  + esc2(miss.join("／")) + '。<br>⛔ 这两件事是**分开**的：<b>工厂已经核对通过</b>（上面那条绿的），这边红的是「参数还没填完」，不是"页面认不得这台工厂"。'
+  + '<br><button class="ghost" id="btnGotoParams" style="margin-top:6px">去填这 ' + miss.length + ' 格 ↓</button></div>';
+}
 function applySchemaVisibility(){
  var isKoi = Boolean(state.sel && schemaIdOfFactory(state.sel) === KOI_SCHEMA_ID);
  ["pf_fourroute_only", "pf_fourroute_only2"].forEach(function(id){ var el = $(id); if (el) el.hidden = isKoi; });
  var kb = $("pf_koi_box"); if (kb) kb.hidden = !isKoi;
  var vd = $("pf_vdHead");
  if (vd) vd.textContent = isKoi ? "vaultData（7 格 / 224 字节 —— 202锦鲤工厂那一套）" : "vaultData（10 格 / 320 字节）";
+ 
  var st = $("pf_kvaultAdminState");
- if (st) st.textContent = (state.account && $("pf_kvaultAdmin") && lower(String($("pf_kvaultAdmin").value).trim()) === lower(state.account))
-  ? "＝当前钱包（发币人本人）✔" : "必须填发币人本人的地址";
+ if (st){
+  var av = $("pf_kvaultAdmin") ? String($("pf_kvaultAdmin").value || "").trim() : "";
+  if (av === ""){ st.innerHTML = "⛔ 还没填。<b>必须＝发币人本人的钱包地址</b>（合约硬要求：金库管理员 ＝ 升级权持有者 ＝ 发币人；工厂拿 newVault 的 creator 当它）。"; }
+  else if (!isHexAddr(av)){ st.innerHTML = "⛔ 这不是合法地址（要 0x ＋ 40 个十六进制字符）。"; }
+  else if (state.account && lower(av) === lower(state.account)){ st.innerHTML = "★ 与当前钱包同一个地址（＝发币人本人）✔"; }
+  else { st.innerHTML = "⛔ 与当前钱包（" + esc2(String(state.account || "还没连")) + "）**不是同一个地址** —— 合约硬要求：金库管理员 ＝ 升级权持有者 ＝ 发币人本人，不相等建库必被拒。"; }
+ }
 }
 
 function resetQuoteForFactory(){
@@ -2363,10 +2430,19 @@ async function selectFactory(id){
  state.check = await verifyFactory(f);
  if (st) { st.className = state.check.ok ? "badge ok" : "badge bad"; st.textContent = state.check.ok ? "已核对" : "没通过"; }
  paintList(); paintPublish(); renderGates();
- var nts = (state.check.notes && state.check.notes.length) ? "<br>" + esc2(state.check.notes.join(" ")) : "";
- if (msg) msg.innerHTML = state.check.ok
- ? "<div class=\"alert ok small\">★ 核对通过 —— 接下来在下面「第 2 步」发币。" + nts + "</div>"
- : "<div class=\"alert danger small\">⛔ 核对没通过：" + esc2(state.check.problems.join("；")) + "</div>";
+ var nts = (state.check.notes && state.check.notes.length) ? "<div class=\"alert info small\">" + esc2(state.check.notes.join(" ")) + "</div>" : "";
+ if (msg){
+  msg.innerHTML = state.check.ok
+   ? (factorySummaryHtml(state.check) + paramsTodoHtml() + nts)
+   : ("<div class=\"alert danger small\">⛔ <b>这台工厂没通过核对</b>（工厂这一层，跟「参数填没填」无关）：" + esc2(state.check.problems.join("；")) + "</div>");
+  
+  var gb = $("btnGotoParams");
+  if (gb && gb.addEventListener) gb.addEventListener("click", function(){
+   var t = $("pf_koi_box");
+   if (t && typeof t.scrollIntoView === "function") t.scrollIntoView({ behavior: "smooth", block: "start" });
+   var first = $("pf_kvaultAdmin"); if (first && typeof first.focus === "function") first.focus();
+  });
+ }
  var big = $("pickBig"); if (big) big.textContent = state.check.ok ? "填表 → 挖靓号 → 发币" : "换一台工厂";
  applySchemaVisibility();
 }
@@ -3522,6 +3598,8 @@ function applyWalletGuide(){ return walletGuide(hasWallet()); }
 void (async function boot(){
  syncRatio();
  paintRouteTable(); paintList(); paintPublish(); paintMisc(); renderGates(); renderAudit();
+ 
+ applySchemaVisibility();
  bind("btnMine", function(){ void startMine(); });
  bind("btnStopMine", stopMine);
  bind("btnKoiFillSelf", function(){
@@ -3531,7 +3609,11 @@ void (async function boot(){
  applySchemaVisibility(); renderGates(); void recheckSources();
  });
  [["pf_khashrate"], ["pf_knft"]].forEach(function(t){ var el = $(t[0]); if (el && el.addEventListener) el.addEventListener("input", scheduleRecheckSources); });
- var kv = $("pf_kvaultAdmin"); if (kv && kv.addEventListener) kv.addEventListener("input", function(){ applySchemaVisibility(); renderGates(); });
+ var kv = $("pf_kvaultAdmin"); if (kv && kv.addEventListener) kv.addEventListener("input", function(){ applySchemaVisibility(); paintPublish(); renderGates(); });
+ 
+ ["pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"].forEach(function(id){
+  var el = $(id); if (el && el.addEventListener) el.addEventListener("input", function(){ paintPublish(); renderGates(); });
+ });
  bind("blkActBtn", function(){ void doPublish(); });
  
  bind("btnBuyMax", function(){ fillBuyMax(); });
