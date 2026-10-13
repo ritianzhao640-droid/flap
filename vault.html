@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>税收金库 · 四路（金版）</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23d0342c'/%3E%3Crect x='4' y='4' width='56' height='56' fill='none' stroke='%23fff' stroke-opacity='.55' stroke-width='2'/%3E%3Ctext x='32' y='28' font-family='Songti SC,SimSun,serif' font-size='22' font-weight='700' fill='%23fff' text-anchor='middle'%3E战%3C/text%3E%3Ctext x='32' y='52' font-family='Songti SC,SimSun,serif' font-size='22' font-weight='700' fill='%23fff' text-anchor='middle'%3E备%3C/text%3E%3C/svg%3E">
 <style>
 /* ══════ A 作战金印 · 定版（2026-10-14，老板令：原文件只当功能框架，界面全按此版）══════
    色板：曜石墨（#0a0805 底 / #12100a 面板 / #2b2415 线）＋ 荣耀金（#d9b96e / #fff3c9 / #b08d45）
@@ -44,9 +45,10 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   box-shadow:0 0 0 1px rgba(208,52,44,.45); }
 .hero-text{ min-width:0; flex:1; }
 .hero-coiner{ margin:0; font-size:var(--fs-12); font-weight:700; letter-spacing:4px; color:var(--muted); }
-.hero-coin{ display:block; max-width:12ch; margin:0;
-  font-size:var(--fs-hero-name); font-weight:400; line-height:1.3; letter-spacing:4px;
-  color:var(--gold-hi); overflow-wrap:anywhere; }
+/* ★ 老板铁令：标题永远一行横排 —— ⛔ 不许折行/叠行；字号随屏宽自动缩（min 18px） */
+.hero-coin{ display:block; margin:0; max-width:none; white-space:nowrap;
+  font-size:clamp(18px, 8.2vw, 58px); font-weight:400; line-height:1.3; letter-spacing:2px;
+  color:var(--gold-hi); overflow:visible; }
 .hero-what{ margin:0; font-size:13px; font-weight:400; letter-spacing:2px; color:var(--muted); }
 .hero-links{ flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2);
   align-self:flex-start; margin-left:auto; }
@@ -58,6 +60,19 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
 .hero-link:hover{ color:var(--gold-hi); box-shadow:0 0 0 1px var(--gold); }
 .hero-link:active{ transform:translateY(1px); }
 .hero-link .icon{ width:16px; height:16px; }
+/* 大标题后缀「· 四路金库」（静态装饰，JS 写币名不受影响） */
+#token-name::after{ content:" · 四路金库"; }
+/* 四路标题：金线收尾 */
+.routes-h{ display:flex; align-items:center; gap:14px; margin:0 0 var(--sp-4);
+  font-size:var(--fs-16); font-weight:400; letter-spacing:5px; color:var(--gold); }
+.routes-h::after{ content:""; flex:1; height:1px; background:var(--line); }
+/* 四路的壹贰叁肆编号 */
+.route-no{ flex:none; font-family:var(--mono); font-size:26px; color:var(--gold); }
+/* 风险/钱包：改成图里那种「细线夹 mono 横条」 */
+.risk{ background-color:transparent; }
+.wallet{ background-color:transparent; border:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; }
+/* 方章四字缩小 */
+.hero-mark{ font-size:12px; letter-spacing:1px; line-height:1.2; }
 /* ① 状态条 */
 .risk{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:var(--sp-2) var(--sp-4);
   margin:0 calc(var(--sp-4) * -1) var(--sp-2); padding:var(--sp-3) var(--sp-4) var(--sp-4);
@@ -191,6 +206,14 @@ button{ min-height:44px; }
 :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
 @keyframes rise{ 0%{ opacity:0; transform:translateY(8px); } 100%{ opacity:1; transform:translateY(0); } }
 .route{ animation:rise .45s var(--ease-out) forwards; animation-delay:calc(var(--j) * 40ms); }
+/* hero 右上角那枚旋转朱砂印（A 版同款）；窄屏藏起防挤 */
+.hero-stamp{ position:absolute; right:var(--sp-5); top:58%; width:56px; height:56px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--red); color:var(--red);
+  font-size:19px; font-weight:700; line-height:1.25; letter-spacing:3px; text-align:center;
+  transform:rotate(6deg); opacity:.85; pointer-events:none; }
+.hero{ position:relative; }
+@media (max-width:640px){ .hero-stamp{ display:none; } }
 /* 窄屏覆盖区 */
 @media (max-width:600px){
   .hero-links{ flex-basis:100%; margin-left:0; }
@@ -221,11 +244,12 @@ button{ min-height:44px; }
   <!-- ⓪ 币名条：一进来先看见**本代币的名字**。名字由脚本从**链上现读**的数据写进来；
        这里这行只是**脚本还没跑起来**时的兜底字，正式跑起来会被真读数盖掉。 -->
   <div class="hero" id="hero">
-    <span class="hero-mark" id="hero-mark" aria-hidden="true">—</span>
+    <span class="hero-mark" id="hero-mark" aria-hidden="true">战备<br>股票</span>
     <span class="hero-text">
       <span class="hero-coiner">202 税收金库 · 四路</span>
       <h1 class="hero-coin" id="token-name">读取中…</h1>
       <span class="hero-what">你比大多数人，早看到了它</span>
+    <span class="hero-stamp" aria-hidden="true">战<br>备</span>
     </span>
     <!-- 右上角两个入口：① 去 BSC 看这个金库合约 ② **202金库工厂**（皇上 2026-09-28 点名：
          「把 BSC 看本代币改成作者金库地址」；★ 2026-09-29 第三十九单点名：「**不显示链接，直接显示202金库工厂**」）。
@@ -328,27 +352,32 @@ button{ min-height:44px; }
          两份**逐字相同**（由脚本同一个变量写进去，判据逐字对拍）；
          墨层里那个 `.route-agent-ink` 是**宽度替身**（`visibility:hidden`），只为让两份文字的盒子一样宽。 -->
   <div class="card" id="card">
+    <div class="routes-h">四 路 分 配</div>
     <div class="routes" id="routes">
       <div class="route" id="route-0" style="--j:0">
         <span class="route-water" id="fill-0" aria-hidden="true"></span>
+        <span class="route-no" aria-hidden="true">壹</span>
         <span class="route-mid"><span class="route-line"><span class="route-name" id="name-0">第 1 路（分红）</span></span><span class="route-sub" id="line-0">读链中…</span></span>
         <span class="route-ink" id="ink-0" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-0-ink">第 1 路（分红）</span></span><span class="route-sub" id="line-0-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-0-ink">读链中</span></span>
         <span class="route-agent" id="agent-0">读链中</span>
       </div>
       <div class="route" id="route-1" style="--j:1">
         <span class="route-water" id="fill-1" aria-hidden="true"></span>
+        <span class="route-no" aria-hidden="true">贰</span>
         <span class="route-mid"><span class="route-line"><span class="route-name" id="name-1">第 2 路（加池）</span></span><span class="route-sub" id="line-1">读链中…</span></span>
         <span class="route-ink" id="ink-1" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-1-ink">第 2 路（加池）</span></span><span class="route-sub" id="line-1-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-1-ink">读链中</span></span>
         <span class="route-agent" id="agent-1">读链中</span>
       </div>
       <div class="route" id="route-2" style="--j:2">
         <span class="route-water" id="fill-2" aria-hidden="true"></span>
+        <span class="route-no" aria-hidden="true">叁</span>
         <span class="route-mid"><span class="route-line"><span class="route-name" id="name-2">第 3 路（销毁）</span></span><span class="route-sub" id="line-2">读链中…</span></span>
         <span class="route-ink" id="ink-2" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-2-ink">第 3 路（销毁）</span></span><span class="route-sub" id="line-2-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-2-ink">读链中</span></span>
         <span class="route-agent" id="agent-2">读链中</span>
       </div>
       <div class="route" id="route-3" style="--j:3">
         <span class="route-water" id="fill-3" aria-hidden="true"></span>
+        <span class="route-no" aria-hidden="true">肆</span>
         <span class="route-mid"><span class="route-line"><span class="route-name" id="name-3">第 4 路（销毁本币）</span></span><span class="route-sub" id="line-3">读链中…</span></span>
         <span class="route-ink" id="ink-3" aria-hidden="true"><span class="route-mid"><span class="route-line"><span class="route-name" id="name-3-ink">第 4 路（销毁本币）</span></span><span class="route-sub" id="line-3-ink">读链中…</span></span><span class="route-agent route-agent-ink" id="agent-3-ink">读链中</span></span>
         <span class="route-agent" id="agent-3">读链中</span>
@@ -1383,7 +1412,7 @@ button{ min-height:44px; }
   function paintsHero(r) {
     var name = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
     safe(function () { el('token-name').textContent = name; });
-    safe(function () { el('hero-mark').textContent = (name === '读不到') ? '—' : name.slice(0, 1); });
+    safe(function () { el('hero-mark').innerHTML = '战备<br>股票'; }); /* 老板令：此处恒为「战备」印文（纯显示，不参与任何逻辑） */
     safe(function () {
       var a = el('link-vault');
       if (a) a.href = EXPLORER_ADDR + P013_VAULT;
