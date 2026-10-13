@@ -1238,13 +1238,21 @@ button{ min-height:44px; }
   function paintCoinNames(r) {
     safe(function () {
       var x = r || {};
-      var tgt = cumName(x.targetSymbol, '第三方代币');
-      var div = cumName(x.dividendTokenSymbol, '分红币');
-      var sel = cumName(x.tokenSymbol, '本币');
-      el('cum-lp-name').textContent = tgt;
-      el('cum-burn-name').textContent = tgt;
-      el('cum-div-name').textContent = div;
-      el('cum-token-name').textContent = sel;
+      /* 取某几路目标币的名字：**有几路就列几个**（去重后连起来），⛔ 不挑一个代表。
+         读不到的那些路不参与；一个都读不到才落兜底词。 */
+      function symsOf(routeIdx, fallback) {
+        var out = [];
+        for (var i = 0; i < routeIdx.length; i++) {
+          var s = (x.routeSymbols && x.routeSymbols[routeIdx[i]]) ? String(x.routeSymbols[routeIdx[i]]).trim() : '';
+          if (s && out.indexOf(s) < 0) out.push(s);
+        }
+        return out.length ? out.join('＋') : fallback;
+      }
+      /* ① 加池＝第 2 路目标 ／ ② 销毁第三方＝第 3 路目标 ／ ④ 销毁本币＝第 4 路目标（**各读各的**，原来两个"第三方"格子共用第 1 路那个名字） */
+      el('cum-lp-name').textContent = symsOf([1], '第三方代币');
+      el('cum-burn-name').textContent = symsOf([2], '第三方代币');
+      el('cum-div-name').textContent = cumName(x.dividendTokenSymbol, '分红币');
+      el('cum-token-name').textContent = symsOf([3], cumName(x.tokenSymbol, '本币'));
     });
   }
 
@@ -1702,7 +1710,7 @@ button{ min-height:44px; }
 
 
 
-    set('fact-cum', '用户视图那四格（第三十四单起标签瘦身、口径全文只在这里）—— ' +
+    set('fact-cum', '用户视图那四格（口径全文只在这里）—— ' +
       '① 已添加 &lt;目标币&gt; 的 LP 总量 ＝ 金库 `totalLiquiditySpent()`（**报价币口径**，第 2 路累计投入的报价币）：' +
       (r.totalLiquiditySpent == null ? '读不到' : (r.totalLiquiditySpent.toString() + ' wei')) +
       '　·　② 已销毁 &lt;目标币&gt; 总量 ＝ 金库 `totalBurnSpent()`（**报价币口径**，第 3 路累计投入的报价币）：' +
