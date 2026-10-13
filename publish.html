@@ -1035,6 +1035,7 @@ var EXT = {
  "id": "new",
  "label": "202 税收四路金库",
  "factory": "0x40f70632d1aa433f26033a2c9fff80e909c07e21",
+ "vaultDataSchemaId": "fourroute10",
  "note": "本次升级用的就是这一台（four-route）。",
  "expectOwner": "0x2e77c9382c8d103434d8122f9352684ef8369101",
  "expectBeaconImpl": "0x9522810362e6272c8eecc49641c85f8f1b1e503b"
@@ -1399,11 +1400,52 @@ function readForm(){
  r1: o.pf_r1, r2: o.pf_r2, r3: o.pf_r3, r4: o.pf_r4,
  t1: o.pf_t1, t2: o.pf_t2, t3: o.pf_t3, fallback: o.pf_fallback,
  kvaultAdmin: o.pf_kvaultAdmin, kadmin: o.pf_kadmin, kmarketing: o.pf_kmarketing,
- kops: o.pf_kops, khashrate: o.pf_khashrate, knft: o.pf_knft, kthreshold: o.pf_kthreshold
+ kops: o.pf_kops, khashrate: o.pf_khashrate, knft: o.pf_knft, kthreshold: o.pf_kthreshold,
+ schemaId: activeSchemaId()
  };
 }
 
 function currentQuoteMode(){ return (currentFactory() && currentFactory().quoteModes && currentFactory().quoteModes.length) ? String(currentFactory().quoteModes[0]) : "erc20"; }
+
+var FORM_FIELD_REGISTRY = [
+ { id: "pf_minShare", key: "minShare", label: "分红门槛", owner: "token", in: ["fourroute10"], apply: true },
+ { id: "pf_selfBuilt", key: "vaultSelfBuiltThreshold", label: "金库自建门槛", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_r1", key: "route1_dividend_bps", label: "第 1 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_r2", key: "route2_lp_bps", label: "第 2 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_r3", key: "route3_burn_bps", label: "第 3 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_r4", key: "route4_burn_own_bps", label: "第 4 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_fallback", key: "vaultFallbackBps", label: "金库兜底留额", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_t1", key: "route1_target_token", label: "第 1 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_t2", key: "route2_target_token", label: "第 2 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_t3", key: "route3_target_token", label: "第 3 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "(derived)route4_target_token", key: "route4_target_token", label: "第 4 路目标币（＝现场挖出来的靓号，只读派生）", owner: "vaultData", in: ["fourroute10"], apply: false },
+ { id: "pf_kvaultAdmin", key: "vaultAdminWallet", label: "金库管理员", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_kadmin", key: "adminWallet", label: "合约交互管理", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_kmarketing", key: "marketingAddress", label: "营销地址", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_kops", key: "opsWallet", label: "运维地址", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_khashrate", key: "hashrateContractAddress", label: "算力合约", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_knft", key: "navigatorNftAddress", label: "领航 NFT", owner: "vaultData", in: ["koi7"], apply: false },
+ { id: "pf_kthreshold", key: "hashrateThreshold", label: "算力门槛", owner: "vaultData", in: ["koi7"], apply: false }
+];
+
+function factoryFormFields(schemaId){
+ return FORM_FIELD_REGISTRY.filter(function(r){ return r.in.indexOf(String(schemaId)) >= 0; });
+}
+function factoryFormFieldIds(schemaId){
+ return factoryFormFields(schemaId).map(function(r){ return r.id; });
+}
+function activeSchemaId(){
+ return String(schemaIdOfFactory(state.sel || currentFactory()) || DEFAULT_SCHEMA_ID);
+}
+function fieldAppliesToFactory(r, schemaId){
+ if (String(r.owner) === "token") return true;
+ return r.in.indexOf(String(schemaId)) >= 0;
+}
+function fieldAppliesMap(schemaId){
+ var sid = String(schemaId || activeSchemaId()); var m = {};
+ FORM_FIELD_REGISTRY.forEach(function(r){ m[r.id] = fieldAppliesToFactory(r, sid); });
+ return m;
+}
 function koiGeometryFromForm(f){
  return {
  vaultAdminWallet: f.kvaultAdmin, adminWallet: f.kadmin, marketingAddress: f.kmarketing,
@@ -1759,9 +1801,9 @@ function validate(){
  var buyUnitsInfo = buyAmountUnits();
  if (buyUnitsInfo.ok) quoteAmt = buyUnitsInfo.units;
  else E("初始买入：" + buyUnitsInfo.err);
- try { minShare = parseTokenAmount(f.minShare, "分红门槛"); } catch (e){ E(e.message); }
- try { sb = BigInt(n(f.selfBuilt, "金库自建门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); }
- try { taxDuration = BigInt(n(f.taxDuration, "收税时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ var applies = fieldAppliesMap(f.schemaId);
+ if (applies["pf_minShare"]) { try { minShare = parseTokenAmount(f.minShare, "分红门槛"); } catch (e){ E(e.message); } }
+ try { sb = BigInt(n(f.selfBuilt, "金库自建门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); } try { taxDuration = BigInt(n(f.taxDuration, "收税时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
  try { antiFarmer = BigInt(n(f.antiFarmer, "防抢跑时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
  try { r1 = n(f.r1, "第 1 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
  try { r2 = n(f.r2, "第 2 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
@@ -1769,7 +1811,7 @@ function validate(){
  try { r4 = n(f.r4, "第 4 路比例", 0, TOTAL_BPS); } catch (e){ E(e.message); }
  try { fb = n(f.fallback, "金库兜底留额", 0, MAX_FALLBACK_BPS); } catch (e){ E(e.message); }
  if (buyTax === 0n && sellTax === 0n) E("买卖税不能都是 0。");
- if (minShare === 0n) E("分红门槛必须大于 0。");
+ if (applies["pf_minShare"] && minShare === 0n) E("分红门槛必须大于 0。");
  if (sb > MAX_SELF_BUILT) E("金库自建门槛超过上限。");
  if (quoteAmt === 0n) E("初始买入必须大于 0：本页就是「先授权、再发币」那两笔，0 就没有第一笔可发。");
  
@@ -1787,7 +1829,7 @@ function validate(){
  if (t2 === null) E("第 2 路目标币不是合法地址。");
  if (t3 === null) E("第 3 路目标币不是合法地址。");
  var predicted = predictedTokenAddr();
- var sch = currentSchema();
+ var sch = schemaById(f.schemaId) || currentSchema();
  var variant = String((sch || {}).variant || "fourroute");
  var geometry = null;
  if (variant === "koi"){
@@ -2410,12 +2452,14 @@ function paramsTodoHtml(){
   + '<br><button class="ghost" id="btnGotoParams" style="margin-top:6px">去填这 ' + miss.length + ' 格 ↓</button></div>';
 }
 function applySchemaVisibility(){
- var isKoi = Boolean(state.sel && schemaIdOfFactory(state.sel) === KOI_SCHEMA_ID);
+ var sid = activeSchemaId();
+ var isKoi = sid === KOI_SCHEMA_ID;
  ["pf_fourroute_only", "pf_fourroute_only2"].forEach(function(id){ var el = $(id); if (el) el.hidden = isKoi; });
  var kb = $("pf_koi_box"); if (kb) kb.hidden = !isKoi;
  var vd = $("pf_vdHead");
  if (vd) vd.textContent = isKoi ? "vaultData（7 格 / 224 字节 —— 202锦鲤工厂那一套）" : "vaultData（10 格 / 320 字节）";
  
+ FORM_FIELD_REGISTRY.forEach(function(r){ if (String(r.id).indexOf("(derived)") === 0) return; var el = $(r.id); if (el) el.hidden = !fieldAppliesToFactory(r, sid); });
  var st = $("pf_kvaultAdminState");
  if (st){
   var av = $("pf_kvaultAdmin") ? String($("pf_kvaultAdmin").value || "").trim() : "";
@@ -3801,6 +3845,8 @@ window.__dshPublish = {
  koiReadonlySources: EXT.koiReadonlySources, koiSourceDefs: koiSourceDefs, verifyKoiSources: verifyKoiSources,
  wordDataOk: wordDataOk, stringDataOk: stringDataOk, decodeAbiStringStrict: decodeAbiStringStrict,
  koiFormFieldIds: ["pf_kvaultAdmin", "pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"],
+ applySchemaVisibility: applySchemaVisibility, activeSchemaId: activeSchemaId,
+ factoryFormFields: factoryFormFields, factoryFormFieldIds: factoryFormFieldIds, formFieldRegistry: FORM_FIELD_REGISTRY,
 
  isNativeQuoteMode: isNativeQuoteMode, pubBtnLabel: pubBtnLabel,
  quoteSupportedBy: quoteSupportedBy, quoteSupportOf: quoteSupportOf, quoteSupportOk: quoteSupportOk,
