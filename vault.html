@@ -7,10 +7,10 @@
 <title>税收金库 · 四路（金版）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23d0342c'/%3E%3Crect x='4' y='4' width='56' height='56' fill='none' stroke='%23fff' stroke-opacity='.55' stroke-width='2'/%3E%3Ctext x='32' y='28' font-family='Songti SC,SimSun,serif' font-size='22' font-weight='700' fill='%23fff' text-anchor='middle'%3E战%3C/text%3E%3Ctext x='32' y='52' font-family='Songti SC,SimSun,serif' font-size='22' font-weight='700' fill='%23fff' text-anchor='middle'%3E备%3C/text%3E%3C/svg%3E">
 <style>
-/* ══════ A 作战金印 · 定版（2026-10-14，老板令：原文件只当功能框架，界面全按此版）══════
-   色板：曜石墨（#0a0805 底 / #12100a 面板 / #2b2415 线）＋ 荣耀金（#d9b96e / #fff3c9 / #b08d45）
-   ＋ 朱砂（#d0342c：印、水位条、熔断、警示——涨红习惯）。
-   字体：正文衬线；数字一律 mono。四路＝壹贰叁肆＋细红渐变条（旧双层水位机制弃用，读数照旧）。 */
+
+
+
+
 :root{
   --bg:#0a0805; --panel:#12100a; --panel-2:#17140c; --line:#2b2415;
   --gold:#d9b96e; --gold-hi:#fff3c9; --gold-mid:#b08d45; --text:#efe9da; --muted:#a69c82;
@@ -33,7 +33,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   background-color:var(--bg); }
 .wrap{ position:relative; max-width:760px; margin:0 auto; padding:var(--sp-4) var(--sp-4) var(--sp-6); }
 .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
-/* ⓪ 币名条 */
+
 .hero{ margin:calc(var(--sp-2) * -1) calc(var(--sp-4) * -1) 0;
   display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2) var(--sp-4);
   padding:var(--sp-5) var(--sp-4);
@@ -45,7 +45,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   box-shadow:0 0 0 1px rgba(208,52,44,.45); }
 .hero-text{ min-width:0; flex:1; }
 .hero-coiner{ margin:0; font-size:var(--fs-12); font-weight:700; letter-spacing:4px; color:var(--muted); }
-/* ★ 老板铁令：标题永远一行横排 —— ⛔ 不许折行/叠行；字号随屏宽自动缩（min 18px） */
+
 .hero-coin{ display:block; margin:0; max-width:none; white-space:nowrap;
   font-size:clamp(18px, 8.2vw, 58px); font-weight:400; line-height:1.3; letter-spacing:2px;
   color:var(--gold-hi); overflow:visible; }
@@ -60,20 +60,20 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
 .hero-link:hover{ color:var(--gold-hi); box-shadow:0 0 0 1px var(--gold); }
 .hero-link:active{ transform:translateY(1px); }
 .hero-link .icon{ width:16px; height:16px; }
-/* 大标题后缀「· 四路金库」（静态装饰，JS 写币名不受影响） */
+
 #token-name::after{ content:" · 四路金库"; }
-/* 四路标题：金线收尾 */
+
 .routes-h{ display:flex; align-items:center; gap:14px; margin:0 0 var(--sp-4);
   font-size:var(--fs-16); font-weight:400; letter-spacing:5px; color:var(--gold); }
 .routes-h::after{ content:""; flex:1; height:1px; background:var(--line); }
-/* 四路的壹贰叁肆编号 */
+
 .route-no{ flex:none; font-family:var(--mono); font-size:26px; color:var(--gold); }
-/* 风险/钱包：改成图里那种「细线夹 mono 横条」 */
+
 .risk{ background-color:transparent; }
 .wallet{ background-color:transparent; border:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; }
-/* 方章四字缩小 */
+
 .hero-mark{ font-size:12px; letter-spacing:1px; line-height:1.2; }
-/* ① 状态条 */
+
 .risk{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:var(--sp-2) var(--sp-4);
   margin:0 calc(var(--sp-4) * -1) var(--sp-2); padding:var(--sp-3) var(--sp-4) var(--sp-4);
   border-bottom:1px solid var(--line); color:var(--muted); background-color:var(--bg); }
@@ -82,7 +82,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
 .risk-tag,.risk-word{ font-family:var(--mono); font-size:var(--fs-12); line-height:1.3;
   color:var(--gold); padding:2px var(--sp-3); border-radius:var(--r-pill);
   box-shadow:0 0 0 1px var(--line); }
-/* ①之二 钱包条 */
+
 .wallet{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-2) var(--sp-3);
   margin:var(--sp-2) 0 0; padding:var(--sp-3) var(--sp-4);
   color:var(--muted); background-color:var(--panel); border:1px solid var(--line); }
@@ -97,7 +97,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
 .wallet-key:hover{ color:var(--gold-hi); border-color:var(--gold); }
 .wallet-key:disabled{ opacity:.5; cursor:not-allowed; }
 .wallet-key[hidden]{ display:none; }
-/* ② 六个小框（分割线格子） */
+
 .card{ position:relative; overflow:hidden; margin-top:var(--sp-4);
   padding:var(--sp-5) var(--sp-4); color:var(--text);
   background-color:var(--panel); border:1px solid var(--line); }
@@ -113,13 +113,13 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   gap:1px; background:var(--line); border:1px solid var(--line); align-items:stretch; }
 .money-box{ min-width:0; display:flex; flex-direction:column; gap:var(--sp-1);
   padding:var(--sp-3); background:var(--panel); border:0; }
-/* ③ 四路：壹贰叁肆＋细红渐变条（A 版样式；读数/状态 id 照旧） */
+
 .routes{ display:flex; flex-direction:column; margin-top:var(--sp-5); }
 .route{ position:relative; display:flex; align-items:center; gap:var(--sp-3);
   min-height:64px; padding:18px 4px 20px;
   border-bottom:1px dashed var(--line);
   color:var(--text); background:transparent; }
-/* 细红条：轨道 ::before，水位 ::after（宽度由适配脚本写 --fill） */
+
 .route::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:3px; background:#1c1810; }
 .route::after{ content:""; position:absolute; left:0; bottom:0; height:3px; width:calc(var(--fill, 0) * 100%);
   max-width:100%; background:linear-gradient(90deg, var(--red-deep), var(--red));
@@ -139,7 +139,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   color:var(--gold); background-color:var(--panel-2);
   box-shadow:0 0 0 1px var(--gold-mid); }
 .route.is-ready .route-agent{ color:var(--gold-hi); box-shadow:0 0 0 1px var(--gold); }
-/* ③之二 动作区：推进 ＋ 领取 同排（复位跳闸时插进来） */
+
 .actions{ position:relative; display:flex; flex-wrap:wrap; gap:var(--sp-3); margin-top:var(--sp-5); }
 .push{ position:relative; z-index:2; display:inline-flex; align-items:center; justify-content:center; flex:1 1 200px;
   min-height:56px; padding:0 var(--sp-5);
@@ -157,7 +157,7 @@ body{ overflow-x:clip; min-height:100vh; color:var(--text);
   border:1px solid var(--red); color:var(--red-dim); }
 .push-reset:hover{ color:#fff; border-color:var(--red); filter:none; }
 button{ min-height:44px; }
-/* 领取按钮：与推进同一套实金语汇，旋钮双色 */
+
 .main-pill{ position:relative; display:flex; align-items:center; gap:var(--sp-3); flex:1.4 1 240px;
   min-height:56px; padding:var(--sp-2) var(--sp-4); border:0; border-radius:var(--r-2);
   color:#231a08; background-color:var(--gold);
@@ -192,7 +192,7 @@ button{ min-height:44px; }
 .spinner{ display:inline-block; width:14px; height:14px; border-radius:var(--r-pill);
   border:2px solid #231a08; border-top-color:transparent; }
 .icon{ width:18px; height:18px; }
-/* ⑤ 读数表（?debug=1） */
+
 .facts[hidden]{ display:none; }
 .facts{ margin-top:var(--sp-5); padding-top:var(--sp-3);
   border-top:1px dashed var(--line);
@@ -206,7 +206,7 @@ button{ min-height:44px; }
 :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
 @keyframes rise{ 0%{ opacity:0; transform:translateY(8px); } 100%{ opacity:1; transform:translateY(0); } }
 .route{ animation:rise .45s var(--ease-out) forwards; animation-delay:calc(var(--j) * 40ms); }
-/* hero 右上角那枚旋转朱砂印（A 版同款）；窄屏藏起防挤 */
+
 .hero-stamp{ position:absolute; right:var(--sp-5); top:58%; width:56px; height:56px;
   display:flex; align-items:center; justify-content:center;
   border:2px solid var(--red); color:var(--red);
@@ -214,7 +214,7 @@ button{ min-height:44px; }
   transform:rotate(6deg); opacity:.85; pointer-events:none; }
 .hero{ position:relative; }
 @media (max-width:640px){ .hero-stamp{ display:none; } }
-/* 窄屏覆盖区 */
+
 @media (max-width:600px){
   .hero-links{ flex-basis:100%; margin-left:0; }
   .wallet-keys{ flex-basis:100%; }
@@ -241,8 +241,8 @@ button{ min-height:44px; }
 <body>
 <main class="wrap" id="main">
 
-  <!-- ⓪ 币名条：一进来先看见**本代币的名字**。名字由脚本从**链上现读**的数据写进来；
-       这里这行只是**脚本还没跑起来**时的兜底字，正式跑起来会被真读数盖掉。 -->
+  
+
   <div class="hero" id="hero">
     <span class="hero-mark" id="hero-mark" aria-hidden="true">战备<br>股票</span>
     <span class="hero-text">
@@ -251,18 +251,18 @@ button{ min-height:44px; }
       <span class="hero-what">你比大多数人，早看到了它</span>
     <span class="hero-stamp" aria-hidden="true">战<br>备</span>
     </span>
-    <!-- 右上角两个入口：① 去 BSC 看这个金库合约 ② **202金库工厂**（皇上 2026-09-28 点名：
-         「把 BSC 看本代币改成作者金库地址」；★ 2026-09-29 第三十九单点名：「**不显示链接，直接显示202金库工厂**」）。
-         ★ 第二格那个链接是**单一常量** `AUTHOR_LINK`（皇上给的对外域名，⛔ 不许编、⛔ 一个字节都不许动）；
-           **上屏文字恒为那 6 个字**（`AUTHOR_LABEL`）—— 网址**一个字节都不上屏**（只留在常量与 `?debug=1` 里）。
-           点它**同时做两件事**：**复制** ＋ （**开关开着时**才）**跳转** —— 复制先发起、不阻塞跳转；
-           反馈**原位**换这颗链接自己的字（`已复制`／`已复制·已打开`，约 2.5 秒复原，⛔ 不静默），
-           完整那句走下方 `setHint(...)`；⛔ 这一块里**不许再有第二个节点** ——
-           皇上报的「版面会跳」就是多出来的那一个（原来那条反馈行撑宽 ⇒ 整块被挤到下一行）。
-         ★ `LINK_JUMP_ENABLED` 开着（第三十九单皇上：「先加个跳转兜底」）＝ **复制 ＋ 新窗口打开**；
-           **开关留着** —— 皇上说「后面如果他们不让的话，我就把这个跳转删了就好了，**只留复制**」
-           ⇒ 关掉它必须只剩复制（有**可跑**判据）。页面上**不写任何关于这个开关的字**。
-         href 由脚本按常量写，标记里一个裸地址都没有。 -->
+    
+
+
+
+
+
+
+
+
+
+
+
     <span class="hero-links">
       <a class="hero-link" id="link-vault" href="#" target="_blank" rel="noreferrer">
         <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>在 BSC 上看金库</a>
@@ -271,22 +271,22 @@ button{ min-height:44px; }
     </span>
   </div>
 
-  <!-- ① 状态条（官方硬边界：风险徽章必须在最前、且在任何大视觉之前）。
-       ★ 2026-09-28（第二十一单 · 皇上）：「**把部署进度给删了**」。
-       ★★★ 2026-09-29（**第三十六单 · 皇上**）：「**时钟表盘可以删干净了**」⇒ 第三格「自动执行」
-         **整格删掉**（那一格是钟的兜底文字，钟没了它就没有意义）。
-         现在这一行是**两格**：风险等级 ｜ 风险状态。
-       ⚠️ 风险等级／风险状态两格**必须留**（官方契约要求，⛔ 不许一起删）。 -->
+  
+
+
+
+
+
   <div class="risk">
     <span class="risk-group"><span class="risk-label">风险等级</span><span class="risk-tag" id="risk-pill">风险状态未接入</span></span>
     <span class="risk-group"><span class="risk-label">风险状态</span><span class="risk-word" id="risk-note">风险等级由官方页给 · 这里取不到</span></span>
   </div>
 
-  <!-- ①之二 钱包条：**链**与**钱包**是两件事，分开写。两颗键是页面上唯一的连接路径。
-       ★★ 2026-09-28（皇上口谕）：「那行 BNB（这是你自己的）——**这个都不要，多此一举**」
-       ⇒ 那一行（连同值、连同那句话）**整段删掉**，⛔ 不留空行、⛔ 不换说法。
-       读链／钱包／账户**三行保留**（皇上只点了那一行）。
-       ⇒ 那两个 BNB 读数（金库的与自己钱包的）挪进 `?debug=1`（`#fact-gas`）。 -->
+  
+
+
+
+
   <div class="wallet" id="wallet">
     <span class="wallet-line">
       <span class="wallet-label">读链</span><span class="wallet-val" id="chain-note">正在读…</span>
@@ -299,40 +299,40 @@ button{ min-height:44px; }
     </span>
   </div>
 
-  <!-- ★★★ 2026-09-29（**第三十六单 · 皇上**）：「**时钟表盘可以删干净了，因为我们不走官方的计时器，
-       这个钟表就没用了。**」⇒ 这一张卡现在**只剩那六个格子**（表盘整块删掉，⛔ 一条不留）。
-       ★ 皇上这一单逐字选的是**甲：两列三行**（六个框的排列）：
-           金库余额 ｜ 历史总税收 ／ ① 加池 ｜ ② 销毁 ／ ③ 分红 ｜ ④ 销毁本币。
-       ★ 两个数**只留数字 ＋ 最短单位**，⛔ 一句说明文字都没有（出处全在 `?debug=1` 那张表里）；
-         这张卡**独立** —— 不跟风险那两格、不跟四路混在一起。
-       ⛔ 卡片 id 仍叫 `clockcard`（⛔ 不改 id：它是判据 R21c／R21／必需 id 表的锚，
-         改名会牵动一批**与钟无关**的判据；名字只是个记号，钟的**结构**已经 0 处）。 -->
+  
+
+
+
+
+
+
+
   <div class="card" id="clockcard">
     <div class="dash" id="dash">
       <div class="money" id="money">
       <div class="money" id="money">
-        <!-- ★★★ 2026-09-29（第三十四单 · 皇上亲口要的四项 ＋「各自有一个小框／内容不要太啰嗦」
-             ＋ 总管追加「**上面那两格也套上一样的小框**」）：
-             这一块现在是 **6 个格子 6 个小框**，六行顺序**照旧不变**：
-               金库余额 → 历史总税收 → ① → ② → ③ → ④。
-             ★ 上面两格**只套框**：标签文字（金库余额／历史总税收）与数值逻辑（读法与单位）**一个字没改**。
-             ★ 下面四项的三条（皇上逐字）：「1. ……直接显示"已添加 什么什么代币的LP池池总量"就行了。
-               2. "报价币口径"这个说明都可以去掉。 3. 其他太啰嗦的内容也去掉。」
-             ⇒ 标签瘦身成四行（逐字见下），**点名真币种**；四个口径括注与「历史」字样**全部删掉**
-                （① ② ③ 是只增不减的累计量、④ 是死地址**当前**余额 —— 删掉「历史」反而更准）。
-             ★ 四个币名**现读动态填**（⛔ 不许写死某个具体币名，这一页要给任何金库用）：
-               ① ② 用**第 1 路的目标币符号** `r.targetSymbol`（第 2／3 路读的就是它，见 refresh()）
-               ③ 用**分红币符号** `r.dividendTokenSymbol`
-               ④ 用**本币符号** `r.tokenSymbol`
-               读不到 ⇒ 写兜底词（第三方代币／分红币／本币）——⛔ 不许留空、⛔ 不许编（在 paintCoinNames）
-             ★ 完整口径**留在 `?debug=1` 那张表里**（默认看不见，给审的人看）：
-               ① `totalLiquiditySpent()`（报价币口径） ② `totalBurnSpent()`（报价币口径）
-               ③ 镜 `dividendTotalDistributedOf(vault)` ⇒ 官方 `totalDividendsDistributed()`（分红币自己口径）
-               ④ 本币 `balanceOf(死地址)`（死地址余额口径，死地址取自镜 `configView(vault)` 第 [2] 个字段）
-             ⛔ 六项**全部只读**（lens／只读 eth_call），⛔ 不加任何写操作、⛔ 不加任何外链主机名。
-             ⛔ 数值与单位**一个字节不许动**：仍是现读、仍是真实位数、读不到仍写「读不到」；
-                单位后缀（报价币符号／分红币符号／本币符号）照旧跟着值走 —— 那是唯一还说明"这数是什么"的地方。
-             ⛔ 小框只套框：**一个新颜色都不加**（下面 6 个框都 `background:transparent`）。 -->
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <div class="money-boxes" id="money-boxes">
           <div class="money-row money-box"><span class="money-k" id="money-k-bal">金库余额</span><span class="money-v money-v-cum num" id="v-reserved">—</span></div>
           <div class="money-row money-box"><span class="money-k" id="money-k-tax">历史总税收</span><span class="money-v money-v-cum num" id="v-progress">—</span></div>
@@ -345,12 +345,12 @@ button{ min-height:44px; }
     </div>
   </div>
 
-  <!-- ② 四路那几行（每一路：**整条水位** ＋ 路名与读数 ＋ 一句状态）＋ 动作 ＋ `?debug=1` 那张表
-       ★★★ 2026-09-28（第二十四单 · 皇上）：「中间的进度条的中间为什么还有一个区域是黑色的，没有颜色的？」
-       ⇒ 行内**不再有不透明底块**。文字**两份**：主层金纸（`.route-mid` 那两行）＋ **墨层**
-         （`.route-ink` 里那两行，曜石黑、`aria-hidden`、默认被 `clip-path` 整层裁光）。
-         两份**逐字相同**（由脚本同一个变量写进去，判据逐字对拍）；
-         墨层里那个 `.route-agent-ink` 是**宽度替身**（`visibility:hidden`），只为让两份文字的盒子一样宽。 -->
+  
+
+
+
+
+
   <div class="card" id="card">
     <div class="routes-h">四 路 分 配</div>
     <div class="routes" id="routes">
@@ -384,7 +384,7 @@ button{ min-height:44px; }
       </div>
     </div>
 
-    <!-- ③ 金库动作：全页只有这两颗（复位那颗**只在跳闸时露出来**） -->
+    
     <div class="actions" id="actions">
       <button type="button" class="push" id="push-next" data-state="idle">推进金库</button>
       <button type="button" class="push" id="push-reset" data-state="idle" hidden>复位熔断</button>
@@ -403,28 +403,28 @@ button{ min-height:44px; }
   </button>
     </div>
 
-    <!-- ④ 读数表（**默认不展示给用户**）：只读；每一行写明「读什么 / 从哪读」。
-         ★★ 2026-09-28 皇上原话：「还有你这个长篇大论，这个不用展示给用户了」。
-         ⇒ 默认 `hidden`（＝**不展示**，⛔ 不是"折叠起来默认收起"那种还能点开的）；
-           只在网址带 **`?debug=1`** 时才由脚本把它放出来（自己排查用）。
-         ⚠️ 用户视图里**必须留下**的两样**不在**这张表里、也不受这个开关影响：
-            · 顶部**风险状态**那一块（`#risk-pill` / `#risk-note` 一直写着「未接入」）；
-            · **四路各是什么**（分红／加池／销毁第三方／销毁本币）与**第 4 路那句「等待池子迁移」**
-              —— 它们写在四路那几行里（`#name-*` / `#line-*` / `#agent-*`），用户看得见钱去哪了。 -->
+    
+
+
+
+
+
+
+
     <div class="facts" id="facts" hidden>
       <p class="facts-title">金库读数（全部现读现算）· 只在 <code>?debug=1</code> 时展示</p>
       <div class="fact" id="fact-vault"><span class="fact-k">金库</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-proxy"><span class="fact-k">金库本体是代理</span><span class="fact-v">读链中…</span></div>
-      <!-- ★ 皇上最终口径：那三个数**留在用户视图里**（只是说明删了）；
-           出处与解释写在这三行里（**只有 `?debug=1` 才看得见**）。 -->
+      
+
       <div class="fact" id="fact-balance"><span class="fact-k">金库余额（现在还剩多少）</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-received"><span class="fact-k">总税收（累计收进来多少）</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-spent"><span class="fact-k">累计已花</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-token"><span class="fact-k">本币</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-quote"><span class="fact-k">报价币（税收币）</span><span class="fact-v">读链中…</span></div>
-      <!-- ★ 2026-09-28（第二十三单）：皇上要的 `?debug=1` 里有「**金库／工厂／币的地址与字节数**」——
-           工厂这一格原来整条缺失（`owner()`/`gasStation()` 读回来了却没处显示）⇒ 补上。
-           ★ 两个字节数是**只在 `?debug=1` 时**才多读的两发 `eth_getCode`（⛔ 正常那一轮一个都不多读）。 -->
+      
+
+
       <div class="fact" id="fact-factory"><span class="fact-k">工厂</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-threshold"><span class="fact-k">每一路的门槛</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-cursor"><span class="fact-k">游标（下一按碰哪一对）</span><span class="fact-v">读链中…</span></div>
@@ -439,20 +439,20 @@ button{ min-height:44px; }
       <div class="fact" id="fact-route4"><span class="fact-k">第 4 路的四个账</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-pool4"><span class="fact-k">第 4 路在等的那口池子</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-msg"><span class="fact-k">这一页现在</span><span class="fact-v">读链中…</span></div>
-      <!-- ★★★ 2026-09-29（第三十三单）：用户视图那四个累计格子的**出处**（只有 `?debug=1` 才看得见）。 -->
+      
       <div class="fact" id="fact-cum"><span class="fact-k">累计① 已添加 &lt;目标币&gt; 的 LP 总量 ／ ② 已销毁 &lt;目标币&gt; 总量（**都是报价币口径**）</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-cum-div"><span class="fact-k">累计③ 已分红 &lt;分红币&gt; 总量（**分红币自己口径**）</span><span class="fact-v">读链中…</span></div>
       <div class="fact" id="fact-cum-dead"><span class="fact-k">累计④ 已销毁 &lt;本币&gt; 总量（**死地址余额口径**）</span><span class="fact-v">读链中…</span></div>
     </div>
   </div>
 
-  <!-- ⑤ 主按钮：全页**唯一**的领取入口 —— 分红币名 ＋ 可领金额 ＋ 动作词都在这一颗药丸里。
-       ★★★ 2026-09-28（**第二十五单 · 皇上**）：
-         ·「**那为什么显示一个待签名**……**这个不用展示给别人啊**」⇒ 那颗**状态牌平时不显示**
-           （markup 就带 `hidden`；**只有真的把交易交给钱包之后**才由脚本放出来，文案见 `TX_SAY`）；
-         ·「**分红币名可以显示，但是那个 18 位可以不用显示**」⇒ 这一格**只写币名**
-           （链上现读 `symbol()`；读不到用中性的「分红币」兜底）—— ⛔ 不写小数位数、⛔ 不写"位数读不到"。
-         ⛔ 币名**不许写死**（皇上：「万一我分红别的币呢？不要定死」）：全部现读，源码里 0 处具体币名字面量。 -->
+  
+
+
+
+
+
+
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -464,74 +464,74 @@ button{ min-height:44px; }
 </svg>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════════════════
-   税收金库 · 四路（金版）  —— 第十九单：接真链接、真数据、能连钱包
-   ──────────────────────────────────────────────────────────────────────────────
-   ★ 这一页**只有一处签名原语**：`sendTx()` 里那一次 `eth_sendTransaction`（走钱包）。
-     全文 0 处估气价、0 处燃气价格字段、0 处私钥、0 处签名、0 处广播。
-   ★ 这一页**只有一个地址常量**：`P013_VAULT`（派活里逐字复制、并由链上 `eth_getCode`
-     复核过 456 字节）。本币 / 报价币 / 工厂 / 官方分红合约 / 分红币 / 门槛 / 间隔
-     全部**从链上现读**（`taxToken()` `vaultQuoteToken()` `factory()` `dividendContract()`
-     镜的 `launchConfigOf(vault)`）—— 一个都不许手打。
-   ★ 「读不到」与「0」是两件事：任何一项读不到都写「读不到」，⛔ 绝不当成 0。
-   ★ 第 4 路（销毁本币）：池子没建好时链上只发一个「我在等池子」，**不花尝试次数、不算失败**
-     ⇒ 页面状态块写「等待池子迁移」（第三十五单皇上逐字定的那三句之一），⛔ 不画成能按的按钮。
-   ══════════════════════════════════════════════════════════════════════════════ */
+
+
+
+
+
+
+
+
+
+
+
+
+
 (function () {
   'use strict';
 
-  /* ══════════ ① 常量（唯一的一个地址；其余全部现读） ══════════ */
+  
   var P013_VAULT = '0x4533d5784f8940518a4a23e174414cf1b88fd250';
   var BSC_CHAIN_ID = 56;
   var BSC_CHAIN_ID_HEX = '0x38';
-  /* ★★ 2026-09-28（第二十一单 · 皇上）：「把 BSC 看本代币改成作者金库地址」——
-     那一格展示的、以及点下去要复制/跳转的，都是**这一个常量**（皇上给的对外域名，
-     P012 口谕 64 里写着「对外发币页（公开、要跟审计一起报的外链就指向它）」，
-     官方规定**外链申报必须是绝对 HTTPS 网址**）⇒ 末尾**带斜杠**的绝对 HTTPS。
-     ⛔ 不许改成别的、⛔ 不许编。⚠️ 总管只读查过 DNS：这个域名现在还没有 A 记录（打不开），
-       页面上**不为这件事写任何解释文字**（皇上要干净）；复制照常可用，跳转留开关。 */
+  
+
+
+
+
+
   var AUTHOR_LINK = 'https://xiao17.asia/';
-  /* ★★ 皇上原话：「如果官方没有给我们审计，**可能不允许设置点击跳转**。但**你要保留这个功能**：
-     如果官方允许就加上，不允许就算了。」⇒ 这就是那个开关。
-     ★★★ 2026-09-29（**第三十九单 · 皇上**）：「**如果官方支持跳转的话，先加个跳转兜底。**
-       后面如果他们不让的话，我就把这个跳转删了就好了，**只留复制**。」
-       ⇒ 本单把它由 `false` 改成 **`true`（兜底打开）**：点一下 ＝ **复制 ＋ 新窗口打开**；
-         ★ **开关必须留着**（⛔ 不许删、⛔ 不许把逻辑写死成"永远跳"）——
-         关掉它（改回 `false`）必须**只剩复制、不跳**，这条有**可跑判据**
-         （`check-html-金版.mjs` 的 R27 段把 `authorClickActions()` 抠出来**在两种开关位置各真跑一遍**
-          ＋ `rehearse-金版-mock-wallet.mjs` 拿 `false` 的页面**真点一遍**）。
-     ⛔ 页面上**不写任何关于这个开关的字**（用户不需要知道）；**这一项等官方裁定**。 */
+  
+
+
+
+
+
+
+
+
+
   var LINK_JUMP_ENABLED = true;
-  /* ★★★ 2026-09-29（第三十九单 · 皇上）：「**不显示链接，直接显示202金库工厂**　但是，
-     点击又可以复制我们的链接。」⇒ 那颗链接**上屏的字恒为这 6 个字**（逐字，皇上两轮都写 202）；
-     网址 `AUTHOR_LINK` **一个字节都不上屏**（只留在常量与 `?debug=1` 那一行里）。
-     ⛔ 不许改词、⛔ 不许改成别的字（皇上说一句就改）。 */
+  
+
+
+
   var AUTHOR_LABEL = '202金库工厂';
-  /* ★★★ 同单：反馈**原位**换这颗链接自己的字，**约 2.5 秒**后自己复原成上面那 6 个字。
-     ⛔ 不许用绝对定位盖别的东西；⛔ 不许让 hero 的宽或高变化（所以**不新增任何节点**）。 */
+  
+
   var AUTHOR_FEEDBACK_MS = 2500;
-  /* ★★ 2026-09-28（第二十一单）：协议头**照正常写**。
-     这里原来是 `var SCHEME = 'https:' + '//'` —— 那是把协议头拆开、专为骗过静态眼那条
-     「全文 0 处 http(s)://」的写法；总管已判**不许**（伪装过检查 ≠ 合规）。
-     改成正路：判据里**显式写明允许这些"只读浏览器外链"**（区块浏览器地址前缀 ＋ 四个公共只读 RPC），
-     页面里就正常写字面量。⛔ 除这几条以外，页面里不许再出现任何 http(s) 字面量。 */
+  
+
+
+
+
   var EXPLORER_ADDR = 'https://bscscan.com/address/';
-  /* 交易对象只许这几个字段；燃气**价格**那三个字段一个都不许出现 */
+  
   var ALLOWED_FIELDS = ['from', 'to', 'data', 'gas', 'value'];
   var FORBIDDEN_FEE_FIELDS = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas'];
-  /* 燃气**限额**（不是价格）：页面固定给出，⛔ 一次估算都不发。
-     为什么：金库会把内部失败吃掉 ⇒ 钱包/节点估算会停在"失败那条便宜路"上，
-     估出来的上限偏小，交易一上链就不够 gas（看着像"页面发坏了"）。
-     推进那一笔要够**一对里两路**：单路天花板 1,500,000 ＋ 下一路的闸 1,200,000
-     （950,000 ＋ 250,000）＋ 交易本身 21,000 ＝ 硬下限 2,721,000；给到 3,500,000。 */
+  
+
+
+
+
   var STATIC_GAS_LIMIT = 3500000n;
   var NEXT_ROUTE_GAS_FLOOR = 2721000n;
   var GAS_LIMIT_CLAIM = 1000000n;
-  /* 交易状态是**五态**，不许合成布尔值 */
+  
   var TX_STATES = ['待签名', '待确认', '成功', '失败', '未确认/卡住'];
   var REFRESH_MS = 20000;
-  /* 只读走**公共 RPC**（写永远只走钱包）。四个端点实测都带 `access-control-allow-origin: *`；
-     实测不通的 `binance.llamarpc.com` **不列进来**。四档并发抢答、单档 4 秒 ⇒ 最坏约 4 秒。 */
+  
+
   var PUBLIC_RPCS = [
     'https://bsc-dataseed.binance.org',
     'https://bsc-dataseed1.binance.org',
@@ -543,7 +543,7 @@ button{ min-height:44px; }
   var READ_TIMEOUT_MS = 4000;
   var ZERO_ADDR = '0x' + '0'.repeat(40);
 
-  /* ══════════ ② 只读通道 / 写通道：两个口子，按方法名分流 ══════════ */
+  
   var _rpcIdx = 0;
   function readRpc(method, params) {
     if (READ_METHODS.indexOf(method) < 0) {
@@ -595,7 +595,7 @@ button{ min-height:44px; }
       });
     });
   }
-  /* ⛔ 写路径专用：**只有它碰 `window.ethereum`** */
+  
   function walletRpc(method, params) {
     return window.ethereum.request({ method: method, params: params || [] });
   }
@@ -608,9 +608,9 @@ button{ min-height:44px; }
     return Promise.reject(new Error('这一页不让走这个通道：' + method));
   }
 
-  /* ══════════ ③ keccak-256（纯 JS，只用来**现算** selector） ══════════
-     ★ 与 `皇上-金库页.html` 那份逐字符相同（手抄 RC 表错一位 ⇒ selector 全算错，
-       而语法照样合法、页面照样能跑 —— 本厂真踩过）。 */
+  
+
+
   var RC = [
     0x00000001n, 0x00008082n, 0x800000000000808an, 0x8000000080008000n,
     0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
@@ -670,7 +670,7 @@ button{ min-height:44px; }
     return Uint8Array.from(out);
   }
   function keccakSel(sig) { return toHex(keccak256(utf8Bytes(sig))).slice(0, 10); }
-  /* ★ 全部 selector **现算**，一个手写的十六进制选择器都没有 */
+  
   var SEL = {
     taxToken: keccakSel('taxToken()'),
     vaultQuoteToken: keccakSel('vaultQuoteToken()'),
@@ -702,24 +702,24 @@ button{ min-height:44px; }
     dividendContract: keccakSel('dividendContract()'),
     dividendToken: keccakSel('dividendToken()'),
     withdrawableDividends: keccakSel('withdrawableDividends(address)'),
-    /* 只读镜（P013VaultLens）：间隔 / 门槛 / 重试上限 / 可选额 —— 全部只读 */
+    
     lensConfig: keccakSel('launchConfigOf(address)'),
     lensTimer: keccakSel('timerView(address)'),
     lensClaimable: keccakSel('claimableDividendOf(address,address)'),
     lensMinShare: keccakSel('dividendMinShareBalanceOf(address)'),
-    /* ★★★ 2026-09-29（第三十三单）：四个累计格子里那**两个只读镜**读数。
-       · `dividendTotalDistributedOf(vault)` —— 官方分红合约那个累计量，由镜转发过来
-         （界面**仍然不直连**官方分红合约，口径与第十九单一致）；
-       · `configView(vault)` —— 死地址（第 [2] 个字段）从这里取。
-       ⚠️ 金库上**没有** `configView()` 这个口（金库只列了 42 个方法）；死地址只在镜的
-          `configView(vault)` 里 —— 现读反解过：第 [7]/[8]/[10] 个字段分别 == 金库的
-          factory()/taxToken()/vaultQuoteToken() ⇒ 字段位置对得上（证据：本单探针脚本）。
-       ⛔ 这两条**只读**，一个写字段都不带。 */
+    
+
+
+
+
+
+
+
     lensDividendTotal: keccakSel('dividendTotalDistributedOf(address)'),
     lensConfigView: keccakSel('configView(address)')
   };
 
-  /* ══════════ ④ 小工具 ══════════ */
+  
   function el(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -743,10 +743,10 @@ button{ min-height:44px; }
     return v == null ? null : '0x' + v.toString(16).padStart(40, '0');
   }
   function isZeroAddr(a) { return lower(a) === ZERO_ADDR; }
-  /* ★ 法式硬红线：**绝不许 NaN / undefined / Infinity 上屏** */
+  
   function readable(n) { return typeof n === 'number' && isFinite(n); }
   function shortAddr(a) { return isHexAddr(a) ? (a.slice(0, 8) + '…' + a.slice(-6)) : String(a || '读不到'); }
-  /* wei → 普通数字（按链上**真实**位数；8 位小数） */
+  
   function toCoins(v, decimals) {
     if (v == null) return null;
     var d = (decimals == null ? null : Number(decimals));
@@ -760,18 +760,18 @@ button{ min-height:44px; }
     var out = Number(whole) + frac8;
     return neg ? -out : out;
   }
-  /* ★★★ 2026-09-29（**第三十五单 · 皇上**）：「0.00 这个数字太大了，要再加显示两个 0。」
-     ⇒ 全站金额**最少 4 位小数**。改动点**只有这一处**（`minimumFractionDigits` 2 → 4）：
-        一处改、全站生效（余额／总税收／四个累计格子／可领额／四路桶里多少），
-        ⇒ 真的 0 从「0.00」变「0.0000」；`0.03404342` 这类本来就有更多位的**不受影响**。
-     ★ 三条不许松：① ⛔ 不许逐个调用点去改（只此一处）；② ⛔ 不许有的地方 2 位、有的地方 4 位；
-       ③ ⛔ 不许写死位数 —— 上限仍按**链上现读**的 decimals（`maxDec` 由调用方传进来）。
-     ★ 上封那一段里的 `Math.max(4, …)`：这是「**最少** 4 位」那条口径的落点 ——
-        `toLocaleString` 在 `maximumFractionDigits < minimumFractionDigits` 时会**直接抛 RangeError**
-        （本单真踩到：喂 2 位就抛）⇒ 上封**不得小于** 4（⛔ 不是写死，调用方传 ≥4 时照旧听它的）。
-       ⇒ 现读位数 ≥ 4 ⇒ `maxDec` 一字节不变（**正常读数走的就是这条路**）；< 4 的调用方 ⇒ 抬到 4。
-     ★ `?debug=1` 里读出来的是 `wei` 原始整数，那一部分**不动**（它根本不走这个口）。
-     出处：第三十五单派活 §一.1 ＋ 判据 `check-html-金版.mjs` R24a（"只有一处且 ＝ 4"）。 */
+  
+
+
+
+
+
+
+
+
+
+
+
   function fmtAmt(x, maxDec) {
     if (!readable(x)) return '读不到';
     return x.toLocaleString('zh-CN', { minimumFractionDigits: 4, maximumFractionDigits: Math.max(4, maxDec == null ? 8 : maxDec) });
@@ -787,15 +787,15 @@ button{ min-height:44px; }
     var frac = (w % 1000000000000000000n).toString().padStart(18, '0').replace(/0+$/, '');
     return frac ? whole.toString() + '.' + frac : whole.toString();
   }
-  /* ★★★ 2026-09-29（第三十三单）：四个累计格子的**唯一一处**文字产出。
-     ★ 铁律（一条都不许松）：
-       ① **读不到就写「读不到」** —— 链上整数读不到（null），或者它自己的位数读不到，
-          或者位数不是 0–36 的整数 ⇒ 一律「读不到」。⛔ 不许写 0、⛔ 不许留空、⛔ 不许编数。
-          （★「真的是 0」与「读不到」是**两件事**：0 wei 照实折成 0.00000000，只有 null 才写「读不到」。）
-       ② **单位一律用真实位数**：调用方把**链上现读的位数**传进来（报价币走金库/镜，分红币问它自己，
-          本币问它自己）—— ⛔ 这里一个写死的 18 都没有。
-       ③ 只写「数 ＋ 单位」，⛔ 不写字段名、⛔ 不写解释句（口径在标签里说清）。
-       ④ 单位读不到就不拼单位（⛔ 不拿一个假符号顶上）。 */
+  
+
+
+
+
+
+
+
+
   function fmtCum(weiVal, decimals, unit) {
     if (weiVal == null) return '读不到';
     var d = (decimals == null ? null : Number(decimals));
@@ -810,34 +810,34 @@ button{ min-height:44px; }
     : function (cb) { return setTimeout(function () { cb(Date.now()); }, 16); };
   var REDUCE = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  /* ══════════ ⑤（**第三十六单已整段删除**：原「自动执行的钟」＋「⑤之二 自动执行 · 仪表盘」两节） ══════════
-     ★★★ 2026-09-29（**第三十六单 · 皇上令删钟**）：「**时钟表盘可以删干净了，因为我们不走官方的
-     计时器，这个钟表就没用了。**」
-     ⇒ 这一段（皇上第五次解冻令点名要删的那几件：表盘那一族的纯函数、画表的那一支、每帧重画的
-       连续循环、秒针与「灭点」的驱动、以及那口「下一次大概什么时候被叫醒」的本地倒数）
-       **整段删掉，一条不留**。
-     ⛔ **链上什么都不改**：合约／ABI／写路径／gas／selector 一个字节没动；
-        ★「复位熔断」那一颗**照旧只在链上那一格现读为真时露出来**（见 `paintControls`），
-          ⛔ 它**不依赖任何钟的状态**。
-     ★ 逐字的删除清单（哪一个类名／哪一个函数名）落在
-       `00-intake/回报-营缮-第三十六单-删钟与两列三行.md`；本页里**一个残留都不留**。
-     ★ `?debug=1` 那张表里与计时有关的**读数照旧保留**（那是账目，不是钟）：见 `paintFacts` 的
-       `fact-queue`（上一次排队 ＋ 间隔）／`fact-trip`（跳闸位）／`fact-cursor`（游标）。 */
+  
 
-  /* ══════════ ⑥ 状态 ══════════ */
+
+
+
+
+
+
+
+
+
+
+
+
+  
   var state = {
     account: null, authorized: false, chainId: null, rpcChainId: null,
     read: null, readAt: null, problems: [],
     txKind: null, txState: TX_STATES[0], txHash: null,
-    /* ★ 2026-09-28（第二十五单）：交易是不是还在手上 —— 在手上的时候，
-       `paintClaim` **不许**去改按钮那句话（否则每 20 秒一次 refresh 会把「请在钱包里确认」换掉、
-       还会把按钮重新点亮 ⇒ 可能被点两下）。结束几秒后由 `restoreBtn()` 放回。 */
+    
+
+
     txActive: false,
     hint: '',
     claim: { state: 'reading', amount: null, reason: '' }
   };
 
-  /* ══════════ ⑦ 三种交易（**形状固定**；全部经 `sendTx` 这一个口子递出去） ══════════ */
+  
   function buildClaimPayload(from) {
     return { from: from, to: P013_VAULT, data: SEL.claimDividend, gas: toQuantity(GAS_LIMIT_CLAIM), value: '0x0' };
   }
@@ -847,7 +847,7 @@ button{ min-height:44px; }
   function buildResetPayload(from) {
     return { from: from, to: P013_VAULT, data: SEL.resetTimerCircuit, gas: toQuantity(STATIC_GAS_LIMIT), value: '0x0' };
   }
-  /* 自检：形状 / to / data / value / **零燃气价格字段**。⛔ 只认识这三种，别的 kind 一律拒。 */
+  
   function validateTx(p, kind) {
     var errs = [];
     if (!p) { errs.push('没有交易'); return errs; }
@@ -878,7 +878,7 @@ button{ min-height:44px; }
     return errs;
   }
 
-  /* ══════════ ⑧ 读链：一次把要的都读了（全部只读） ══════════ */
+  
   function ethCall(to, data) {
     if (!isHexAddr(to)) return Promise.resolve({ ok: false, message: 'to 不是合法地址' });
     return rpc('eth_call', [{ to: to, data: data }, 'latest'])
@@ -923,12 +923,12 @@ button{ min-height:44px; }
       return out.replace(/\u0000+$/, '');
     });
   }
-  /* 这一次读链的**全部读数**（一个字段都不猜；读不到就是 null）
-     ★★ 2026-09-28（第二十一单 —— 皇上亲报的那个 bug）：
-     ① **一步读不到只让那一格写「读不到」**：链头那几步（chainId / 块号 / 块时间 / 代码字节）
-        原来一挂就把整条 `.then` 链推进 `.catch`，**整页一个字都画不出来**。现在每一步各自兜底。
-     ② **余额那一批与别的批解耦**：报价币那一组（symbol/decimals/balanceOf）自成一组，
-        另外两组各自兜底 ⇒ 任何一组挂掉都不许连累余额那一格。 */
+  
+
+
+
+
+
   function soft(p, fallback) {
     return Promise.resolve(p).then(function (x) { return x; }, function () { return fallback; });
   }
@@ -991,9 +991,9 @@ button{ min-height:44px; }
           batchAttempts: Number(wordToBig(r4.result, 2)), batchSkipped: wordToBig(r4.result, 3) !== 0n
         } : null;
         if (!r.route4State) r.problems.push('读不到 route4State()（第 4 路自己的四个账）');
-        /* ★ 修掉一个「0 被读成读不到」的假红：`nextRouteCursor()` 真的是 0 时，
-           原来那句 `if (!r.nextRouteCursor)` 会把 0n 当成"没读到" ⇒ 报一条假的读不到。
-           `0` 与 `读不到` 是两件事（法式），这里必须用 `== null` 判。 */
+        
+
+
         if (r.nextRouteCursor == null) r.problems.push('读不到 nextRouteCursor()');
         return Promise.all([0, 1, 2, 3].map(function (i) {
           return ethCall(V, SEL.routeAt + BigInt(i).toString(16).padStart(64, '0'));
@@ -1006,15 +1006,15 @@ button{ min-height:44px; }
         });
       });
     }).then(function () {
-      /* 币 / 报价币 / 工厂 / 分红合约：全部从金库与币自己嘴里读出来。
-         ★★ 三组**各自兜底**（`.catch` 兜成一组 null）：
-            · 报价币那一组 = **余额那一格的口粮**（symbol / decimals / balanceOf）
-            · 本币那一组   = 本币名字与位数（0 位、18 位都行）
-            · 工厂那一组   = owner / gasStation
-         ⛔ 根因（2026-09-28 真网络复现过）：`decimals()` 返回的是 **uint256**，
-            原来这两处用 `callStr()`（按 ABI string 解）去读 ⇒ **恒为 null** ⇒
-            `toCoins(余额, null)` 直接判 null ⇒ 那一格写「读不到」而链上明明有余额。
-            ⇒ `decimals()` 必须用 **callBig**（uint）读。 */
+      
+
+
+
+
+
+
+
+
       var gToken = soft(r.taxToken ? Promise.all([
         callStr(r.taxToken, SEL.symbol),
         callBig(r.taxToken, SEL.decimals),
@@ -1040,15 +1040,15 @@ button{ min-height:44px; }
       r.vaultBalance = q[2];
       r.factoryOwner = f[0]; r.gasStation = f[1];
       r.bnbWei = a[3];
-      /* ★ 余额那一格自己的两件口粮：缺哪一件就**只**报哪一件（⛔ 不连累别的格） */
+      
       if (r.vaultBalance == null) r.problems.push('读不到金库余额（报价币 balanceOf(金库)）');
       if (r.quoteDecimals == null) r.problems.push('读不到报价币位数（报价币自己的 decimals()）');
-      /* 门槛：金库自己的 `selfBuiltThreshold()` 是 0 时，用工厂那一档（镜的 launchConfigOf 第 7 个字段） */
+      
       r.selfBuilt = r.selfBuiltThreshold;
       return Promise.all([
         soft(r.dividendContract ? callAddr(r.dividendContract, SEL.dividendToken) : Promise.resolve(null), null),
-        /* ★ 我的可领额**只在我自己连上钱包之后**才读 —— 没连时读回来的会是**金库自己**的那一格，
-           把它显示成「我的可领额」就是假话（读不到 ≠ 0）。镜那一格同理。 */
+        
+
         Promise.all([
           soft(callBig(P013_LENS, SEL.lensClaimable, state.account ? [wAddr(V), wAddr(state.account)] : null), null),
           soft(callBig(P013_LENS, SEL.lensMinShare, [wAddr(V)]), null)
@@ -1082,10 +1082,10 @@ button{ min-height:44px; }
       r.poolQuoteBal = a[3]; r.poolCoinBal = a[4];
       return null;
     }).then(function () {
-      /* ★ 2026-09-28（第二十三单）：`?debug=1` 那张表要「金库／工厂／币的地址与字节数」——
-         金库那两个字节数在 `eth_getCode(V)` 那一步就有了；工厂与币的**只在开 debug 时**才多读，
-         ⛔ 正常那一轮一个 RPC 都不多（改的是排查面，不是用户面）。
-         读不到就写「读不到」，⛔ 不连累任何一格（soft 兜底）。 */
+      
+
+
+
       if (!debugOn()) return null;
       var want = [];
       if (r.factory) want.push(['factoryCodeBytes', r.factory]);
@@ -1105,15 +1105,15 @@ button{ min-height:44px; }
       return r;
     });
   }
-  /* 只读镜的地址：链上没有只读出口能拿到它 ⇒ 这一格**另立**（与派活逐字一致）。
-     镜没答话时整组 null，页面写「读不到」，⛔ 不当 0。 */
+  
+
   var P013_LENS = '0xE47D13E7C40BE6383BA5c18643A673CaffE7c95b';
   function loadLens(r) {
     if (!isHexAddr(P013_LENS)) { r.lens = null; return Promise.resolve(r); }
     var arg = wAddr(P013_VAULT);
     return Promise.all([
-      /* ★ 2026-09-28（第二十一单）：「读不到」与「地址上没有代码」是两件事，分开记
-         （一条只读通道答不上话，不该被写成"镜没部署"）。 */
+      
+
       rpc('eth_getCode', [P013_LENS, 'latest']).then(function (c) { return { got: true, code: c }; },
         function () { return { got: false, code: null }; }),
       ethCall(P013_LENS, SEL.lensConfig + arg),
@@ -1142,48 +1142,48 @@ button{ min-height:44px; }
     });
   }
 
-  /* ══════════ ⑧之三 ★★★ 2026-09-29（第三十三单）：四个累计格子要读的四样东西 ══════════
-     皇上原话：「在"金库余额"和"总税收"的下面，能不能添加 4 个显示项：
-                1. 已添加第三方LP 历史总量　2. 已销毁的第三方代币、历史总量　
-                3. 已分红的第三方代币、历史总量　4. 已销毁的本代币数量、历史总量」
-     总管查实（`02-impl/src/P013Vault.sol:190-215` 注释逐字）：链上**只有报价币口径**的累计量，
-       **没记 LP 个数、没记目标币个数，本币销毁也没有计数器** ⇒ 皇上拍板**甲**：先用现有口径上，
-       不编数、标签写清（⛔ 不改合约）。
-     ⇒ 四项的数据来源（派活 §三 逐字）：
-       ① `totalLiquiditySpent()`（金库，第 2 路累计投入的**报价币**）
-       ② `totalBurnSpent()`（金库，第 3 路累计投入的**报价币**）
-       ③ 镜 `dividendTotalDistributedOf(vault)` ⇒ 官方分红合约 `totalDividendsDistributed()`
-          （★ 这个数是官方分红合约那个**累计**量：它自 部署起**一路累加**、只增不减；
-             按官方接口注释 = "total dividends ever distributed by this contract"，
-             即**累计已分发/已发放**出去的总额，**不是**"当前账上还留着多少"。
-             ★★ 口径结论（**以实际为准、不猜**）：官方那份 Dividend 实现里 `totalDividendsDistributed`
-             就是 `deposit()`／`distributeDividends()` 那条路累加出来的**历史累计发放总额**，
-             该合约**没有任何"取回/递减"的出口** ⇒ 它只增不减。UI 因此必须写成
-             「**历史总量**」而不是「现在还挂着多少」。）
-       ④ 本币 `balanceOf(死地址)`（**死地址余额口径**）：死地址取自镜 `configView(vault)` 第 [2] 个字段。
-      ★ 三条纪律：**整组单独兜底**（读不到只让这四格写「读不到」，⛔ 不连累任何别的格）；
-        单位走**真实位数**（报价币 = 金库现读的 `quoteDecimals`／分红币 = 它自己的 `decimals()`／
-        本币 = 它自己的 `decimals()`）；⛔ 这一路**一个写操作都没有**、⛔ 一个新主机名都没有。 */
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   function loadCumulative(r) {
-    /* ★★ 2026-09-29（本单自测**真踩到**的一条，留痕）：**这一路无论成功失败，都必须把 `r` 原样还回去**。
-       为什么（血的）：本单第一版在「镜读得到」那一支里写成 `return <Promise 链>;`，而那条链的
-       **最后一步 `return null`** ⇒ 整条链解析成 `null` ⇒ `refresh()` 的下一环拿到 `null` ⇒
-       `r.routes` 当场抛 `Cannot read properties of null (reading 'routes')` ⇒ 整页被 `.catch` 收走、
-       写「读链失败」，**把本来读得好好的那些格全连累了**（正是法式最不许的那一类）。
-       判据当场抓到：`rehearse-金版-mock-wallet.mjs` 两条红（细节三／细节七）。
-       ⇒ 口径钉死：这一步**只往 `r` 上添几个字段**（`dividendTotalDistributed` / `deadAddress` /
-         `tokenDecimals2` / `deadBalance`），然后 **`return r`**；⛔ 中途每一环的返回值都不许是 null。 */
+    
+
+
+
+
+
+
+
     if (!r) return Promise.resolve(r);
-    /* ★ ③ 官方分红合约那个累计量 —— 经由**只读镜**转发（界面仍然不直连官方分红合约，
-       口径与第十九单一致）。单独兜底：读不到 ⇒ null ⇒ 那一格写「读不到」。 */
+    
+
     var pDiv = soft(ethCall(P013_LENS, SEL.lensDividendTotal + wAddr(P013_VAULT)), { ok: false, result: null })
       .then(function (dt) {
         r.dividendTotalDistributed = (dt && dt.ok && isHex(dt.result) && dt.result.length >= 2 + 64)
           ? wordToBig(dt.result, 0) : null;
         return r;
       });
-    /* ① 死地址：镜的 configView(vault) 第 [2] 个字段（13 个返回值，全是字）。
-       ⛔ 镜读不到 / 字段缺 ⇒ null（那一格写「读不到」）。 */
+    
+
     var dead = null;
     if (r.lens && isHexAddr(P013_LENS)) {
       return pDiv.then(function () {
@@ -1194,7 +1194,7 @@ button{ min-height:44px; }
           if (d && !isZeroAddr(d)) dead = d;
         }
         r.deadAddress = dead;
-        /* ④ 本币的位数与死地址余额（两发只读 eth_call，各自兜底） */
+        
         if (!dead || !isHexAddr(r.taxToken)) { r.tokenDecimals2 = null; r.deadBalance = null; return r; }
         return Promise.all([
           soft(callBig(r.taxToken, SEL.decimals), null),
@@ -1209,7 +1209,7 @@ button{ min-height:44px; }
     r.deadAddress = null; r.tokenDecimals2 = null; r.deadBalance = null;
     return pDiv;
   }
-  /* 四个格子的**唯一一处**上屏逻辑（读不到就写「读不到」，⛔ 不许 0、⛔ 不许空、⛔ 不许编）。 */
+  
   function paintCumulative(r) {
     if (!r) return;
     safe(function () {
@@ -1222,15 +1222,15 @@ button{ min-height:44px; }
       el('v-cum-dead').textContent = fmtCum(r.deadBalance, r.tokenDecimals2, ut);
     });
   }
-  /* ══════════ 第三十四单 · 四个格子的**币名**（现读动态填；⛔ 数值那一处一个字节都没动） ══════════
-     ★ 皇上：「直接显示"已添加 **什么什么代币** 的LP池池总量"就行了」——「什么什么」＝**现读的币种**。
-     ★ 三条硬口径（派活 §二 逐字）：
-       ① 币名**现读**：① ② 读 `r.targetSymbol`（第 2／3 路的目标币符号，refresh() 现读）／
-          ③ 读 `r.dividendTokenSymbol`／④ 读 `r.tokenSymbol`；
-       ② 读不到 ⇒ 写**兜底词**（第三方代币／分红币／本币）——⛔ 不许留空、⛔ 不许写死某个具体币名、⛔ 不许编；
-       ③ ⛔ 这一处**只管币名**：数值与单位仍由 `paintCumulative` 那一处写（两边互不牵连）。
-     ★ 本页面里**一个币名字面量都没有**（连报价币那个符号也是链上现读的）——全页扫过 0 处。
-     ⚠️ 四个兜底词**例外**：它们是"读不到时写什么"的**词条**，不是币名（判据 R23i 逐条钉住）。 */
+  
+
+
+
+
+
+
+
+
   function cumName(sym, fallback) {
     var s = (sym == null ? '' : String(sym)).trim();
     return s === '' ? fallback : s;
@@ -1248,7 +1248,7 @@ button{ min-height:44px; }
     });
   }
 
-  /* ══════════ ⑨ 钱包（EIP-1193） ══════════ */
+  
   function hasWallet() { return typeof window.ethereum !== 'undefined' && window.ethereum != null; }
   function isLocalFile() { return typeof location !== 'undefined' && String(location.protocol) === 'file:'; }
   function chainNameOf(id) { return id === BSC_CHAIN_ID ? 'BNB 主网（56）' : ('链 ' + String(id)); }
@@ -1312,7 +1312,7 @@ button{ min-height:44px; }
     }).catch(function () { return null; });
   }
 
-  /* ══════════ ⑩ 唯一的那一处「把交易交给钱包」 ══════════ */
+  
   function sendTx(payload, kind) {
     var errs = validateTx(payload, kind);
     if (errs.length) {
@@ -1355,7 +1355,7 @@ button{ min-height:44px; }
     });
   }
 
-  /* ══════════ ⑪ 画页面 ══════════ */
+  
   function fmtWeiOrNull(v, decimals, maxDec) {
     var n = toCoins(v, decimals);
     return n == null ? '读不到' : fmtAmt(n, maxDec);
@@ -1370,7 +1370,7 @@ button{ min-height:44px; }
   function poolEmpty(r) {
     var gotR = Array.isArray(r.poolReserves) && r.poolReserves.length === 2 && r.poolReserves[0] != null && r.poolReserves[1] != null;
     var gotB = r.poolQuoteBal != null && r.poolCoinBal != null;
-    if (!gotR && !gotB) return null;                    /* ★ 读不到 ⇒ null，**不是** false */
+    if (!gotR && !gotB) return null;                    
     return (gotR && r.poolReserves[0] === 0n && r.poolReserves[1] === 0n) ||
            (gotB && r.poolQuoteBal === 0n && r.poolCoinBal === 0n);
   }
@@ -1412,13 +1412,13 @@ button{ min-height:44px; }
   function paintsHero(r) {
     var name = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
     safe(function () { el('token-name').textContent = name; });
-    safe(function () { el('hero-mark').innerHTML = '战备<br>股票'; }); /* 老板令：此处恒为「战备」印文（纯显示，不参与任何逻辑） */
+    safe(function () { el('hero-mark').innerHTML = '战备<br>股票'; }); 
     safe(function () {
       var a = el('link-vault');
       if (a) a.href = EXPLORER_ADDR + P013_VAULT;
     });
-    /* ★ 「202金库工厂」那一格：上屏的字**恒为那 6 个字**（`authorLinkText()`），**网址一个字节都不上屏**。
-       留空时**不挂 href**（点不动那个默认的 `#`），点下去由 `authorOpen()` 给人话反馈。 */
+    
+
     safe(function () {
       var a = el('link-author');
       if (a) {
@@ -1429,19 +1429,19 @@ button{ min-height:44px; }
       if (s) s.textContent = authorLinkText();
     });
   }
-  /* ── 「202金库工厂」那一格：展示（恒那 6 个字）＋ 点击（复制 ＋ 视开关跳转）──────────────────
-     ★★★ 2026-09-29（第三十九单 · 皇上）：
-       · 上屏的字**永远**是 `AUTHOR_LABEL`（`202金库工厂`）—— ⛔ 网址不再当标签印出来；
-       · 反馈**不再参与版式**：⛔ 不新增节点、⛔ 不绝对定位 —— 只**原位**换这颗链接自己的字，
-         约 `AUTHOR_FEEDBACK_MS`（2500）毫秒后自己复原（这就是治皇上报的「版面会跳」那一条）。 */
+  
+
+
+
+
   function authorLinkText() { return AUTHOR_LABEL; }
   function authorClickActions() { return LINK_JUMP_ENABLED ? ['copy', 'jump'] : ['copy']; }
-  /* 原位反馈那句（**短**）：成 ＝ `已复制`／`已复制·已打开`；不成 ＝ `复制失败`。⛔ 不许写长句。 */
+  
   function authorFeedbackText(copied, opened) {
     return copied ? (opened ? '已复制·已打开' : '已复制') : '复制失败';
   }
   var _authorBackTimer = null;
-  /* **原位**换字 ＋ 到点复原。⛔ 一个节点都不新增（所以 hero 的宽高不会变）。 */
+  
   function authorSay(text) {
     safe(function () {
       var s = el('author-link-text');
@@ -1463,13 +1463,13 @@ button{ min-height:44px; }
     var out = { copied: false, opened: false, why: '' };
     var link = String(AUTHOR_LINK || '');
     if (!link) {
-      /* 留空 ＝ 待皇上给链接：⛔ 不复制空串、⛔ 不跳，如实说一句 */
+      
       out.why = '待填';
       authorSay('待填');
-      setHint('那一格还是<b>待填</b> —— 皇上还没把链接给我，所以既没得复制、也没得跳。');
+      setHint('那一格还是<b>待填</b> —— 链接还没填，所以既没得复制、也没得跳。');
       return out;
     }
-    /* ① **复制**先发起（不 await ⇒ 不阻塞下面那一步） */
+    
     var copyP = Promise.resolve(null);
     try {
       if (typeof navigator !== 'undefined' && navigator && navigator.clipboard && navigator.clipboard.writeText) {
@@ -1477,16 +1477,16 @@ button{ min-height:44px; }
           function () { out.copied = false; });
       }
     } catch (e) { out.copied = false; }
-    /* ② **跳转**：只有开关开着才跳（`LINK_JUMP_ENABLED`；⛔ 复制失败也照样跳 —— 两件事互不阻塞）。
-       ★ 关掉这个开关（改回 false）⇒ 这一段整段不走 ＝ **只复制、不跳**。 */
+    
+
     if (LINK_JUMP_ENABLED) {
       try {
         if (typeof window !== 'undefined' && typeof window.open === 'function') { window.open(link, '_blank', 'noopener'); out.opened = true; }
       } catch (e) { out.opened = false; }
     }
-    /* ③ **人话反馈**（⛔ 不许静默）—— 分两处，**都不进 hero**：
-       ① **原位**把这颗链接自己的字换成那句短的（≤6 字，约 2.5 秒复原）；
-       ② 完整那句（复制成没成／跳没跳／这一项等官方裁定）走下方本来就有的提示行 `setHint(...)`。 */
+    
+
+
     copyP.then(function () {
       authorSay(authorFeedbackText(out.copied, out.opened));
       setHint(out.copied
@@ -1541,19 +1541,19 @@ button{ min-height:44px; }
     var th = effThreshold(r);
     var rs = r.routesState;
     var selfSym = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
-    /* ★★★ 2026-10-14 修：四路**各自**的目标币名（原来四路都用了第 1 路的那个名字）
-       皇上报：「为什么全部变成『领头羊』了？还有两项应该是『战备人生』才对」
-       链上实况：第 1 路＝领头羊／第 2、3 路＝战备人生／第 4 路＝本币。
-       旧写法只读第 0 路的目标符号（refresh() 里 `r.targetSymbol = a[0]`）就把它套给了全部四路 ——
-       ⛔ 四路的目标本来就允许不同（routeAt(i).target 各读各的）。
-       这里改成**每一路自己的**目标符号；读不到 ⇒ 写「读不到」（⛔ 不许拿别人的名字顶上）。
-       ⛔ 币名一律链上现读，一个都不写死。 */
+    
+
+
+
+
+
+
     var routeSym = (r.routeSymbols && r.routeSymbols.length === 4) ? r.routeSymbols : [null, null, null, null];
     var symAt = function (i) {
       var s = routeSym[i];
       return (s && String(s).trim()) ? String(s).trim() : '读不到';
     };
-    /* 四路各自的白话名 —— 币名与比例**全部来自链上现读**（routeAt(i) 的 bps / target），一个都不写死 */
+    
     var labels = [
       '第 1 路 · 分红发 ' + symAt(0),
       '第 2 路 · 加 ' + symAt(1) + ' 的 LP',
@@ -1571,15 +1571,15 @@ button{ min-height:44px; }
           name = labels[idx] + (share == null ? '' : '  ' + (share / 100) + '%');
           if (res != null && th.wei != null && th.wei > 0n) {
             ready = res >= th.wei;
-            /* ★ 水位比例 ＝ 桶 ÷ 门槛（链上现读）；**没满 ⇒ 全黑**（下限就是 0，⛔ 不留那种 6% 的小尾巴） */
+            
             var ratioN = Number((res * 100n) / th.wei) / 100;
             ratio = readable(ratioN) ? Math.max(0, Math.min(1, ratioN)) : 0;
           }
-          /* ★★ 2026-09-28（第二十一单 · 皇上口谕）：「那个门槛就不用了，去掉吧……是不是你只需要
-             标注一下，说到哪一路满了多少执行就可以了」。
-             ⇒ 用户视图里**只留三样**：路名／桶里多少／一句状态。
-                ⛔ 「门槛」那个数**不给用户看**（判据**一点没松**：`ready` 仍由链上现读的门槛算出来）；
-                「试了几次／批次号」这类账目也一起挪进 `?debug=1` 那张表。 */
+          
+
+
+
+
           sub = '桶里 ' + fmtWeiOrNull(res, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || '');
           if (skipped === true) st = '已跳过';
           else if (res == null || th.wei == null) st = '读不到';
@@ -1591,12 +1591,12 @@ button{ min-height:44px; }
           skipped = r4 ? r4.batchSkipped : null;
           name = labels[idx] + (share == null ? '' : '  ' + (share / 100) + '%');
           var empty = poolEmpty(r);
-          /* ★★ 第 4 路**特殊对待**（"不骗人"的底线，皇上这一单点名）：
-             它**桶里够了也跑不了**（本币的池子还是空的）⇒ 状态必须写「等待池子迁移」，
-             ⛔ **不许写「等待执行」**；池子通了、且桶够了，才跟着变成「等待执行」。
-             ★★ 2026-09-29（**第三十五单 · 皇上**）：状态词由**皇上逐字定** ——
-                `够了 · 会执行` → **`等待执行`** ／ `还在攒` → **`正在积攒`** ／ `在等池子` → **`等待池子迁移`**
-                （另外三个照旧：`已跳过`／`读不到`／`池子读不到`；⛔ 一个字都不许改）。 */
+          
+
+
+
+
+
           if (empty === true) st = '等待池子迁移';
           else if (skipped === true) st = '已跳过';
           else if (empty === false) st = (res == null || th.wei == null ? '读不到' : (res >= th.wei ? '等待执行' : '正在积攒'));
@@ -1606,15 +1606,15 @@ button{ min-height:44px; }
             ratio = readable(ratio4) ? Math.max(0, Math.min(1, ratio4)) : 0;
             ready = (empty === false) && (res >= th.wei);
           }
-          /* 用户视图那一行**只写「桶里多少」**（第三十五单起那一大句括号说明**不再挂在这里**）；
-             「试了几次／批次号／池子储备」与那句说明的全文，一起进 `?debug=1` 那张表（见 `paintFacts`）。 */
+          
+
           sub = '桶里 ' + fmtWeiOrNull(res, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || '');
         }
         safe(function () {
           var row = el('route-' + idx);
           if (row) {
-            /* ★ 水位高度就是唯一的表达（「一眼知道涨到几成」）；`is-t1/t2/t3` 与 `data-tier` 只是
-               算得出来的**机器记号**，⛔ 不再靠换颜色表现（第二十三单：就一层水，不换色）。 */
+            
+
             var tier = ratio <= 0.25 ? 'is-t1' : (ratio <= 0.5 ? 'is-t2' : (ratio < 1 ? 'is-t3' : ''));
             row.className = 'route' + (ready ? ' is-ready' : (ratio > 0 ? ' ' + tier : ''));
             row.setAttribute('data-fill', 'scaleY(' + ratio.toFixed(3) + ')');
@@ -1622,8 +1622,8 @@ button{ min-height:44px; }
             row.setAttribute('data-tier', ready ? '4' : (ratio <= 0 ? '0' : (tier === 'is-t1' ? '1' : (tier === 'is-t2' ? '2' : '3'))));
           }
         });
-        /* ★ 水位：只改 `transform:scaleY(0..1)`（`transform-origin:bottom` ⇒ **从下往上涨**）——
-           ⛔ 没有波浪、没有倾斜；整块就是容器（不是那"小小的一条"）。 */
+        
+
         safe(function () {
           var w = el('fill-' + idx);
           if (w && w.style) w.style.transform = 'scaleY(' + ratio.toFixed(3) + ')';
@@ -1631,13 +1631,13 @@ button{ min-height:44px; }
         safe(function () { var n = el('name-' + idx); if (n) n.textContent = name; });
         safe(function () { var s = el('line-' + idx); if (s) s.textContent = sub; });
         safe(function () { var a = el('agent-' + idx); if (a) a.textContent = st; });
-        /* ★★★ 2026-09-28（第二十四单 · 皇上）：「中间的进度条的中间为什么还有一个区域是黑色的，没有颜色的？」
-           行内那块黑（`.route-mid` 的不透明底块）**已经整层删掉**；现在靠的是这一层**墨字**：
-             · 墨层的文字与主层**逐字相同**（同一个 `name`／`sub`／`st` 变量写两处 ⇒ 不会各自漂移）；
-             · 墨层整层按**水位比例**裁：`clip-path:inset((1 − 水位) × 100% 0 0 0)`
-               ⇒ 水位线**以下**留着（黑字压金水）、**以上**裁掉（露出主层那层金纸字）。
-             · `ratio` 就是水位高度（＝桶 ÷ 门槛），与 `fill-N` 的 `scaleY` 是**同一个数**
-               ⇒ 水位线到哪、字的变色线就到哪（涨水那 0.9 秒里，两条插值都是线性的，不会错位）。 */
+        
+
+
+
+
+
+
         safe(function () { var n2 = el('name-' + idx + '-ink'); if (n2) n2.textContent = name; });
         safe(function () { var s2 = el('line-' + idx + '-ink'); if (s2) s2.textContent = sub; });
         safe(function () { var a2 = el('agent-' + idx + '-ink'); if (a2) a2.textContent = st; });
@@ -1680,13 +1680,13 @@ button{ min-height:44px; }
     var th = effThreshold(r);
     set('fact-vault', esc(P013_VAULT) + '　·　链上代码 ' + (r.codeBytes == null ? '读不到' : (r.codeBytes + ' 字节')) +
       '　·　点数 ' + fmtInt(r.blockNumber) + (r.blockTimestamp == null ? '' : ('（块时间 ' + String(r.blockTimestamp) + '）')));
-    /* ★ 「金库代码 456 字节」这件事**本身是对的**，但会让人误解 ⇒ 在这里说清：
-       金库本体是 **beacon 代理**（代码短是正常的），它背后那份实现体是**另一个地址**，本页不读它。
-       ⛔ 只写本页**真读到的**那个字节数；⛔ 不把实现体的字节数写死（那是编数据）。 */
+    
+
+
     set('fact-proxy', '金库本体是 **beacon 代理**：上面那个 ' + (r.codeBytes == null ? '读不到' : (r.codeBytes + ' 字节')) +
       ' 是**代理自己**的代码（代理短是正常的）；它背后那份实现体的地址本页不读，所以这里也不写它的字节数。');
-    /* ★★ 皇上两道令的**最终口径**：数留着（用户视图），**说明一句都不要**；
-       出处与解释只许写在这里（`?debug=1` 才看得见的那张表）。 */
+    
+
     set('fact-balance', (r.vaultBalance == null ? '读不到' : (fmtWeiOrNull(r.vaultBalance, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || ''))) +
       '　—— 用户视图那个「金库余额」：链上 `balanceOf(金库)`（' + String(r.vaultBalance == null ? '读不到' : r.vaultBalance.toString()) + ' wei）',
       (r.vaultBalance == null ? 'bad' : null));
@@ -1695,19 +1695,19 @@ button{ min-height:44px; }
       (r.totalReceived == null ? 'bad' : null));
     set('fact-spent', (r.totalSpent == null ? '读不到' : (fmtWeiOrNull(r.totalSpent, r.quoteDecimals, 8) + ' ' + String(r.quoteSymbol || ''))) +
       '　—— 用户视图那个「累计已花」：链上累计 `totalSpent()`（' + String(r.totalSpent == null ? '读不到' : r.totalSpent.toString()) + ' wei）' +
-      '　·　★ 皇上说的「历史总税收」与「总税收」是**同一个字段**（`totalReceived()`）⇒ 不重复摆，这一格换成累计已花',
+      '　·　★ 口径：「历史总税收」与「总税收」是**同一个字段**（`totalReceived()`）⇒ 不重复摆，这一格换成累计已花',
       (r.totalSpent == null ? 'bad' : null));
-    /* ★★★ 2026-09-29（第三十三单）：用户视图那四个累计格子的**出处与口径**（只有 `?debug=1` 才看得见）。
-       ★ 皇上拍板「甲」：链上只有**报价币口径**的计数器（`02-impl/src/P013Vault.sol:190-215` 注释逐字），
-         **没记 LP 个数、没记目标币个数，本币销毁也没有计数器** ⇒ 这四格是现有口径，⛔ 不是编的数。
-       ★ 第 ④ 格是「**死地址余额口径**」—— 它量的是**死地址里现在挂着的本币余额**，
-         ⛔ 不是「一共销毁过多少枚」（链上没有那个计数器）。 */
+    
+
+
+
+
     set('fact-cum', '用户视图那四格（第三十四单起标签瘦身、口径全文只在这里）—— ' +
       '① 已添加 &lt;目标币&gt; 的 LP 总量 ＝ 金库 `totalLiquiditySpent()`（**报价币口径**，第 2 路累计投入的报价币）：' +
       (r.totalLiquiditySpent == null ? '读不到' : (r.totalLiquiditySpent.toString() + ' wei')) +
       '　·　② 已销毁 &lt;目标币&gt; 总量 ＝ 金库 `totalBurnSpent()`（**报价币口径**，第 3 路累计投入的报价币）：' +
       (r.totalBurnSpent == null ? '读不到' : (r.totalBurnSpent.toString() + ' wei')) +
-      '　·　⚠️ ① ② **都不是「币个数」** —— 链上没有记 LP 个数、也没有记目标币个数（皇上选的「甲」＝只用现有口径）',
+      '　·　⚠️ ① ② **都不是「币个数」** —— 链上没有记 LP 个数、也没有记目标币个数（口径：只用现有口径）',
       (r.totalLiquiditySpent == null || r.totalBurnSpent == null) ? 'bad' : null);
     set('fact-cum-div', '③ 已分红 &lt;分红币&gt; 总量 ＝ 官方分红合约 `totalDividendsDistributed()` 的**累计**' +
       '（镜 `dividendTotalDistributedOf(vault)` 转发；' + (r.dividendTotalDistributed == null ? '读不到' : r.dividendTotalDistributed.toString()) + ' wei）' +
@@ -1719,7 +1719,7 @@ button{ min-height:44px; }
       (r.deadBalance == null ? '读不到' : (r.deadBalance.toString() + ' wei')) + '）' +
       '　·　死地址（镜 `configView(vault)` 第 [2] 个字段）：' + (r.deadAddress ? esc(r.deadAddress) : '读不到') +
       '　·　★ 这是**死地址余额口径** —— 量的是死地址里**现在挂着**的本币余额，' +
-      '⛔ 不是「一共销毁过多少枚本币」（链上**没有**本币销毁计数器；皇上拍的「甲」＝不改合约、只用现有口径）' +
+      '⛔ 不是「一共销毁过多少枚本币」（链上**没有**本币销毁计数器；口径：不改合约、只用现有口径）' +
       '　·　位数问本币自己的 `decimals()`：' + (r.tokenDecimals2 == null ? '读不到' : (String(r.tokenDecimals2) + ' 位')),
       (r.deadBalance == null ? 'bad' : null));
     set('fact-token', esc(r.tokenSymbol || '读不到') + '　·　' + esc(r.taxToken || '读不到') +
@@ -1727,7 +1727,7 @@ button{ min-height:44px; }
       '　·　金库自己说它指向这枚币（taxToken()）');
     set('fact-quote', esc(r.quoteSymbol || '读不到') + '　·　位数 ' + (r.quoteDecimals == null ? '读不到' : String(r.quoteDecimals)) +
       '　·　' + esc(r.quoteToken || '读不到') + '（vaultQuoteToken()）');
-    /* ★ 2026-09-28（第二十三单）：`?debug=1` 里「金库／工厂／币的地址与字节数」要求的**工厂**那一格。 */
+    
     set('fact-factory', (r.factory ? esc(r.factory) : '读不到') +
       '　·　代码 ' + (r.factoryCodeBytes == null ? '读不到（只在 ?debug=1 时才多读这一发）' : (r.factoryCodeBytes + ' 字节')) +
       '　·　owner ' + (r.factoryOwner ? esc(r.factoryOwner) : '读不到') +
@@ -1744,13 +1744,13 @@ button{ min-height:44px; }
       '　·　间隔 triggerRequestInterval = ' + (r.lens && r.lens.intervalSec != null ? (String(r.lens.intervalSec) + ' 秒') : '读不到') +
       '（出处：只读镜 launchConfigOf(vault) 第 6 个字段）');
     set('fact-gas', (r.bnbWei == null ? '读不到' : (r.bnbWei.toString() + ' wei（' + weiToBnb(r.bnbWei) + ' BNB）—— 金库这条路是开的')) +
-      '　·　你自己钱包的 BNB（用户视图里原来那一行已按皇上口谕删掉，读数挪到这里）：' +
+      '　·　你自己钱包的 BNB（用户视图里原来那一行已按口径删掉，读数挪到这里）：' +
       (state.balanceWei == null ? '读不到（没连钱包就没读）' : (weiToBnb(state.balanceWei) + ' BNB')),
       (r.bnbWei != null && r.bnbWei < 100000000000000n) ? 'bad' : null);
     set('fact-dividend', (r.dividendContract ? esc(r.dividendContract) : '读不到') +
       '　·　分红币 ' + esc(r.dividendTokenSymbol || r.targetSymbol || '读不到') + '（' + esc(r.dividendToken || '读不到') + '）' +
       '　·　★ 位数 ' + (r.dividendTokenDecimals == null ? '读不到' : (String(r.dividendTokenDecimals) + ' 位')) +
-      '（皇上：用户视图那一行**只留币名、不显示位数** ⇒ 位数挪到这里）' +
+      '（口径：用户视图那一行**只留币名、不显示位数** ⇒ 位数挪到这里）' +
       '　·　出处：本币自己说的 dividendContract()');
     var cv = claimView(r);
     set('fact-mine', cv.state === 'ready' ? (fmtAmt(cv.amount, 8) + ' ' + String(r.dividendTokenSymbol || ''))
@@ -1775,10 +1775,10 @@ button{ min-height:44px; }
         '　·　试了 ' + r4.batchAttempts + ' 次　·　' + (r4.batchSkipped ? '已跳过' : '没被跳过') +
         '（出处：金库 route4State() —— 四条 [3] 数组装不下第 4 路，链上给它单开了一道门）'));
     var empty = poolEmpty(r);
-    /* ★★★ 2026-09-29（**第三十五单 · 皇上**）：原来挂在第 4 路用户视图那一行后面的那一大句括号说明
-       —— `（本币的池子还是空的 ⇒ 只发一个「我在等池子」，不算失败）` —— **从用户视图摘掉**（太啰嗦），
-       挪到**这一格**（`?debug=1` 那张表里，表格默认 `hidden`，正常用户看不见）。
-       ⛔ 判据是「**必须在这张表里**」（⛔ 不许整句消失）：一句话都不许丢，只是换个地方说。 */
+    
+
+
+
     var pool4Note = (empty === true ? '（本币的池子还是空的 ⇒ 只发一个「我在等池子」，不算失败）' : '');
     set('fact-pool4', (r.mainPool ? esc(r.mainPool) : '读不到') +
       '　·　储备 ' + (r.poolReserves ? (r.poolReserves[0].toString() + ' / ' + r.poolReserves[1].toString()) : '读不到') +
@@ -1802,15 +1802,15 @@ button{ min-height:44px; }
       }
     });
   }
-  /* ★★★ 2026-09-28（**第二十五单 · 皇上**）：「那为什么显示一个**待签名**，然后又有一个
-     币名跟一个位数？这些都是什么鬼啊……**这个不用展示给别人啊**」。
-     （★ 皇上原话里点了那个分红币的名字；这一页**一个字都不写它** —— 币名币址全链上现读。）
-     ⇒ 那颗状态牌：**平时不显示**；**只有真的把交易交给钱包之后**才出现；
-        给用户看的**必须是人话**（⛔ 不许"待签名／待确认"这种术语）；
-        交易**结束**（成功／失败／没确认）⇒ 让它**多留几秒**给人看见，然后收起来，
-        并**恢复成按钮本来的那句话**（`paintClaim` 里那套 `setBtn`）。
-     ★ 同一件事只有一个判据来源：**这张对照表是唯一产出用户文案的地方**（`txSay()`）。
-     ★ 内部那五个技术态（`TX_STATES`）一个字都不许直接上屏（判据盯着这条）。 */
+  
+
+
+
+
+
+
+
+
   var TX_SAY = {
     '待签名': '请在钱包里确认',
     '待确认': '已提交，等确认',
@@ -1819,7 +1819,7 @@ button{ min-height:44px; }
     '未确认/卡住': '还没确认'
   };
   var TX_FINAL = ['成功', '失败', '未确认/卡住'];
-  var PILL_LINGER_MS = 6000;                 /* 结束之后留几秒给人看见 */
+  var PILL_LINGER_MS = 6000;                 
   var pillTimer = null;
   function txSay(label) { return TX_SAY[label] || null; }
   function showPill(text) {
@@ -1838,7 +1838,7 @@ button{ min-height:44px; }
       p.textContent = '';
     });
   }
-  /* 收牌之后的"复原"：把按钮放回"按当前读数该有的样子"（可按/禁用 ＋ 它自己那句话） */
+  
   function restoreBtn() {
     state.txActive = false;
     safe(function () { paintClaim(state.read || {}); });
@@ -1852,30 +1852,30 @@ button{ min-height:44px; }
         if (v) v.innerHTML = text; else m.innerHTML = '<span class="fact-k">这一页现在</span><span class="fact-v">' + text + '</span>';
       }
     });
-    /* ★ 用户视图：只在有交易时露牌，而且只说人话 */
+    
     var say = txSay(label);
     var isFinal = TX_FINAL.indexOf(label) >= 0;
     if (pillTimer) { clearTimeout(pillTimer); pillTimer = null; }
-    state.txActive = true;                   /* 交易在手上 ⇒ 不许 refresh 把按钮那句话抢回去 */
+    state.txActive = true;                   
     if (say) showPill(say);
     if (isFinal) {
-      /* ★ 结束了：留 `PILL_LINGER_MS` 给人看见，然后收牌 ＋ 把按钮复原 */
+      
       pillTimer = setTimeout(function () { pillTimer = null; hidePill(); restoreBtn(); }, PILL_LINGER_MS);
     }
   }
   function paintClaim(r) {
     var cv = claimView(r);
-    /* ★★ 2026-09-28（第二十五单 · 皇上）：「**分红币名可以显示，但是那个 18 位可以不用显示**」
-       ⇒ 用**链上现读**的币名（`dividendContract() → dividendToken() → symbol()`）；
-         读不到 ⇒ 中性的「分红币」兜底（⛔ 不瞎编、⛔ 不拿别的币名兜底、⛔ 不写"位数读不到"）。
-       ⛔ 这一行**只写币名** —— 小数位数挪进 `?debug=1`（`#fact-dividend`）。 */
+    
+
+
+
     var sym = (r.dividendTokenSymbol && String(r.dividendTokenSymbol).trim()) ? String(r.dividendTokenSymbol).trim() : '分红币';
     safe(function () {
       var t = el('claim-token');
       if (t) t.textContent = sym;
     });
-    /* ⛔ 这里**不许**再往状态牌写 `state.txState`（皇上：不要平时挂着一个状态词）——
-       状态牌由 `setTx()` 一处管（有交易才露、只说人话、结束几秒后收起来）。 */
+    
+
     var amtNode = el('claim-amount');
     var rightChain = (state.chainId === BSC_CHAIN_ID);
     var canSend = Boolean(state.account) && rightChain;
@@ -1888,12 +1888,12 @@ button{ min-height:44px; }
     } else {
       safe(function () { if (amtNode) amtNode.textContent = '未接入'; });
     }
-    /* ★ 交易还在手上（`state.txActive`）⇒ **不碰按钮那句话、也不把它点亮**：
-       按钮那句话一直是它自己的话；交易到哪一步由状态牌说（`setTx`）。
-       否则每 20 秒一次 refresh 会把它点回可按 ⇒ 可能被点两下。 */
+    
+
+
     if (!state.txActive) {
-      /* ★ 能不能按，先看**钱包与链**（错链/没连一律禁止发送，并把原因写在按钮上）；
-         再看可领额自己的状态。⛔ 不许把「链不对」画成「没得领」——那会让人以为只是行情问题。 */
+      
+
       if (!canSend) {
         setBtn('blocked', !state.account ? '先连钱包' : '链不对（禁止发送）');
       } else if (cv.state === 'ready') {
@@ -1917,12 +1917,12 @@ button{ min-height:44px; }
     paintsHero(r);
     safe(function () { el('risk-pill').textContent = '风险状态未接入'; });
     safe(function () { el('risk-note').textContent = '风险等级由官方页给 · 这里取不到'; });
-    /* ★★★ 2026-09-28（第二十一单 · 皇上最终口径）：这张卡里 **两个数** ——
-         · 金库余额   ＝ `balanceOf(金库)`（现在还剩多少）
-         · 历史总税收 ＝ `totalReceived()`（累计收进来多少；皇上另说的「总税收」与它是**同一个字段**，
-           ⇒ 按总管给的路子**不重复摆**一个一模一样的数）
-       用户视图里**只留数字 ＋ 最短单位**，⛔ 一句说明/字段名都没有；出处全在 `?debug=1` 那张表里。
-       （`totalSpent()` 那个"累计已花"读数也留在 debug 表里，用户视图不摆 —— 皇上这一版只点了两个数。） */
+    
+
+
+
+
+
     safe(function () {
       var u = String(r.quoteSymbol || '');
       var bal = toCoins(r.vaultBalance, r.quoteDecimals);
@@ -1930,11 +1930,11 @@ button{ min-height:44px; }
       el('v-reserved').textContent = (bal == null ? '读不到' : (fmtAmt(bal, 8) + ' ' + u));
       el('v-progress').textContent = (tax == null ? '读不到' : (fmtAmt(tax, 8) + ' ' + u));
     });
-    /* ★★★ 2026-09-29（第三十三单）：那四个累计格子（来源与口径见 `loadCumulative` 上面那段）。
-       ⛔ 读不到就写「读不到」——⛔ 不许写 0、⛔ 不许留空、⛔ 不许编数。 */
+    
+
     paintCumulative(r);
-    /* ★ 第三十四单：六个小框里的**币名**（现读符号；读不到写兜底词）——与数值分开、各自兜底。
-       ⛔ 上面两格不参与这一处：它们的标签是**固定的**（金库余额／历史总税收），一个字节没动。 */
+    
+
     paintCoinNames(r);
     paintRoutes(r);
     paintFacts(r);
@@ -1946,7 +1946,7 @@ button{ min-height:44px; }
     safe(function () {
       var b = el('push-reset');
       if (b) {
-        /* ★ 复位那一颗**只在跳闸时露出来**（顺序是硬的：先 resetTimerCircuit、再 nextRoute） */
+        
         b.hidden = !(r.timerTripped === true);
         b.disabled = !canSend;
         b.textContent = canSend ? '复位熔断（先按这一颗）' : (!state.account ? '复位熔断（先连钱包）' : '复位熔断（链不对，禁止发送）');
@@ -1961,11 +1961,11 @@ button{ min-height:44px; }
     });
   }
 
-  /* ══════════ ⑫ 读一次（只读读链；⛔ 不再接任何钟） ══════════ */
-  /* ★★ 2026-09-28（第二十一单 · 皇上）：「还有你这个长篇大论，这个不用展示给用户了」
-     ⇒ 读数表（`#facts`）**默认不展示**（markup 里就带 `hidden`），
-       只有网址带 **`?debug=1`** 时才由这里放出来 —— 不是"折叠起来默认收起"，是**根本不显示**。
-     ⛔ 风险状态那一块与四路那几行**不在** `#facts` 里，也不受这个开关影响（用户视图必须留）。 */
+  
+  
+
+
+
   function debugOn() {
     try {
       var s = String((typeof location !== 'undefined' && location.search) || '') + '&' +
@@ -1983,13 +1983,13 @@ button{ min-height:44px; }
   function refresh() {
     if (reading) return Promise.resolve(state.read);
     reading = true;
-    /* ★ 2026-09-28（第二十一单）：这条链上每一步都**各自兜底**了（见 `loadAll` 的 `soft`），
-       所以正常情况下它根本不会 reject；下面那个 `.catch` 是**最后一道**：
-       真到了那一步，也要**把每一格画成「读不到」**（⛔ 不许把整页留在「—」上，
-       更⛔ 不许留成 0 —— 皇上亲报的那一格就是这么被连累的）。 */
+    
+
+
+
     return loadAll().then(function (r) { return loadLens(r); }).then(function (r) { return loadCumulative(r); }).then(function (r) {
-      /* ★★★ 2026-10-14 修：四路各自读自己的目标符号（原来只读第 0 路、套给全部四路 ——
-         皇上报的那条 bug）。每个目标**各问一次** `symbol()`：⛔ 不共用、⛔ 不写死。 */
+      
+
       var targets4 = [0, 1, 2, 3].map(function (i) {
         return (r.routes && r.routes[i] && isHexAddr(r.routes[i].target)) ? r.routes[i].target
              : (i >= 3 && isHexAddr(r.token) ? r.token : null);
@@ -2024,10 +2024,10 @@ button{ min-height:44px; }
     if (state.chainId !== BSC_CHAIN_ID) { setHint('你的钱包不在 <b>BNB 主网（56）</b> ⇒ 这一页禁止发送。先切链。'); return Promise.resolve(null); }
     var cv = claimView(state.read || {});
     if (cv.state !== 'ready') { setHint('现在不能领：' + esc(cv.reason || '可领额不是正数')); return Promise.resolve(null); }
-    /* ★★ 2026-09-28（**第二十五单**）：⛔ **不换按钮那句话** ——
-       那句话是"这颗按钮自己的话"（领取我的分红／先连钱包／现在没得领…）；
-       交易进行到哪一步，由**状态牌**用人话说（`setTx` 的 `TX_SAY`）。
-       ⇒ 这里只做两件事：**旋钮转起来**（`confirming`）＋ **按住不动**（禁用）。 */
+    
+
+
+
     var bt = el('claim-btn-text');
     setBtn('confirming', (bt && bt.textContent) ? String(bt.textContent) : '领取我的分红');
     return sendTx(buildClaimPayload(state.account), 'claimDividend').then(function (out) {
@@ -2059,23 +2059,23 @@ button{ min-height:44px; }
     });
     bind('push-next', function () { nextRouteFlow(); });
     bind('push-reset', function () { resetFlow(); });
-    /* ★ 「作者金库地址」那一格：点一下 **同时** 复制 ＋（开关开着时）跳转 */
+    
     bind('link-author', function (e) {
       if (e && typeof e.preventDefault === 'function') e.preventDefault();
       authorOpen();
     });
-    /* ★ 读数表默认不展示（皇上）；`?debug=1` 才放出来 */
+    
     applyDebug();
-    /* ★★ 2026-09-28（第二十五单）：状态牌**开局就收起来**（markup 里也带 `hidden`；
-       这里再显式写一次 ⇒ 假 DOM 那套判据也看得见"开局是收着的"）。 */
+    
+
     hidePill();
-    /* 进页面：先自动问一次账户（有就静默接上），再读链 */
+    
     autoConnectOnce().then(function () { return refresh(); });
     if (typeof setInterval === 'function') {
       setInterval(function () { refresh(); }, REFRESH_MS);
     }
   }
-  /* 给自检用的观察窗（⛔ 只读；页面本身不依赖它） */
+  
   window.__dshGold = {
     state: state,
     sel: SEL,
@@ -2089,17 +2089,17 @@ button{ min-height:44px; }
     authorLinkText: authorLinkText,
     authorClickActions: authorClickActions,
     authorOpen: authorOpen,
-    /* ★★★ 2026-09-29（第三十九单）：判据要能把这几样抠出来**真跑**（标签 ／ 原位短句 ／ 复原毫秒数），
-       ⛔ 页面自己一条都不依赖这个观察窗。 */
+    
+
     authorLabel: AUTHOR_LABEL,
     authorFeedbackMs: AUTHOR_FEEDBACK_MS,
     authorFeedbackText: authorFeedbackText,
     authorSay: authorSay,
     claimView: claimView,
-    /* ★ 2026-09-29（第三十三单）：四个累计格子的那两处（判据脚本要能把它们抠出来真跑） */
+    
     fmtCum: fmtCum,
     paintCumulative: paintCumulative,
-    /* ★ 2026-09-29（第三十四单）：四个小框里的**币名**那一处（判据要能把它抠出来真跑） */
+    
     cumName: cumName,
     paintCoinNames: paintCoinNames,
     pairNameOf: pairNameOf,
@@ -2108,7 +2108,7 @@ button{ min-height:44px; }
     nextRouteFlow: nextRouteFlow,
     resetFlow: resetFlow,
     txStates: TX_STATES,
-    /* ★ 2026-09-28（第二十五单）给判据用：状态牌那一套（人话对照表 ＋ 显隐 ＋ 留几秒） */
+    
     txSay: txSay,
     txSayTable: TX_SAY,
     setTx: setTx,
@@ -2125,8 +2125,8 @@ button{ min-height:44px; }
 })();
 </script>
 <script>
-/* UI 适配层（只管显示，不碰链上逻辑）：把脚本写进 data-fill 的水位
-   映射成四路细红条的宽度（--fill 0..1 ⇒ width = fill × 100%）。 */
+
+
 (function () {
   'use strict';
   for (var i = 0; i < 4; i++) {
