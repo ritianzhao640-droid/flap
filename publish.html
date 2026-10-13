@@ -1446,6 +1446,63 @@ function fieldAppliesMap(schemaId){
  FORM_FIELD_REGISTRY.forEach(function(r){ m[r.id] = fieldAppliesToFactory(r, sid); });
  return m;
 }
+
+function paramLedger(){
+ var f0 = readForm();
+ var sid = String(f0.schemaId || activeSchemaId());
+ var v = null;
+ try { v = validate(f0); } catch (e){ return { schemaId: sid, error: (e && e.message ? e.message : String(e)), rows: [] }; }
+ if (!v) v = { errors: ["validate() 没有回对象"] };
+ var f = v.form || f0;
+ var applies = fieldAppliesMap(sid);
+ var words = null, vaultWhy = "";
+ try {
+  var sch0 = schemaById(sid);
+  var g = null;
+  if (String(sch0.variant) === "koi") { g = koiGeometryFromForm(f); }
+  else {
+   var n0 = function(x){ return BigInt(String(x == null ? "0" : x).trim() || "0"); };
+   g = {
+    route1_bps: Number(n0(f.r1)), route2_bps: Number(n0(f.r2)), route3_bps: Number(n0(f.r3)),
+    route1_target_token: normAddr(f.t1) || ZERO_ADDR, route2_target_token: normAddr(f.t2) || ZERO_ADDR,
+    route3_target_token: normAddr(f.t3) || ZERO_ADDR,
+    vaultFallbackBps: Number(n0(f.fallback)), vaultSelfBuiltThreshold: n0(f.selfBuilt).toString(),
+    route4_burn_own_bps: Number(n0(f.r4)), route4_target_token: predictedTokenAddr() || ZERO_ADDR
+   };
+  }
+  var b = buildVaultData(g, sch0);
+  if (b && b.ok && b.words) words = b.words;
+  else vaultWhy = "页面自己的 buildVaultData 现在判不过（" + (b ? ("格 " + b.wordCount + "／字节 " + b.bytes + "，errors=" + JSON.stringify(b.errors || [])) : "没返回") + "）⇒ 这一段的刻度还没有自己的判据，先记『待验』";
+ } catch (e){ words = null; vaultWhy = "vaultData 这一段这次编不出来：" + (e && e.message ? e.message : e); }
+ function W(i){ return (words && words.length > i) ? words[i] : null; }
+ function PW(){ return words ? "" : vaultWhy; }
+ var rows = [
+  { key: "minimumShareBalance", label: "分红门槛", humanId: "pf_minShare", human: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? f.minShare : null; })(),
+    unit: "枚", scale: 18, step: "value × 10^18", onChain: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? v.minScaleWei : null; })(), wire: true,
+    applies: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return Boolean(e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]); })(),
+    pendingWhy: "这台工厂的表单里**没有**分红门槛这一格（它没有持币分红）；而发币参数仍会带上一个数 —— ★ 这是本页一处**待查**：没有分红的金库这个字段该填什么，还没有链上结论",
+    why: "canon/prelude/IPortal.sol:566「min: 10K ether」＋ 工厂源码注释逐字 10000e18" },
+  { key: "vaultSelfBuiltThreshold", label: "金库自建门槛", humanId: "pf_selfBuilt", human: f.selfBuilt,
+    unit: "最小单位（无换算）", scale: 0, step: "原样", onChain: W(7), wire: true, pendingWhy: PW(),
+    applies: applies["pf_selfBuilt"], why: "工厂上限 MAX_SELF_BUILT_THRESHOLD = 1e30 ⇒ 不是「枚 × 1e18」（那样上限只合 1e12 枚）" },
+  { key: "vaultFallbackBps", label: "金库兜底留额", humanId: "pf_fallback", human: f.fallback,
+    unit: "bps", scale: 0, step: "原样", onChain: W(6), wire: true, pendingWhy: PW(),
+    applies: applies["pf_fallback"], why: "上限 500 bps" },
+  { key: "route1_dividend_bps", label: "第 1 路比例", humanId: "pf_r1", human: f.r1, unit: "bps", scale: 0, wire: true,
+    onChain: W(0), pendingWhy: PW(), applies: applies["pf_r1"], why: "四路之和必须恰好 10000" },
+  { key: "route2_lp_bps", label: "第 2 路比例", humanId: "pf_r2", human: f.r2, unit: "bps", scale: 0, wire: true,
+    onChain: W(1), pendingWhy: PW(), applies: applies["pf_r2"], why: "同上" },
+  { key: "route3_burn_bps", label: "第 3 路比例", humanId: "pf_r3", human: f.r3, unit: "bps", scale: 0, wire: true,
+    onChain: W(2), pendingWhy: PW(), applies: applies["pf_r3"], why: "同上" },
+  { key: "route4_burn_own_bps", label: "第 4 路比例", humanId: "pf_r4", human: f.r4, unit: "bps", scale: 0, wire: true,
+    onChain: W(8), pendingWhy: PW(), applies: applies["pf_r4"], why: "同上" },
+  { key: "hashrateThreshold", label: "算力门槛", humanId: "pf_kthreshold", human: f.kthreshold,
+    unit: "点（1 枚 Koi ＝ 1 点）", scale: 0, step: "原样", onChain: W(6), wire: false, pendingWhy: PW(),
+    applies: applies["pf_kthreshold"],
+    why: "页内逐字：⛔ 不是 wei、不乘 10^18；留空或 0 ⇒ 工厂补默认 100000 点（进 vaultData 那一格，不是 calldata 顶层）" }
+ ];
+ return { schemaId: sid, errors: v.errors || [], warningCount: (v.warnings || []).length, rows: rows };
+}
 function koiGeometryFromForm(f){
  return {
  vaultAdminWallet: f.kvaultAdmin, adminWallet: f.kadmin, marketingAddress: f.kmarketing,
@@ -3847,6 +3904,7 @@ window.__dshPublish = {
  koiFormFieldIds: ["pf_kvaultAdmin", "pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"],
  applySchemaVisibility: applySchemaVisibility, activeSchemaId: activeSchemaId,
  factoryFormFields: factoryFormFields, factoryFormFieldIds: factoryFormFieldIds, formFieldRegistry: FORM_FIELD_REGISTRY,
+ paramLedger: paramLedger,
 
  isNativeQuoteMode: isNativeQuoteMode, pubBtnLabel: pubBtnLabel,
  quoteSupportedBy: quoteSupportedBy, quoteSupportOf: quoteSupportOf, quoteSupportOk: quoteSupportOk,
