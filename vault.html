@@ -1540,14 +1540,25 @@ button{ min-height:44px; }
   function paintRoutes(r) {
     var th = effThreshold(r);
     var rs = r.routesState;
-    var tgtSym = (r.targetSymbol && String(r.targetSymbol).trim()) ? String(r.targetSymbol).trim() : '读不到';
     var selfSym = (r.tokenSymbol && String(r.tokenSymbol).trim()) ? String(r.tokenSymbol).trim() : '读不到';
+    /* ★★★ 2026-10-14 修：四路**各自**的目标币名（原来四路都用了第 1 路的那个名字）
+       皇上报：「为什么全部变成『领头羊』了？还有两项应该是『战备人生』才对」
+       链上实况：第 1 路＝领头羊／第 2、3 路＝战备人生／第 4 路＝本币。
+       旧写法只读第 0 路的目标符号（refresh() 里 `r.targetSymbol = a[0]`）就把它套给了全部四路 ——
+       ⛔ 四路的目标本来就允许不同（routeAt(i).target 各读各的）。
+       这里改成**每一路自己的**目标符号；读不到 ⇒ 写「读不到」（⛔ 不许拿别人的名字顶上）。
+       ⛔ 币名一律链上现读，一个都不写死。 */
+    var routeSym = (r.routeSymbols && r.routeSymbols.length === 4) ? r.routeSymbols : [null, null, null, null];
+    var symAt = function (i) {
+      var s = routeSym[i];
+      return (s && String(s).trim()) ? String(s).trim() : '读不到';
+    };
     /* 四路各自的白话名 —— 币名与比例**全部来自链上现读**（routeAt(i) 的 bps / target），一个都不写死 */
     var labels = [
-      '第 1 路 · 分红发 ' + tgtSym,
-      '第 2 路 · 加 ' + tgtSym + ' 的 LP',
-      '第 3 路 · 销毁 ' + tgtSym,
-      '第 4 路 · 销毁本币 ' + selfSym
+      '第 1 路 · 分红发 ' + symAt(0),
+      '第 2 路 · 加 ' + symAt(1) + ' 的 LP',
+      '第 3 路 · 销毁 ' + symAt(2),
+      '第 4 路 · 销毁本币 ' + symAt(3)
     ];
     for (var k = 0; k < 4; k++) {
       (function (idx) {
@@ -1977,10 +1988,20 @@ button{ min-height:44px; }
        真到了那一步，也要**把每一格画成「读不到」**（⛔ 不许把整页留在「—」上，
        更⛔ 不许留成 0 —— 皇上亲报的那一格就是这么被连累的）。 */
     return loadAll().then(function (r) { return loadLens(r); }).then(function (r) { return loadCumulative(r); }).then(function (r) {
+      /* ★★★ 2026-10-14 修：四路各自读自己的目标符号（原来只读第 0 路、套给全部四路 ——
+         皇上报的那条 bug）。每个目标**各问一次** `symbol()`：⛔ 不共用、⛔ 不写死。 */
+      var targets4 = [0, 1, 2, 3].map(function (i) {
+        return (r.routes && r.routes[i] && isHexAddr(r.routes[i].target)) ? r.routes[i].target
+             : (i >= 3 && isHexAddr(r.token) ? r.token : null);
+      });
       return Promise.all([
-        (r.routes && r.routes[0] && isHexAddr(r.routes[0].target) ? callStr(r.routes[0].target, SEL.symbol) : Promise.resolve(null))
+        (r.routes && r.routes[0] && isHexAddr(r.routes[0].target) ? callStr(r.routes[0].target, SEL.symbol) : Promise.resolve(null)),
+        (targets4[1] ? callStr(targets4[1], SEL.symbol) : Promise.resolve(null)),
+        (targets4[2] ? callStr(targets4[2], SEL.symbol) : Promise.resolve(null)),
+        (targets4[3] ? callStr(targets4[3], SEL.symbol) : Promise.resolve(null))
       ]).then(function (a) {
         r.targetSymbol = a[0];
+        r.routeSymbols = a;
         reading = false;
         state.read = r; state.readAt = Date.now();
         render();
