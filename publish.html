@@ -1454,6 +1454,27 @@ function paramLedger(){
  try { v = validate(f0); } catch (e){ return { schemaId: sid, error: (e && e.message ? e.message : String(e)), rows: [] }; }
  if (!v) v = { errors: ["validate() 没有回对象"] };
  var f = v.form || f0;
+ // ★ 账**不依赖 validate() 的返回**：表单没填齐时 validate() 会早退，它的返回里就没有 minScaleWei
+ var minScaleWeiSelf = null;
+ try { minScaleWeiSelf = parseTokenAmount(f.minShare, "分红门槛"); } catch (e){ minScaleWeiSelf = null; }
+ // ★★ 更进一步：minScaleWei 要从**真正要发出去那一笔**里读（buildLaunchParams 的 minimumShareBalance），
+ //    ⛔ 不用我在这儿自己算的那个 —— 自己算的就是自证，抓不到「别处把值改坏」。
+ var wireMinShare = null;
+ try {
+  var pv = validate(f0);
+  var lp = buildLaunchParams({});
+  if (lp && lp.minimumShareBalance != null) wireMinShare = lp.minimumShareBalance;
+  else if (pv && pv.minScaleWei != null) wireMinShare = pv.minScaleWei;
+ } catch (e){ wireMinShare = minScaleWeiSelf; }
+ // 表单里空着的格：照页面自己的默认值兜住（这样「账」不会因为某格没填就整段读不出来）
+ var usedDefaults = [];
+ function pick(x, dflt, name){ var t = String(x == null ? "" : x).trim(); if (t !== "") return t; usedDefaults.push(name); return String(dflt); }
+ var DD = (EXT.blockFacts || {}).defaults || {};
+ var hR1 = pick(f0.r1, DD.r1, "第 1 路比例"), hR2 = pick(f0.r2, DD.r2, "第 2 路比例");
+ var hR3 = pick(f0.r3, DD.r3, "第 3 路比例"), hFB = pick(f0.fallback, DD.fallback, "金库兜底留额");
+ var hSB = pick(f0.selfBuilt, DD.selfBuilt, "金库自建门槛");
+ var hR4 = String(f0.r4 == null ? "" : f0.r4).trim();
+ if (hR4 === "") { var rs = BigInt(hR1) + BigInt(hR2) + BigInt(hR3); hR4 = String(BigInt(TOTAL_BPS) - rs); usedDefaults.push("第 4 路比例（＝10000 − 前三路）"); }
  var applies = fieldAppliesMap(sid);
  var words = null, vaultWhy = "";
  try {
@@ -1463,11 +1484,11 @@ function paramLedger(){
   else {
    var n0 = function(x){ return BigInt(String(x == null ? "0" : x).trim() || "0"); };
    g = {
-    route1_bps: Number(n0(f.r1)), route2_bps: Number(n0(f.r2)), route3_bps: Number(n0(f.r3)),
+    route1_bps: Number(n0(hR1)), route2_bps: Number(n0(hR2)), route3_bps: Number(n0(hR3)),
     route1_target_token: normAddr(f.t1) || ZERO_ADDR, route2_target_token: normAddr(f.t2) || ZERO_ADDR,
     route3_target_token: normAddr(f.t3) || ZERO_ADDR,
-    vaultFallbackBps: Number(n0(f.fallback)), vaultSelfBuiltThreshold: n0(f.selfBuilt).toString(),
-    route4_burn_own_bps: Number(n0(f.r4)), route4_target_token: predictedTokenAddr() || ZERO_ADDR
+    vaultFallbackBps: Number(n0(hFB)), vaultSelfBuiltThreshold: n0(hSB).toString(),
+    route4_burn_own_bps: Number(n0(hR4)), route4_target_token: predictedTokenAddr() || ZERO_ADDR
    };
   }
   var b = buildVaultData(g, sch0);
@@ -1478,23 +1499,23 @@ function paramLedger(){
  function PW(){ return words ? "" : vaultWhy; }
  var rows = [
   { key: "minimumShareBalance", label: "分红门槛", humanId: "pf_minShare", human: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? f.minShare : null; })(),
-    unit: "枚", scale: 18, step: "value × 10^18", onChain: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? v.minScaleWei : null; })(), wire: true,
+    unit: "枚", scale: 18, step: "value × 10^18", onChain: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? (wireMinShare == null ? minScaleWeiSelf : wireMinShare) : null; })(), wire: true,
     applies: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return Boolean(e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]); })(),
     pendingWhy: "这台工厂的表单里**没有**分红门槛这一格（它没有持币分红）；而发币参数仍会带上一个数 —— ★ 这是本页一处**待查**：没有分红的金库这个字段该填什么，还没有链上结论",
     why: "canon/prelude/IPortal.sol:566「min: 10K ether」＋ 工厂源码注释逐字 10000e18" },
-  { key: "vaultSelfBuiltThreshold", label: "金库自建门槛", humanId: "pf_selfBuilt", human: f.selfBuilt,
+  { key: "vaultSelfBuiltThreshold", label: "金库自建门槛", humanId: "pf_selfBuilt", human: hSB,
     unit: "最小单位（无换算）", scale: 0, step: "原样", onChain: W(7), wire: true, pendingWhy: PW(),
     applies: applies["pf_selfBuilt"], why: "工厂上限 MAX_SELF_BUILT_THRESHOLD = 1e30 ⇒ 不是「枚 × 1e18」（那样上限只合 1e12 枚）" },
-  { key: "vaultFallbackBps", label: "金库兜底留额", humanId: "pf_fallback", human: f.fallback,
+  { key: "vaultFallbackBps", label: "金库兜底留额", humanId: "pf_fallback", human: hFB,
     unit: "bps", scale: 0, step: "原样", onChain: W(6), wire: true, pendingWhy: PW(),
     applies: applies["pf_fallback"], why: "上限 500 bps" },
-  { key: "route1_dividend_bps", label: "第 1 路比例", humanId: "pf_r1", human: f.r1, unit: "bps", scale: 0, wire: true,
+  { key: "route1_dividend_bps", label: "第 1 路比例", humanId: "pf_r1", human: hR1, unit: "bps", scale: 0, wire: true,
     onChain: W(0), pendingWhy: PW(), applies: applies["pf_r1"], why: "四路之和必须恰好 10000" },
-  { key: "route2_lp_bps", label: "第 2 路比例", humanId: "pf_r2", human: f.r2, unit: "bps", scale: 0, wire: true,
+  { key: "route2_lp_bps", label: "第 2 路比例", humanId: "pf_r2", human: hR2, unit: "bps", scale: 0, wire: true,
     onChain: W(1), pendingWhy: PW(), applies: applies["pf_r2"], why: "同上" },
-  { key: "route3_burn_bps", label: "第 3 路比例", humanId: "pf_r3", human: f.r3, unit: "bps", scale: 0, wire: true,
+  { key: "route3_burn_bps", label: "第 3 路比例", humanId: "pf_r3", human: hR3, unit: "bps", scale: 0, wire: true,
     onChain: W(2), pendingWhy: PW(), applies: applies["pf_r3"], why: "同上" },
-  { key: "route4_burn_own_bps", label: "第 4 路比例", humanId: "pf_r4", human: f.r4, unit: "bps", scale: 0, wire: true,
+  { key: "route4_burn_own_bps", label: "第 4 路比例", humanId: "pf_r4", human: hR4, unit: "bps", scale: 0, wire: true,
     onChain: W(8), pendingWhy: PW(), applies: applies["pf_r4"], why: "同上" },
   { key: "hashrateThreshold", label: "算力门槛", humanId: "pf_kthreshold", human: f.kthreshold,
     unit: "点（1 枚 Koi ＝ 1 点）", scale: 0, step: "原样", onChain: W(6), wire: false, pendingWhy: PW(),
