@@ -1334,6 +1334,11 @@ var VSCHEMAS = {};
 })();
 var DEFAULT_SCHEMA_ID = "fourroute10";
 var KOI_SCHEMA_ID = "koi7";
+// ★ 官方分红门槛下限：10,000 枚 × 1e18（canon/prelude/IPortal.sol:566「min: 10K ether」）。
+//   工厂源码逐字（P013VaultFactory.sol:855）：这个字段**每次发币都必须给、且不许为 0** ——
+//   官方在只有追踪模式（dividendBps == 0）时也会把它写进分红合约，实测那枚币报 10000e18。
+//   ⇒ 表单里没有这一格的工厂（例如锦鲤工厂：没有持币分红），页面就发这个下限。
+var OFFICIAL_MIN_SHARE_FLOOR = 10000n * (10n ** 18n);
 var KOI_LIVE = EXT.koiReadonlySources || {};
 function schemaById(id){ return VSCHEMAS[String(id)] || null; }
 function currentFactory(){ return state && state.sel ? state.sel : null; }
@@ -1498,11 +1503,18 @@ function paramLedger(){
  function W(i){ return (words && words.length > i) ? words[i] : null; }
  function PW(){ return words ? "" : vaultWhy; }
  var rows = [
-  { key: "minimumShareBalance", label: "分红门槛", humanId: "pf_minShare", human: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? f.minShare : null; })(),
-    unit: "枚", scale: 18, step: "value × 10^18", onChain: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]) ? (wireMinShare == null ? minScaleWeiSelf : wireMinShare) : null; })(), wire: true,
-    applies: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return Boolean(e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]); })(),
-    pendingWhy: "这台工厂的表单里**没有**分红门槛这一格（它没有持币分红）；而发币参数仍会带上一个数 —— ★ 这是本页一处**待查**：没有分红的金库这个字段该填什么，还没有链上结论",
-    why: "canon/prelude/IPortal.sol:566「min: 10K ether」＋ 工厂源码注释逐字 10000e18" },
+  { key: "minimumShareBalance", label: "(分红门槛)" + (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; return (e && e.in.indexOf(sid) >= 0) ? "分红门槛" : "官方下限"; })(),
+    humanId: "pf_minShare",
+    human: (function(){ var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0]; var onForm = Boolean(e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]); return onForm ? f.minShare : "10000"; })(),
+    unit: "枚", scale: 18, step: "value × 10^18",
+    onChain: (function(){
+      var e = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0];
+      var onForm = Boolean(e && e.in.indexOf(sid) >= 0 && applies["pf_minShare"]);
+      if (onForm) return (wireMinShare == null ? minScaleWeiSelf : wireMinShare);
+      return OFFICIAL_MIN_SHARE_FLOOR;
+    })(), wire: true,
+    applies: true,
+    why: "canon/prelude/IPortal.sol:566「min: 10K ether」＋ 工厂源码注释逐字 10000e18；★ 表单里没有这一格的工厂走**官方下限 10,000 枚**（0 会被工厂拒）" },
   { key: "vaultSelfBuiltThreshold", label: "金库自建门槛", humanId: "pf_selfBuilt", human: hSB,
     unit: "最小单位（无换算）", scale: 0, step: "原样", onChain: W(7), wire: true, pendingWhy: PW(),
     applies: applies["pf_selfBuilt"], why: "工厂上限 MAX_SELF_BUILT_THRESHOLD = 1e30 ⇒ 不是「枚 × 1e18」（那样上限只合 1e12 枚）" },
@@ -2006,7 +2018,14 @@ function buildLaunchParams(over){
  deflationBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.deflationBps : v.model.slots.deflationBps),
  dividendBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.dividendBps : v.model.slots.dividendBps),
  lpBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.lpBps : v.model.slots.lpBps),
- minimumShareBalance: v.minScaleWei,
+ // ★ 分红门槛（minimumShareBalance）：每次发币都必须给、且不许为 0（工厂源码 P013VaultFactory.sol:855 逐字）。
+ //   这台工厂的表单里**没有**这一格时（锦鲤工厂：没有持币分红）⇒ 发**官方下限 10,000 枚 = 1e22**，
+ //   ⛔ 不许留 0、也不拿表单里那个无意义的数（那是四路工厂的口径）。
+ minimumShareBalance: (function(){
+  var fld = FORM_FIELD_REGISTRY.filter(function(x){ return x.id === "pf_minShare"; })[0];
+  var has = Boolean(fld && fld.in.indexOf(String(v.schemaId)) >= 0) && v.minScaleWei != null && v.minScaleWei !== 0n;
+  return has ? v.minScaleWei : OFFICIAL_MIN_SHARE_FLOOR;
+ })(),
  
  dividendToken: (v.variant === "koi" ? ZERO_ADDR : MAGIC_DIVIDEND_COMPUTED),
  commissionReceiver: COMMISSION,
