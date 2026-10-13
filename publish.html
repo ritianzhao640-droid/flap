@@ -1413,24 +1413,76 @@ function readForm(){
 function currentQuoteMode(){ return (currentFactory() && currentFactory().quoteModes && currentFactory().quoteModes.length) ? String(currentFactory().quoteModes[0]) : "erc20"; }
 
 var FORM_FIELD_REGISTRY = [
- { id: "pf_minShare", key: "minShare", label: "分红门槛", owner: "token", in: ["fourroute10"], apply: true },
- { id: "pf_selfBuilt", key: "vaultSelfBuiltThreshold", label: "金库自建门槛", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_r1", key: "route1_dividend_bps", label: "第 1 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_r2", key: "route2_lp_bps", label: "第 2 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_r3", key: "route3_burn_bps", label: "第 3 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_r4", key: "route4_burn_own_bps", label: "第 4 路比例", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_fallback", key: "vaultFallbackBps", label: "金库兜底留额", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_t1", key: "route1_target_token", label: "第 1 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_t2", key: "route2_target_token", label: "第 2 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_t3", key: "route3_target_token", label: "第 3 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "(derived)route4_target_token", key: "route4_target_token", label: "第 4 路目标币（＝现场挖出来的靓号，只读派生）", owner: "vaultData", in: ["fourroute10"], apply: false },
- { id: "pf_kvaultAdmin", key: "vaultAdminWallet", label: "金库管理员", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_kadmin", key: "adminWallet", label: "合约交互管理", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_kmarketing", key: "marketingAddress", label: "营销地址", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_kops", key: "opsWallet", label: "运维地址", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_khashrate", key: "hashrateContractAddress", label: "算力合约", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_knft", key: "navigatorNftAddress", label: "领航 NFT", owner: "vaultData", in: ["koi7"], apply: false },
- { id: "pf_kthreshold", key: "hashrateThreshold", label: "算力门槛", owner: "vaultData", in: ["koi7"], apply: false }
+ //  ★ 每条除了「归哪台工厂」，还照原样带着**怎么画**（label／hint／控件类型／网格／分组）
+ //     ⇒ 表单由这张表渲染（加新工厂＝只加一份表），⛔ 不再手写输入框。
+ //  owner: token＝平台级参数（进 calldata）／vaultData＝进格表的那几格
+ { id: "pf_minShare", key: "minShare", label: "分红门槛", owner: "token", in: ["fourroute10"], apply: true,
+   u: "枚", scale: 18, wire: 1,
+   lb: "☆ 分红门槛 / Dividend threshold",
+   hint: "填的是<b>枚数</b>（不是 wei）：链上会按 <span class=\"mono\">× 10^18</span> 换算；官方下限 <b>10,000 枚</b>（低于它平台按最低档处理）；必须 &gt; 0",
+   kind: "text", cls: "mono", def: "100000", grid: "one", order: 40,
+   why: "canon/prelude/IPortal.sol:566「min: 10K ether」＋ 工厂源码注释逐字 10000e18" },
+ { id: "pf_t3", key: "route3_target_token", label: "第 3 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "地址", scale: 0, wire: 1, lb: "☆ 第 3 路目标币（必填，不许填本币）", hint: "你想销毁的那枚第三方币",
+   kind: "text", cls: "mono", ph: "必填", grid: "g3r", order: 43, why: "四路之和必须恰好 10000" },
+ { id: "pf_selfBuilt", key: "vaultSelfBuiltThreshold", label: "金库自建门槛", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "最小单位（无换算）", scale: 0, wire: 1, lb: "金库自建门槛（第 8 格）", hint: "0 ＝ 用工厂定死的门槛",
+   kind: "text", cls: "mono", def: "0", grid: "g3b", order: 51,
+   why: "工厂上限 MAX_SELF_BUILT_THRESHOLD = 1e30 ⇒ 不是「枚 × 1e18」" },
+ { id: "pf_r1", key: "route1_dividend_bps", label: "第 1 路比例", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "bps", scale: 0, wire: 1, lb: "☆ 第 1 路 · 分红 bps", kind: "number", min: "0", max: "10000",
+   cls: "", def: "2000", grid: "g3a", order: 44, why: "四路之和必须恰好 10000" },
+ { id: "pf_r2", key: "route2_lp_bps", label: "第 2 路比例", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "bps", scale: 0, wire: 1, lb: "☆ 第 2 路 · 加池 bps", kind: "number", min: "0", max: "10000",
+   cls: "", def: "3000", grid: "g3a", order: 45, why: "四路之和必须恰好 10000" },
+ { id: "pf_r3", key: "route3_burn_bps", label: "第 3 路比例", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "bps", scale: 0, wire: 1, lb: "☆ 第 3 路 · 销毁第三方 bps", kind: "number", min: "0", max: "10000",
+   cls: "", def: "3000", grid: "g3a", order: 46, why: "四路之和必须恰好 10000" },
+ { id: "pf_r4", key: "route4_burn_own_bps", label: "第 4 路比例", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "bps", scale: 0, wire: 1, lb: "☆ 第 4 路 · 销毁本币 bps（vaultData 第 9 格）",
+   hint: "默认按 10000 −（前 3 路之和）回填，你也可以改；四路之和不是 10000 会硬拦",
+   kind: "number", min: "0", max: "10000", cls: "", def: "", grid: "g3b", order: 50, why: "四路之和必须恰好 10000" },
+ { id: "pf_fallback", key: "vaultFallbackBps", label: "金库兜底留额", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "bps", scale: 0, wire: 1, lb: "金库兜底留额 bps（第 7 格）", hint: "0–500；本版四路全自建 ⇒ 应为 0",
+   kind: "number", min: "0", max: "500", cls: "", def: "0", grid: "g3b", order: 52, why: "上限 500 bps" },
+ { id: "pf_t1", key: "route1_target_token", label: "第 1 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "地址", scale: 0, wire: 1, lb: "第 1 路目标币", hint: "留空 ＝ 走官方口袋",
+   kind: "text", cls: "mono", ph: "留空 = 官方口袋", def: "", grid: "g3r", order: 41, why: "留空走官方口袋" },
+ { id: "pf_t2", key: "route2_target_token", label: "第 2 路目标币", owner: "vaultData", in: ["fourroute10"], apply: false,
+   u: "地址", scale: 0, wire: 1, lb: "第 2 路目标币", hint: "留空 ＝ 走官方口袋",
+   kind: "text", cls: "mono", ph: "留空 = 官方口袋", def: "", grid: "g3r", order: 42, why: "留空走官方口袋" },
+ { id: "(derived)route4_target_token", key: "route4_target_token", label: "第 4 路目标币（＝现场挖出来的靓号，只读派生）",
+   owner: "vaultData", in: ["fourroute10"], apply: false, u: "地址（派生）", scale: 0, wire: 0, derived: "r4Out",
+   lb: "第 4 路目标币（第 10 格 · 只读）", hint: "由上面「第 4 路：现场挖靓号」算出来，⛔ 不许手打",
+   grid: "g3r", order: 47, why: "第 10 格必须 ＝ 本币地址（链上强制）" },
+ { id: "pf_kvaultAdmin", key: "vaultAdminWallet", label: "金库管理员", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 金库管理员 vaultAdminWallet（第 1 格）",
+   hint: "＝金库 admin ＋ 升级权初始持有者。<b>必须就是发币人本人</b>（工厂拿 <span class=\"mono\">creator</span> 当升级权持有人 ⇒ 不相等建库必被拒）",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k", order: 60, why: "金库 initialize 硬判" },
+ { id: "pf_kadmin", key: "adminWallet", label: "合约交互管理", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 合约交互管理 adminWallet（第 2 格）",
+   hint: "填数字、提交的那个人（销毁／回购触发／小游戏兜底注资）",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k", order: 61, why: "金库 initialize 硬判" },
+ { id: "pf_kmarketing", key: "marketingAddress", label: "营销地址", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 营销地址 marketingAddress（第 3 格）",
+   hint: "＝那个「桶」本身（收钱的地方）。必须与运维地址不同",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k", order: 62, why: "金库 initialize 硬判" },
+ { id: "pf_kops", key: "opsWallet", label: "运维地址", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 运维地址 opsWallet（第 4 格）",
+   hint: "桶里那 20 点由金库自动转给它（只收钱）。⛔ 必须与营销地址不同",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k2", order: 63, why: "金库 initialize 硬判" },
+ { id: "pf_khashrate", key: "hashrateContractAddress", label: "算力合约", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 算力合约 hashrateContractAddress（第 5 格）",
+   hint: "只读来源（不是收款方）。<b>只读核对</b>：有代码 ＋ 答得出 <span class=\"mono\">totalEffectiveWeight()</span>",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k2", order: 64, why: "金库 initialize 硬判" },
+ { id: "pf_knft", key: "navigatorNftAddress", label: "领航 NFT", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "地址", scale: 0, wire: 0, lb: "☆ 领航 NFT navigatorNftAddress（第 6 格）",
+   hint: "只读来源（不是收款方）。<b>只读核对</b>：有代码 ＋ 答得出 <span class=\"mono\">slotsIssued()</span>",
+   kind: "text", cls: "mono", ph: "0x…（40 位）", def: "", grid: "g3k2", order: 65, why: "金库 initialize 硬判" },
+ { id: "pf_kthreshold", key: "hashrateThreshold", label: "算力门槛", owner: "vaultData", in: ["koi7"], apply: false,
+   u: "点（1 枚 Koi ＝ 1 点）", scale: 0, wire: 0, lb: "算力门槛 hashrateThreshold（第 7 格 · 选填）",
+   hint: "单位是<b>「点」</b>（1 枚 Koi ＝ 1 点，⛔ 不是 wei、不乘 10^18）。<b>留空或填 0 ⇒ 工厂补默认 100000 点（10 万点）</b>；部署后不可改",
+   kind: "text", cls: "mono", ph: "留空 = 工厂默认 100000 点", def: "", grid: "g2k", order: 66, why: "⛔ 不是 wei、不乘 10^18" }
 ];
 
 function factoryFormFields(schemaId){
@@ -1450,6 +1502,65 @@ function fieldAppliesMap(schemaId){
  var sid = String(schemaId || activeSchemaId()); var m = {};
  FORM_FIELD_REGISTRY.forEach(function(r){ m[r.id] = fieldAppliesToFactory(r, sid); });
  return m;
+}
+
+// ---- 表单**由字段表渲染**（2026-10-13）：加新工厂＝只加一份表，⛔ 不再手写输入框 --------------
+//   每个 schema 画成「一个分组 = 一段网格」，段与段的 class 沿用页面原来的 grid3／grid2 等。
+var FORM_GROUP_CLASS = { one: "", g3a: "grid3", g3b: "grid3", g3r: "grid3", g3k: "grid3", g3k2: "grid3", g2k: "grid2" };
+var FORM_SECTION_BY_SCHEMA = {
+ fourroute10: [
+  { group: "one" },
+  { cls: "cardHead", text: "四路比例（四条加起来必须恰好 10000）" },
+  { group: "g3a" }, { group: "g3b" }, { group: "g3r" }
+ ],
+ koi7: [
+  { cls: "cardHead", text: "202锦鲤工厂 · 建库 7 格（算力与领航那一套）" },
+  { html: "<p class=\"muted small\" style=\"margin:4px 0 0\">这一台是<b>另一套参数表</b>：7 格 × 32 字节 ＝ <b>224 字节</b>（选 202 四路金库时是 10 格／320 字节）。\n下面每一格的名字都与链上 <span class=\"mono\">vaultDataSchema()</span> 自称的字段<b>逐字相同</b> —— 页面不自己编名字。</p>" },
+  { group: "g3k" },
+  { html: "<div class=\"muted small\" id=\"pf_kvaultAdminState\" style=\"margin:2px 0 6px 4px\">必须＝发币人本人的钱包地址</div>" },
+  { group: "g3k2" },
+  { group: "g2k" },
+  { html: "<div><div class=\"row\" style=\"margin-top:14px\"><button class=\"ghost\" id=\"btnKoiFillSelf\">用当前钱包填「金库管理员」</button></div>\n<div class=\"muted small\" style=\"margin-top:6px\">金库管理员必须 ＝ 发币人本人（＝ <span class=\"mono\">newVault</span> 的 <span class=\"mono\">creator</span>）。</div></div>" }
+ ]
+};
+function esc3(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function renderFieldInput(r){
+ if (String(r.id).indexOf("(derived)") === 0){
+  return "<div class=\"kv\"><span class=\"k\">" + r.lb + "</span><span class=\"v mono break\" id=\"" + r.derived + "\">—</span></div>" +
+   (r.hint ? "<span class=\"hint\">" + r.hint + "</span>" : "");
+ }
+ var attrs = "type=\"" + (r.kind || "text") + "\"";
+ if (r.cls) attrs += " class=\"" + r.cls + "\"";
+ attrs += " id=\"" + r.id + "\"";
+ if (r.def != null && r.def !== "") attrs += " value=\"" + esc3(r.def) + "\"";
+ else attrs += " value=\"\"";
+ if (r.ph) attrs += " placeholder=\"" + esc3(r.ph) + "\"";
+ if (r.min != null) attrs += " min=\"" + r.min + "\"";
+ if (r.max != null) attrs += " max=\"" + r.max + "\"";
+ return "<label class=\"fl\"><span class=\"lb\">" + r.lb + "</span>" +
+  (r.hint ? "<span class=\"hint\">" + r.hint + "</span>" : "") +
+  "<input " + attrs + " /></label>";
+}
+function formSectionHtml(schemaId){
+ var sec = FORM_SECTION_BY_SCHEMA[String(schemaId)] || [];
+ var out = [];
+ for (var i = 0; i < sec.length; i++){
+  var s = sec[i];
+  if (s.html != null){ out.push(s.html); continue; }
+  if (s.text != null){ out.push("<div class=\"" + s.cls + "\" style=\"margin-top:12px\">" + s.text + "</div>"); continue; }
+  var rows = FORM_FIELD_REGISTRY.filter(function(r){ return r.in.indexOf(String(schemaId)) >= 0 && r.grid === s.group; })
+   .sort(function(a, b){ return Number(a.order || 0) - Number(b.order || 0); });
+  if (!rows.length) continue;
+  var gcls = FORM_GROUP_CLASS[s.group];
+  out.push((gcls ? "<div class=\"" + gcls + "\">" : "") + rows.map(renderFieldInput).join("") + (gcls ? "</div>" : ""));
+ }
+ return out.join("\n");
+}
+function renderForm(){
+ ["fourroute10", "koi7"].forEach(function(sid){
+  var box = document.getElementById("pfBox_" + sid);
+  if (box) box.innerHTML = formSectionHtml(sid);
+ });
 }
 
 function paramLedger(){
@@ -3942,7 +4053,7 @@ window.__dshPublish = {
  koiReadonlySources: EXT.koiReadonlySources, koiSourceDefs: koiSourceDefs, verifyKoiSources: verifyKoiSources,
  wordDataOk: wordDataOk, stringDataOk: stringDataOk, decodeAbiStringStrict: decodeAbiStringStrict,
  koiFormFieldIds: ["pf_kvaultAdmin", "pf_kadmin", "pf_kmarketing", "pf_kops", "pf_khashrate", "pf_knft", "pf_kthreshold"],
- applySchemaVisibility: applySchemaVisibility, activeSchemaId: activeSchemaId,
+ applySchemaVisibility: applySchemaVisibility, activeSchemaId: activeSchemaId, renderForm: renderForm, formSectionHtml: formSectionHtml,
  factoryFormFields: factoryFormFields, factoryFormFieldIds: factoryFormFieldIds, formFieldRegistry: FORM_FIELD_REGISTRY,
  paramLedger: paramLedger,
 
