@@ -394,7 +394,7 @@ svg.ic.i24{width:var(--s24);height:var(--s24)}
  <div class="kv"><span class="k">预计收到</span><span class="v mono break" id="buyReceiveOut">—</span></div>
  <div id="buyCapMsg"></div>
  <label class="fl"><span class="lb">分红门槛 / Dividend threshold</span>
- <span class="hint">持币到这个数才有分红（本页按 18 位小数换算，必须 &gt; 0）</span>
+ <span class="hint">填的是<b>枚数</b>（不是 wei）：链上会按 <span class="mono">× 10^18</span> 换算；官方下限 <b>10,000 枚</b>（低于它平台按最低档处理）；必须 &gt; 0</span>
  <input type="text" class="mono" id="pf_minShare" value="100000" /></label>
 
  <div id="pf_fourroute_only">
@@ -1759,7 +1759,7 @@ function validate(){
  var buyUnitsInfo = buyAmountUnits();
  if (buyUnitsInfo.ok) quoteAmt = buyUnitsInfo.units;
  else E("初始买入：" + buyUnitsInfo.err);
- try { minShare = BigInt(n(f.minShare, "分红门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); }
+ try { minShare = parseTokenAmount(f.minShare, "分红门槛"); } catch (e){ E(e.message); }
  try { sb = BigInt(n(f.selfBuilt, "金库自建门槛", 0, "9".repeat(40))); } catch (e){ E(e.message); }
  try { taxDuration = BigInt(n(f.taxDuration, "收税时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
  try { antiFarmer = BigInt(n(f.antiFarmer, "防抢跑时长", 0, "9".repeat(40))); } catch (e){ E(e.message); }
@@ -1855,7 +1855,7 @@ function validate(){
   }
  }
  return { errors: errors, warnings: warnings, form: f, quoteToken: quote, buyTax: buyTax, sellTax: sellTax,
- quoteAmtWei: quoteAmt, minShareWei: minShare, taxDuration: taxDuration, antiFarmer: antiFarmer,
+ quoteAmtWei: quoteAmt, minScaleWei: minShare, taxDuration: taxDuration, antiFarmer: antiFarmer,
  r1: r1, r2: r2, r3: r3, r4: r4, fallback: fb, geometry: geometry, model: model, built: built,
  schema: sch, schemaId: schemaIdOfFactory(currentFactory()), variant: variant,
  capInfo: capInfo, buyUnits: buyUnitsInfo };
@@ -1886,7 +1886,7 @@ function buildLaunchParams(over){
  deflationBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.deflationBps : v.model.slots.deflationBps),
  dividendBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.dividendBps : v.model.slots.dividendBps),
  lpBps: (v.variant === "koi" ? KOI_LAUNCH_SLOTS.lpBps : v.model.slots.lpBps),
- minimumShareBalance: v.minShareWei,
+ minimumShareBalance: v.minScaleWei,
  
  dividendToken: (v.variant === "koi" ? ZERO_ADDR : MAGIC_DIVIDEND_COMPUTED),
  commissionReceiver: COMMISSION,
@@ -2923,6 +2923,17 @@ function decStrToScaled(s, scale){
  var frac = (p[1] || "").slice(0, scale).padEnd(scale, "0");
  try{ return BigInt(p[0] || "0") * (10n ** BigInt(scale)) + BigInt(frac || "0"); }
  catch(e){ return null; }
+}
+var TOKEN_AMOUNT_DECIMALS = 18; 
+function parseTokenAmount(txt, label){
+ var t = String(txt == null ? "" : txt).trim();
+ if (t === "") throw new Error(label + "没填。");
+ if (!/^\d+(\.\d+)?$/.test(t)) throw new Error(label + "只许填数字（可以带小数）。");
+ if (fracLen(t) > TOKEN_AMOUNT_DECIMALS) throw new Error(label + "最多 " + TOKEN_AMOUNT_DECIMALS + " 位小数。");
+ var s = decStrToScaled(t, TOKEN_AMOUNT_DECIMALS);
+ if (s === null) throw new Error(label + "填的数看不懂（" + t + "）。");
+ if (s === 0n) throw new Error(label + "必须大于 0。");
+ return s;
 }
 
 function curveOf(t){
