@@ -10,48 +10,42 @@
 | `index.html` | ★ **入口页**。黑底白字，一屏看完，两个大按钮分别进「发布代币」与「税收金库」。 |
 | `publish.html` | **发布代币**页。填名称与图标、选定报价币，一键发一枚新代币；发行费与买入税当场算给你看。 |
 | `vault.html` | **税收金库**页。已发出去的币收到的税去哪了：四路分账、能领多少、什么时候能领。 |
+| `stockbase/index.html` | **股底分股回购销毁裂变**发布页（自带 `app.css` 与 `src/`）。选它这一台时，参数表上属于它的只有「分红门槛」一格（平台级参数，发币时由官方通道写入）。 |
 
-另外两件（不进站点、只为交付与核对）：
-
-| 文件 | 是什么 |
-|---|---|
-| `说明-给挂站的人.txt` | 给挂站的人／平台看的一页说明（怎么放文件、域名怎么指、文件指纹）。 |
-| `site-public.zip` | 上面几件打成的 zip，方便整包交给别人。 |
-
-⛔ 这个仓库里**故意没有**任何构建配置（没有 `package.json`、没有 `vercel.json`、没有构建脚本）——
+⛔ 这个站里**故意没有**任何构建配置（没有 `package.json`、没有 `vercel.json`、没有构建脚本）——
 它不需要构建。谁要是往里加构建配置，那就是加错了。
 
-## 怎么部署到 Vercel
+## 怎么部署
 
-1. 把这个仓库推到 GitHub（**根目录**就是这三张页，`index.html` 在根上）；
-2. 在 Vercel 里 **Add New… → Project**，选中这个仓库并导入；
-3. **Framework Preset 选 `Other`**，Build Command 与 Output Directory **都留空**（不设构建命令）；
-4. 点 **Deploy**。Vercel 会把仓库根目录当静态站发布 ⇒ 打开根域名出现的就是 `index.html`。
+**纯静态**：把这一批文件原样放到网页根目录即可 —— 没有构建命令、没有环境变量、不需要装任何东西。
+`index.html` 在根上，`stockbase/` 是它下面的一层（那一页自己的相对引用要的就是这个层次）。
 
-⛔ 不需要环境变量、不需要 API、不需要任何服务端配置。
+⛔ 这个站**不依赖任何托管平台**；⛔ 也不进任何公开代码仓。谁来放、放到哪台机器上，由站点的负责人决定。
 
-## 域名怎么指（xiao17.asia）
+## 域名
 
-★ **一律照 Vercel 界面给出的 DNS 指示配**：在 Vercel 项目的 **Settings → Domains** 里添加
-`xiao17.asia`，它会把该填的记录逐条列出来（根域一般是一条 **A 记录**指向 Vercel 给的地址；
-`www` 一般是一条 **CNAME** 指向 Vercel 给的名称 —— 以界面显示为准），照它填即可。
+域名指向我们自己的服务器 —— 那一步由站点的负责人自己做（改解析、加虚拟主机）。
 
-⛔ 我们**不在这里写任何 IP 地址**（这是公开仓库，写服务器地址等于对外广播）。
-域名的 DNS 由 Vercel 的界面说了算：它给什么，就填什么。
+⛔ 这份文件里**不写任何 IP 地址、不写服务器路径**：它随站点一起可能被外面看到，
+写进去等于对外广播内部信息。
 
 ## 文件的 sha256
 
-生成这一刻现算，你可以自己核一遍（Linux／macOS `shasum -a 256 文件名`；
-Windows PowerShell `Get-FileHash 文件名 -Algorithm SHA256`）：
+生成这一刻现算，你可以自己核一遍（用你系统自带的校验工具算一份 **SHA-256**，
+与下面每一个字符都比对）：
 
-    index.html    sha256 = 2527A0FAD0DC4DDE09153581FA9B3EA182460FB81FF6935D0F9A78881EF7047F     3558 字节
-    publish.html  sha256 = 6697C6376C2633870618535FF1DCA85195508E17F238DFF7F533630A648A2E99     200741 字节
-    vault.html    sha256 = 5F9C35353A8E1FEEF8F7A7B80D789B3DB8DA376C54EA3FC0CB73F8806BA65DBC     91040 字节
+    index.html                      sha256 = 2527A0FAD0DC4DDE09153581FA9B3EA182460FB81FF6935D0F9A78881EF7047F        3558 字节
+    publish.html                    sha256 = 30611B0B9C21A9929E5562414BDEC29E324A0E56D838902B492F57700FD6A804      226362 字节
+    vault.html                      sha256 = 110400A6417CAF2891315E8A9C98CCEE86B9DA4A7AB17C64ECE927F045B00423        2091 字节
+    stockbase/index.html            sha256 = AAF1A7901DB89208949CEB1B9031AE8B6C28A8DE1E6D7D4BCBC9ABC39F065972       47288 字节
+    stockbase/app.css               sha256 = 22EF9CDC011E3C2677C054D76D41F48810B237EE5EDC53678E05AB955573D448       12698 字节
+    stockbase/src/abi.js            sha256 = 7E2E428D1CFB84D993488647F4BD2F839D4A02EEA5C42D2D6098C2C5DC148520        7043 字节
+    stockbase/src/schema-inline.js  sha256 = 373510732ACEB3E49A4F9F28FAF30FEF11839543F79206D1B1B357B9A83E5AB3        3808 字节
 
 ⛔ 这张表**不列 README.md 自己**：文件里写自己的指纹就变成了自指（写进去，指纹就变了 ⇒ 那句话必假）。
-想核它自己，直接 `Get-FileHash README.md -Algorithm SHA256`（Linux／macOS 用 `shasum -a 256 README.md`）。
+想核它自己，用系统自带的校验工具对 `README.md` 算一份 **SHA-256** 即可（它的指纹不在上面那张表里）。
 
 ## 一句话边界
 
 这些页面对链上数据**只读**；交易由访问者在自己的钱包里**亲手签名**。
-页面本身不碰私钥、不签名、不广播；这个仓库里也没有任何对内页或内部配置。
+页面本身不碰私钥、不签名、不广播；这一批文件里也没有任何对内页或内部配置。
